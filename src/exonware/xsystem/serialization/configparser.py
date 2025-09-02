@@ -235,3 +235,34 @@ class ConfigParserSerializer(aSerialization):
             "interpolation": str(self._interpolation) if self._interpolation else None
         })
         return config
+
+
+# Module-level convenience functions for consistent API
+def dumps(data: Any, **kwargs: Any) -> str:
+    """Serialize data to ConfigParser string with default settings."""
+    serializer = ConfigParserSerializer(**kwargs)
+    return serializer.dumps(data)
+
+
+def loads(s: str, **kwargs: Any) -> Any:
+    """Deserialize ConfigParser string with default settings."""
+    serializer = ConfigParserSerializer(**kwargs)
+    return serializer.loads(s)
+
+
+def load_file(file_path: Union[str, Path], **kwargs: Any) -> Any:
+    """Load ConfigParser from file with default settings."""
+    serializer = ConfigParserSerializer(**kwargs)
+    return serializer.load_file(file_path)
+
+
+def save_file(data: Any, file_path: Union[str, Path], **kwargs: Any) -> None:
+    """Save data to ConfigParser file with default settings."""
+    serializer = ConfigParserSerializer(**kwargs)
+    return serializer.save_file(data, file_path)
+
+
+# Error classes for consistency with other serializers
+class ConfigParserError(Exception):
+    """Base exception for ConfigParser serialization errors."""
+    pass

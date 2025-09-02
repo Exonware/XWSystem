@@ -275,6 +275,43 @@ class CborSerializer(aSerialization):
         return config
 
 
+# Module-level convenience functions for consistent API
+def dumps(data: Any, **kwargs: Any) -> str:
+    """Serialize data to CBOR string (base64-encoded) with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.dumps(data)
+
+
+def loads(s: str, **kwargs: Any) -> Any:
+    """Deserialize CBOR string with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.loads(s)
+
+
+def dumps_bytes(data: Any, **kwargs: Any) -> bytes:
+    """Serialize data to CBOR bytes with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.dumps_binary(data)
+
+
+def loads_bytes(data: bytes, **kwargs: Any) -> Any:
+    """Deserialize CBOR bytes with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.loads_bytes(data)
+
+
+def load_file(file_path: Union[str, Path], **kwargs: Any) -> Any:
+    """Load CBOR from file with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.load_file(file_path)
+
+
+def save_file(data: Any, file_path: Union[str, Path], **kwargs: Any) -> None:
+    """Save data to CBOR file with default settings."""
+    serializer = CborSerializer(**kwargs)
+    return serializer.save_file(data, file_path)
+
+
 # Error classes for consistency with other serializers
 class CborError(Exception):
     """Base exception for CBOR serialization errors."""

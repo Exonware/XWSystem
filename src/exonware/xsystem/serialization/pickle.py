@@ -386,6 +386,43 @@ class PickleSerializer(aSerialization):
         return config
 
 
+# Module-level convenience functions for consistent API
+def dumps(data: Any, **kwargs: Any) -> str:
+    """Serialize data to Pickle string (base64-encoded) with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.dumps(data)
+
+
+def loads(s: str, **kwargs: Any) -> Any:
+    """Deserialize Pickle string with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.loads(s)
+
+
+def dumps_bytes(data: Any, **kwargs: Any) -> bytes:
+    """Serialize data to Pickle bytes with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.dumps_binary(data)
+
+
+def loads_bytes(data: bytes, **kwargs: Any) -> Any:
+    """Deserialize Pickle bytes with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.loads_bytes(data)
+
+
+def load_file(file_path: Union[str, Path], **kwargs: Any) -> Any:
+    """Load Pickle from file with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.load_file(file_path)
+
+
+def save_file(data: Any, file_path: Union[str, Path], **kwargs: Any) -> None:
+    """Save data to Pickle file with default settings."""
+    serializer = PickleSerializer(**kwargs)
+    return serializer.save_file(data, file_path)
+
+
 # Error classes for consistency with other serializers
 class PickleError(Exception):
     """Base exception for Pickle serialization errors."""

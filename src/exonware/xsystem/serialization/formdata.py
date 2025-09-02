@@ -390,6 +390,31 @@ class FormDataSerializer(aSerialization):
         return config
 
 
+# Module-level convenience functions for consistent API
+def dumps(data: Any, **kwargs: Any) -> str:
+    """Serialize data to FormData string with default settings."""
+    serializer = FormDataSerializer(**kwargs)
+    return serializer.dumps(data)
+
+
+def loads(s: str, **kwargs: Any) -> Any:
+    """Deserialize FormData string with default settings."""
+    serializer = FormDataSerializer(**kwargs)
+    return serializer.loads(s)
+
+
+def load_file(file_path: Union[str, Path], **kwargs: Any) -> Any:
+    """Load FormData from file with default settings."""
+    serializer = FormDataSerializer(**kwargs)
+    return serializer.load_file(file_path)
+
+
+def save_file(data: Any, file_path: Union[str, Path], **kwargs: Any) -> None:
+    """Save data to FormData file with default settings."""
+    serializer = FormDataSerializer(**kwargs)
+    return serializer.save_file(data, file_path)
+
+
 # Error classes for consistency with other serializers
 class FormDataError(Exception):
     """Base exception for FormData serialization errors."""
