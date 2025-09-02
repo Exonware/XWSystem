@@ -1297,4 +1297,6 @@ MIT License - see LICENSE file for details.
 
 **🚀 xSystem: Because life's too short for dependency hell.**
 
+---
+
 *Built with ❤️ by eXonware.com*

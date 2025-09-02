@@ -496,4 +496,6 @@ pip install exonware-xsystem
 
 **🏆 xSystem: Because life's too short for dependency hell.**
 
+---
+
 *Built with ❤️ by eXonware.com*
