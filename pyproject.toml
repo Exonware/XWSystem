@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "exonware-xsystem"
-version = "0.0.1.post1"
+version = "0.0.1"
 description = "Enterprise-grade Python framework with AI-powered performance optimization, 24 serialization formats, military-grade security, automatic memory leak prevention, circuit breakers, and production monitoring - replaces 50+ dependencies"
 readme = "README.md"
 requires-python = ">=3.8"
