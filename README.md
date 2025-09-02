@@ -461,4 +461,8 @@ pip install xlib-xsystem
 
 **🏆 xSystem: Because life's too short for dependency hell.**
 
+<<<<<<< HEAD
 *Built with ❤️ by eXonware.com*
+=======
+*Built with ❤️ by eXonware.com*
+>>>>>>> e37170bc07f5803634f375472722f63523aa064c
