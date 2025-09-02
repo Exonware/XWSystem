@@ -5,12 +5,32 @@ build-backend = "hatchling.build"
 [project]
 name = "exonware-xsystem"
 version = "0.0.2"
-description = "Enterprise-grade Python framework with AI-powered performance optimization, 17 serialization formats, military-grade security, automatic memory leak prevention, circuit breakers, and production monitoring - replaces 50+ dependencies"
+description = "Enterprise-grade Python framework with AI-powered performance optimization, 24 serialization formats, military-grade security, automatic memory leak prevention, circuit breakers, and production monitoring - replaces 50+ dependencies"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.8"
 keywords = [ "enterprise", "framework", "serialization", "security", "performance", "monitoring", "threading", "memory-management", "circuit-breaker", "object-pool", "crypto", "ai-optimization", "json", "yaml", "msgpack", "bson", "cbor", "exonware",]
-classifiers = [ "Development Status :: 4 - Beta", "Intended Audience :: Developers", "Intended Audience :: Information Technology", "Intended Audience :: System Administrators", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.13", "Topic :: Software Development :: Libraries :: Python Modules", "Topic :: System :: Systems Administration", "Topic :: Security :: Cryptography", "Topic :: Internet :: WWW/HTTP", "Topic :: Database", "Topic :: System :: Monitoring",]
-dependencies = []
+classifiers = [ "Development Status :: 4 - Beta", "Intended Audience :: Developers", "Intended Audience :: Information Technology", "Intended Audience :: System Administrators", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Topic :: Software Development :: Libraries :: Python Modules", "Topic :: System :: Systems Administration", "Topic :: Security :: Cryptography", "Topic :: Internet :: WWW/HTTP", "Topic :: Database", "Topic :: System :: Monitoring",]
+dependencies = [
+    # Core serialization dependencies (17 existing formats)
+    "PyYAML>=5.4.0",
+    "tomli-w>=1.0.0", 
+    "dicttoxml>=1.7.0",
+    "xmltodict>=0.12.0",
+    "defusedxml>=0.7.0",
+    "pymongo>=3.12.0",
+    "msgpack>=1.0.0",
+    "cbor2>=5.0.0",
+    
+    # NEW: Schema-based serialization dependencies (8 new formats)
+    "fastavro>=1.4.0",
+    "protobuf>=3.19.0", 
+    "thrift>=0.15.0",
+    "pyarrow>=8.0.0",
+    "pandas>=1.3.0",
+    "pyorc>=0.6.0",
+    "pycapnp>=1.1.0",
+    "flatbuffers>=2.0.0",
+]
 [[project.authors]]
 name = "Eng. Muhammad AlShehri"
 email = "connect@exonware.com"

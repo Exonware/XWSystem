@@ -1,6 +1,6 @@
 # xSystem Core Tests
 
-This directory contains unit tests for core xSystem functionality.
+This directory contains unit tests for core xSystem functionality, including comprehensive testing of all 24 serialization formats.
 
 ## Structure
 
@@ -71,12 +71,14 @@ The core tests cover:
 - ✅ Version information
 - ✅ Component availability
 - ✅ Examples module access
+- ✅ **24 Serialization Formats**: JSON, YAML, TOML, XML, CSV, ConfigParser, FormData, Multipart, BSON, MessagePack, CBOR, Pickle, Marshal, SQLite3, DBM, Shelve, Plistlib, Apache Avro, Protocol Buffers, Apache Thrift, Apache Parquet, Apache ORC, Cap'n Proto, FlatBuffers
 
 ## Requirements
 
-- Python 3.9+
+- Python 3.8+ (lowered for better compatibility with enterprise schema formats)
 - pytest
 - exonware.xsystem components
+- **🆕 All serialization dependencies**: fastavro, protobuf, thrift, pyarrow, pandas, pyorc, pycapnp (optional), flatbuffers
 
 ## Notes
 
@@ -87,4 +89,5 @@ For component-specific tests, see:
 - `../security_tests/` - Path validation
 - `../structures_tests/` - Circular detection
 - `../patterns_tests/` - Handler factory
-- `../threading_tests/` - Threading utilities 
+- `../threading_tests/` - Threading utilities
+- `../serialization_tests/` - 🆕 **All 24 Serialization Formats** (comprehensive testing) 

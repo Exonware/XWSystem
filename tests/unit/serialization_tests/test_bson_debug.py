@@ -7,9 +7,9 @@ import sys
 import os
 from pathlib import Path
 
-# Add xsystem to path
+# Add xsystem to path - adjusted for new location
 current_dir = Path(__file__).parent
-src_dir = current_dir.parent / 'src'
+src_dir = current_dir.parent.parent.parent.parent / 'src'
 sys.path.insert(0, str(src_dir))
 
 def debug_bson():
