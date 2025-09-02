@@ -17,7 +17,7 @@ if src_path not in sys.path:
 def config_module():
     """Provide config module for testing."""
     try:
-        from xlib.xsystem.config import logging
+        from exonware.xsystem.config import logging
         return logging
     except ImportError as e:
         pytest.skip(f"Config module import failed: {e}")

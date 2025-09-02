@@ -17,7 +17,7 @@ if src_path not in sys.path:
 def atomic_file_module():
     """Provide atomic_file module for testing."""
     try:
-        from xlib.xsystem.io.atomic_file import AtomicFileWriter
+        from exonware.xsystem.io.atomic_file import AtomicFileWriter
         return AtomicFileWriter
     except ImportError as e:
         pytest.skip(f"AtomicFileWriter import failed: {e}")

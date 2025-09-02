@@ -27,7 +27,7 @@ def run_config_tests():
     try:
         import coverage
         pytest_args.extend([
-            "--cov=xlib.xsystem.config",
+            "--cov=exonware.xsystem.config",
             "--cov-report=term-missing"
         ])
     except ImportError:

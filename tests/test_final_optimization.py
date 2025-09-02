@@ -51,7 +51,7 @@ def test_optimized_serializers():
             print(f"\n🔄 Testing {name}...")
             
             # Import serializer
-            module_obj = __import__(f"xlib.xsystem.serialization.{module}", fromlist=[class_name])
+            module_obj = __import__(f"exonware.xsystem.serialization.{module}", fromlist=[class_name])
             serializer_class = getattr(module_obj, class_name)
             
             # Create serializer with test-friendly settings

@@ -24,7 +24,9 @@ import pathlib, os, tempfile
 # ... and 15 more imports
 
 # Just do this:
-from xlib.xsystem import *
+from exonware.xsystem import *
+# Or more simple:
+from xsystem import *
 ```
 
 ## ⚡ **17 Serialization Formats in One Import**
@@ -65,7 +67,7 @@ with AtomicFileWriter("critical.json") as writer:
 
 ```python
 # ADAPTIVE PERFORMANCE ENGINE - This is mind-blowing!
-from xlib.xsystem import PerformanceModeManager, PerformanceMode
+from exonware.xsystem import PerformanceModeManager, PerformanceMode
 
 # AI-powered performance optimization
 manager = PerformanceModeManager(PerformanceMode.DUAL_ADAPTIVE)
@@ -163,7 +165,7 @@ class ConfigManager:
 
 ### **One Simple Install**
 ```bash
-pip install xlib-xsystem
+pip install exonware-xsystem
 ```
 
 *That's it! Everything included - no extras needed.*
@@ -272,7 +274,7 @@ pip install xlib-xsystem
 
 ### **30-Second Demo**
 ```python
-from xlib.xsystem import JsonSerializer, YamlSerializer, SecureHash
+from exonware.xsystem import JsonSerializer, YamlSerializer, SecureHash
 
 # Serialize data
 data = {"project": "awesome", "version": "1.0"}
@@ -289,7 +291,7 @@ password_hash = SecureHash.sha256("user_password")
 
 #### Core Utilities
 ```python
-from xlib.xsystem import (
+from exonware.xsystem import (
     ThreadSafeFactory, 
     PathValidator, 
     AtomicFileWriter, 
@@ -311,7 +313,7 @@ with AtomicFileWriter("important.json") as writer:
 
 #### **Serialization (17 Formats) - The Crown Jewel**
 ```python
-from xlib.xsystem import (
+from exonware.xsystem import (
     # Text formats (8 formats)
     JsonSerializer, YamlSerializer, TomlSerializer, XmlSerializer,
     CsvSerializer, ConfigParserSerializer, FormDataSerializer, MultipartSerializer,
@@ -441,7 +443,7 @@ isort src/ tests/
 ## 🚀 **Ready to Simplify Your Python Stack?**
 
 ```bash
-pip install xlib-xsystem
+pip install exonware-xsystem
 ```
 
 ### **Links**

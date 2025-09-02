@@ -117,7 +117,7 @@ The test suite provides comprehensive coverage for:
 ### For Core Tests
 1. Add test file to `tests/core/`
 2. Use `@pytest.mark.xsystem_core` marker
-3. Import from `xlib.xsystem`
+3. Import from `exonware.xsystem`
 
 ### For Unit Tests
 1. Add test file to appropriate subdirectory in `tests/unit/`

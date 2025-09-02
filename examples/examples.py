@@ -13,11 +13,11 @@ from pathlib import Path
 from typing import Any, Dict
 
 # Import xsystem utilities
-from ..src.xlib.xsystem.threading import ThreadSafeFactory
-from ..src.xlib.xsystem.security import PathValidator, PathSecurityError
-from ..src.xlib.xsystem.io import AtomicFileWriter
-from ..src.xlib.xsystem.structures import CircularReferenceDetector, CircularReferenceError
-from ..src.xlib.xsystem.patterns import GenericHandlerFactory
+from ..src.exonware.xsystem.threading import ThreadSafeFactory
+from ..src.exonware.xsystem.security import PathValidator, PathSecurityError
+from ..src.exonware.xsystem.io import AtomicFileWriter
+from ..src.exonware.xsystem.structures import CircularReferenceDetector, CircularReferenceError
+from ..src.exonware.xsystem.patterns import GenericHandlerFactory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -398,4 +398,4 @@ if __name__ == "__main__":
     demonstrate_error_handling()
     
     print("\n🎉 All xsystem utility examples completed successfully!")
-    print("📚 For more details, see: src/xlib/xsystem/README.md") 
+    print("📚 For more details, see: src/exonware/xsystem/README.md") 

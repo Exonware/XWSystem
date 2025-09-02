@@ -12,15 +12,15 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from xlib.xsystem.security.path_validator import PathValidator, PathSecurityError
-from xlib.xsystem.validation.data_validator import (
+from exonware.xsystem.security.path_validator import PathValidator, PathSecurityError
+from exonware.xsystem.validation.data_validator import (
     DataValidator,
     ValidationError,
     validate_path_input,
     check_data_depth,
     estimate_memory_usage,
 )
-from xlib.xsystem.validation.type_safety import (
+from exonware.xsystem.validation.type_safety import (
     SafeTypeValidator,
     GenericSecurityError,
     validate_untrusted_data,

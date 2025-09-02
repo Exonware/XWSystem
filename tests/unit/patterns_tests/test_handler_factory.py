@@ -13,7 +13,7 @@ if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
 try:
-    from xlib.xsystem.patterns.handler_factory import GenericHandlerFactory
+    from exonware.xsystem.patterns.handler_factory import GenericHandlerFactory
 except ImportError as e:
     pytest.skip(f"GenericHandlerFactory import failed: {e}", allow_module_level=True)
 

@@ -16,7 +16,7 @@ import warnings
 from pathlib import Path
 
 # Import all 17 serializers (12 core + 5 built-in Python modules)
-from xlib.xsystem import (
+from exonware.xsystem import (
     # Core 12 formats
     JsonSerializer, YamlSerializer, TomlSerializer, XmlSerializer,
     BsonSerializer, MsgPackSerializer, CborSerializer,

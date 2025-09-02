@@ -29,7 +29,7 @@ python -m pytest tests/packages/xsystem/unit/core_tests/ -v
 python -m pytest tests/packages/xsystem/unit/core_tests/test_xsystem_core.py -v
 
 # Run with coverage
-python -m pytest tests/packages/xsystem/unit/core_tests/ --cov=xlib.xsystem --cov-report=html
+python -m pytest tests/packages/xsystem/unit/core_tests/ --cov=exonware.xsystem --cov-report=html
 ```
 
 ### Method 2: Using runner
@@ -76,7 +76,7 @@ The core tests cover:
 
 - Python 3.9+
 - pytest
-- xlib.xsystem components
+- exonware.xsystem components
 
 ## Notes
 

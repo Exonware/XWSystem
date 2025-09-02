@@ -15,7 +15,7 @@ if src_path not in sys.path:
 def circular_detector_module():
     """Provide CircularReferenceDetector module for testing."""
     try:
-        from xlib.xsystem.structures.circular_detector import CircularReferenceDetector
+        from exonware.xsystem.structures.circular_detector import CircularReferenceDetector
         return CircularReferenceDetector
     except ImportError as e:
         pytest.skip(f"CircularReferenceDetector import failed: {e}")

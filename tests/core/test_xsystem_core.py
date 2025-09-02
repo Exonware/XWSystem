@@ -15,8 +15,8 @@ if src_path not in sys.path:
 
 # Import components being tested
 try:
-    import xlib.xsystem as xsystem
-    from xlib.xsystem import __version__
+    import exonware.xsystem as xsystem
+    from exonware.xsystem import __version__
 except ImportError as e:
     pytest.skip(f"xSystem import failed: {e}", allow_module_level=True)
 
@@ -26,8 +26,8 @@ class TestXSystemCore:
     
     def test_xsystem_import(self):
         """Test that xsystem can be imported successfully."""
-        import xlib.xsystem
-        assert xlib.xsystem is not None
+        import exonware.xsystem
+        assert exonware.xsystem is not None
     
     def test_xsystem_version(self):
         """Test that xsystem has a version string."""
@@ -38,17 +38,17 @@ class TestXSystemCore:
     def test_xsystem_module_structure(self):
         """Test that xsystem has expected module structure."""
         # Test that main components are accessible
-        import xlib.xsystem.io
-        import xlib.xsystem.security
-        import xlib.xsystem.structures
-        import xlib.xsystem.patterns
-        import xlib.xsystem.threading
+        import exonware.xsystem.io
+        import exonware.xsystem.security
+        import exonware.xsystem.structures
+        import exonware.xsystem.patterns
+        import exonware.xsystem.threading
         
-        assert xlib.xsystem.io is not None
-        assert xlib.xsystem.security is not None
-        assert xlib.xsystem.structures is not None
-        assert xlib.xsystem.patterns is not None
-        assert xlib.xsystem.threading is not None
+        assert exonware.xsystem.io is not None
+        assert exonware.xsystem.security is not None
+        assert exonware.xsystem.structures is not None
+        assert exonware.xsystem.patterns is not None
+        assert exonware.xsystem.threading is not None
 
 
 class TestXSystemUtilities:
@@ -64,7 +64,7 @@ class TestXSystemUtilities:
     def test_examples_available(self):
         """Test that examples module is available."""
         try:
-            from xlib.xsystem import examples
+            from exonware.xsystem import examples
             assert examples is not None
         except ImportError:
             pytest.skip("Examples module not available")

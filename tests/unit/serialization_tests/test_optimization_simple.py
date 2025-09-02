@@ -26,7 +26,7 @@ def test_optimized_serializers_basic():
     
     # Test XML (text format)
     try:
-        from xlib.xsystem.serialization.xml import XmlSerializer
+        from exonware.xsystem.serialization.xml import XmlSerializer
         xml_serializer = XmlSerializer()
         
         # Basic serialization
@@ -44,7 +44,7 @@ def test_optimized_serializers_basic():
     
     # Test JSON (text format)
     try:
-        from xlib.xsystem.serialization.json import JsonSerializer
+        from exonware.xsystem.serialization.json import JsonSerializer
         json_serializer = JsonSerializer()
         
         # Basic serialization
@@ -62,7 +62,7 @@ def test_optimized_serializers_basic():
     
     # Test BSON (binary format)
     try:
-        from xlib.xsystem.serialization.bson import BsonSerializer
+        from exonware.xsystem.serialization.bson import BsonSerializer
         bson_serializer = BsonSerializer()
         
         # Basic serialization
@@ -87,13 +87,13 @@ def test_inherited_file_operations():
     serializers = []
     
     try:
-        from xlib.xsystem.serialization.json import JsonSerializer
+        from exonware.xsystem.serialization.json import JsonSerializer
         serializers.append(("JSON", JsonSerializer(), ".json"))
     except ImportError:
         pass
     
     try:
-        from xlib.xsystem.serialization.xml import XmlSerializer
+        from exonware.xsystem.serialization.xml import XmlSerializer
         serializers.append(("XML", XmlSerializer(), ".xml"))
     except ImportError:
         pass

@@ -36,35 +36,35 @@ class TestCompleteOptimization:
         
         # JSON
         try:
-            from xlib.xsystem.serialization.json import JsonSerializer
+            from exonware.xsystem.serialization.json import JsonSerializer
             text_serializers.append(("JSON", JsonSerializer()))
         except ImportError:
             pass
         
         # XML
         try:
-            from xlib.xsystem.serialization.xml import XmlSerializer
+            from exonware.xsystem.serialization.xml import XmlSerializer
             text_serializers.append(("XML", XmlSerializer()))
         except ImportError:
             pass
         
         # YAML
         try:
-            from xlib.xsystem.serialization.yaml import YamlSerializer
+            from exonware.xsystem.serialization.yaml import YamlSerializer
             text_serializers.append(("YAML", YamlSerializer()))
         except ImportError:
             pass
         
         # TOML
         try:
-            from xlib.xsystem.serialization.toml import TomlSerializer
+            from exonware.xsystem.serialization.toml import TomlSerializer
             text_serializers.append(("TOML", TomlSerializer()))
         except ImportError:
             pass
         
         # CSV
         try:
-            from xlib.xsystem.serialization.csv import CsvSerializer
+            from exonware.xsystem.serialization.csv import CsvSerializer
             # CSV needs flat data - avoid nested lists that exceed depth 2
             csv_data = [{"test": "optimization_complete", "number": 100, "status": "active"}]
             text_serializers.append(("CSV", CsvSerializer(), csv_data))
@@ -73,7 +73,7 @@ class TestCompleteOptimization:
         
         # ConfigParser
         try:
-            from xlib.xsystem.serialization.configparser import ConfigParserSerializer
+            from exonware.xsystem.serialization.configparser import ConfigParserSerializer
             config_data = {"section1": test_data}  # ConfigParser needs sections
             text_serializers.append(("ConfigParser", ConfigParserSerializer(), config_data))
         except ImportError:
@@ -81,14 +81,14 @@ class TestCompleteOptimization:
         
         # FormData
         try:
-            from xlib.xsystem.serialization.formdata import FormDataSerializer
+            from exonware.xsystem.serialization.formdata import FormDataSerializer
             text_serializers.append(("FormData", FormDataSerializer()))
         except ImportError:
             pass
         
         # Multipart
         try:
-            from xlib.xsystem.serialization.multipart import MultipartSerializer
+            from exonware.xsystem.serialization.multipart import MultipartSerializer
             text_serializers.append(("Multipart", MultipartSerializer()))
         except ImportError:
             pass
@@ -119,42 +119,42 @@ class TestCompleteOptimization:
         
         # BSON
         try:
-            from xlib.xsystem.serialization.bson import BsonSerializer
+            from exonware.xsystem.serialization.bson import BsonSerializer
             binary_serializers.append(("BSON", BsonSerializer()))
         except ImportError:
             pass
         
         # MessagePack
         try:
-            from xlib.xsystem.serialization.msgpack import MsgPackSerializer
+            from exonware.xsystem.serialization.msgpack import MsgPackSerializer
             binary_serializers.append(("MessagePack", MsgPackSerializer()))
         except ImportError:
             pass
         
         # CBOR
         try:
-            from xlib.xsystem.serialization.cbor import CborSerializer
+            from exonware.xsystem.serialization.cbor import CborSerializer
             binary_serializers.append(("CBOR", CborSerializer()))
         except ImportError:
             pass
         
         # Pickle
         try:
-            from xlib.xsystem.serialization.pickle import PickleSerializer
+            from exonware.xsystem.serialization.pickle import PickleSerializer
             binary_serializers.append(("Pickle", PickleSerializer(allow_unsafe=True)))
         except ImportError:
             pass
         
         # Marshal
         try:
-            from xlib.xsystem.serialization.marshal import MarshalSerializer
+            from exonware.xsystem.serialization.marshal import MarshalSerializer
             binary_serializers.append(("Marshal", MarshalSerializer()))
         except ImportError:
             pass
         
         # Plistlib (Binary format)
         try:
-            from xlib.xsystem.serialization.plistlib import PlistlibSerializer
+            from exonware.xsystem.serialization.plistlib import PlistlibSerializer
             import plistlib
             binary_serializers.append(("Plistlib", PlistlibSerializer(fmt=plistlib.FMT_BINARY)))
         except ImportError:
@@ -162,7 +162,7 @@ class TestCompleteOptimization:
         
         # SQLite3
         try:
-            from xlib.xsystem.serialization.sqlite3 import Sqlite3Serializer
+            from exonware.xsystem.serialization.sqlite3 import Sqlite3Serializer
             sqlite_data = [test_data]  # SQLite needs list of dicts
             binary_serializers.append(("SQLite3", Sqlite3Serializer(), sqlite_data))
         except ImportError:
@@ -170,14 +170,14 @@ class TestCompleteOptimization:
         
         # DBM
         try:
-            from xlib.xsystem.serialization.dbm import DbmSerializer
+            from exonware.xsystem.serialization.dbm import DbmSerializer
             binary_serializers.append(("DBM", DbmSerializer()))
         except ImportError:
             pass
         
         # Shelve
         try:
-            from xlib.xsystem.serialization.shelve import ShelveSerializer
+            from exonware.xsystem.serialization.shelve import ShelveSerializer
             binary_serializers.append(("Shelve", ShelveSerializer(allow_unsafe=True)))
         except ImportError:
             pass
@@ -229,7 +229,7 @@ class TestCompleteOptimization:
         
         for name, module, class_name, ext, data in serializer_configs:
             try:
-                module_obj = __import__(f"xlib.xsystem.serialization.{module}", fromlist=[class_name])
+                module_obj = __import__(f"exonware.xsystem.serialization.{module}", fromlist=[class_name])
                 serializer_class = getattr(module_obj, class_name)
                 
                 # Special initialization for some serializers
@@ -300,7 +300,7 @@ class TestCompleteOptimization:
         
         for module_name, class_name in serializer_modules:
             try:
-                module_obj = __import__(f"xlib.xsystem.serialization.{module_name}", fromlist=[class_name])
+                module_obj = __import__(f"exonware.xsystem.serialization.{module_name}", fromlist=[class_name])
                 serializer_class = getattr(module_obj, class_name)
                 
                 # Special initialization

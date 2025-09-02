@@ -14,7 +14,7 @@ from pathlib import Path
 import threading
 import time
 
-from xlib.xsystem import (
+from exonware.xsystem import (
     ThreadSafeFactory, PathValidator, AtomicFileWriter, 
     CircularReferenceDetector, GenericHandlerFactory,
     setup_logging, get_logger

@@ -13,12 +13,12 @@ import tempfile
 import json
 from pathlib import Path
 
-from xlib.xsystem.security.path_validator import PathValidator, PathSecurityError
-from xlib.xsystem.security.crypto import SymmetricEncryption, SecureStorage
-from xlib.xsystem.io.atomic_file import AtomicFileWriter
-from xlib.xsystem.validation.data_validator import DataValidator
-from xlib.xsystem.serialization.jsonx import JsonSerializer
-from xlib.xsystem.monitoring.error_recovery import ErrorRecoveryManager
+from exonware.xsystem.security.path_validator import PathValidator, PathSecurityError
+from exonware.xsystem.security.crypto import SymmetricEncryption, SecureStorage
+from exonware.xsystem.io.atomic_file import AtomicFileWriter
+from exonware.xsystem.validation.data_validator import DataValidator
+from exonware.xsystem.serialization.jsonx import JsonSerializer
+from exonware.xsystem.monitoring.error_recovery import ErrorRecoveryManager
 
 
 @pytest.mark.xsystem_integration

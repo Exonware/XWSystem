@@ -15,7 +15,7 @@ if src_path not in sys.path:
 def handler_factory_module():
     """Provide GenericHandlerFactory module for testing."""
     try:
-        from xlib.xsystem.patterns.handler_factory import GenericHandlerFactory
+        from exonware.xsystem.patterns.handler_factory import GenericHandlerFactory
         return GenericHandlerFactory
     except ImportError as e:
         pytest.skip(f"GenericHandlerFactory import failed: {e}")

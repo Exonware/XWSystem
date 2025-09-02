@@ -34,7 +34,7 @@ def run_core_tests():
     try:
         import coverage
         pytest_args.extend([
-            "--cov=xlib.xsystem",
+            "--cov=exonware.xsystem",
             "--cov-report=term-missing"
         ])
     except ImportError:

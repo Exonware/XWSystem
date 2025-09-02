@@ -17,7 +17,7 @@ if src_path not in sys.path:
 def locks_module():
     """Provide locks module for testing."""
     try:
-        from xlib.xsystem.threading import locks
+        from exonware.xsystem.threading import locks
         return locks
     except ImportError as e:
         pytest.skip(f"Threading locks import failed: {e}")
@@ -26,7 +26,7 @@ def locks_module():
 def safe_factory_module():
     """Provide safe_factory module for testing."""
     try:
-        from xlib.xsystem.threading.safe_factory import SafeFactory
+        from exonware.xsystem.threading.safe_factory import SafeFactory
         return SafeFactory
     except ImportError as e:
         pytest.skip(f"SafeFactory import failed: {e}")

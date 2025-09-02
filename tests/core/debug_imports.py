@@ -30,19 +30,19 @@ def test_xsystem_imports():
     
     try:
         # Test main xsystem import
-        import xlib.xsystem
+        import exonware.xsystem
         print("✅ Main xsystem import successful")
         
         # Test version
-        print(f"✅ xSystem version: {xlib.xsystem.__version__}")
+        print(f"✅ xSystem version: {exonware.xsystem.__version__}")
         
         # Test submodule imports
         components = [
-            ("xlib.xsystem.io", "IO utilities"),
-            ("xlib.xsystem.security", "Security utilities"),
-            ("xlib.xsystem.structures", "Structure utilities"),
-            ("xlib.xsystem.patterns", "Pattern utilities"),
-            ("xlib.xsystem.threading", "Threading utilities")
+            ("exonware.xsystem.io", "IO utilities"),
+            ("exonware.xsystem.security", "Security utilities"),
+            ("exonware.xsystem.structures", "Structure utilities"),
+            ("exonware.xsystem.patterns", "Pattern utilities"),
+            ("exonware.xsystem.threading", "Threading utilities")
         ]
         
         for module_name, description in components:
@@ -64,10 +64,10 @@ def test_specific_components():
     print("\n=== Component-Specific Tests ===")
     
     tests = [
-        ("atomic_file", "xlib.xsystem.io.atomic_file", "AtomicFileWriter"),
-        ("path_validator", "xlib.xsystem.security.path_validator", "PathValidator"),
-        ("circular_detector", "xlib.xsystem.structures.circular_detector", "CircularReferenceDetector"),
-        ("handler_factory", "xlib.xsystem.patterns.handler_factory", "GenericHandlerFactory")
+        ("atomic_file", "exonware.xsystem.io.atomic_file", "AtomicFileWriter"),
+        ("path_validator", "exonware.xsystem.security.path_validator", "PathValidator"),
+        ("circular_detector", "exonware.xsystem.structures.circular_detector", "CircularReferenceDetector"),
+        ("handler_factory", "exonware.xsystem.patterns.handler_factory", "GenericHandlerFactory")
     ]
     
     success_count = 0
@@ -88,7 +88,7 @@ def test_examples():
     print("\n=== Examples Test ===")
     
     try:
-        from xlib.xsystem import examples
+        from exonware.xsystem import examples
         print("✅ Examples module available")
         
         # Test if examples has demo functions

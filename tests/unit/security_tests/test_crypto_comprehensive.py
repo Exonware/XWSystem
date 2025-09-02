@@ -12,7 +12,7 @@ import pytest
 import secrets
 from pathlib import Path
 
-from xlib.xsystem.security.crypto import (
+from exonware.xsystem.security.crypto import (
     AsymmetricEncryption,
     CryptoError,
     SecureHash,

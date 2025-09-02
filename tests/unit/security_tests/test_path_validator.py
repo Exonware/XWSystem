@@ -16,7 +16,7 @@ if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
 try:
-    from xlib.xsystem.security.path_validator import PathValidator, PathSecurityError
+    from exonware.xsystem.security.path_validator import PathValidator, PathSecurityError
 except ImportError as e:
     pytest.skip(f"PathValidator import failed: {e}", allow_module_level=True)
 

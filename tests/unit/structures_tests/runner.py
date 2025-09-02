@@ -13,7 +13,7 @@ def run_tests(verbose=True, coverage=False):
     if verbose:
         cmd.append("-v")
     if coverage:
-        cmd.extend(["--cov=xlib.xsystem.structures", "--cov-report=term-missing"])
+        cmd.extend(["--cov=exonware.xsystem.structures", "--cov-report=term-missing"])
     
     print(f"Running: {' '.join(cmd)}")
     result = subprocess.run(cmd)

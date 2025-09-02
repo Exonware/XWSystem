@@ -5,7 +5,7 @@ Email: connect@exonware.com
 Version: 0.0.1
 Generation Date: August 31, 2025
 
-Tests for xlib.xsystem core utilities.
+Tests for exonware.xsystem core utilities.
 """
 
 import pytest
@@ -13,7 +13,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from xlib.xsystem import (
+from exonware.xsystem import (
     ThreadSafeFactory,
     PathValidator,
     PathSecurityError,

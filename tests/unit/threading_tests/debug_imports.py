@@ -17,7 +17,7 @@ print()
 # Navigate to the correct xsystem location - need to go to project root first
 # From tests/packages/xsystem/unit/threading_tests -> project root
 project_root = Path(__file__).parent.parent.parent.parent.parent.parent
-xsystem_path = project_root / "src" / "xlib" / "xsystem"
+xsystem_path = project_root / "src" / "exonware" / "xsystem"
 print(f"Project root: {project_root}")
 print(f"xSystem path: {xsystem_path}")
 print(f"xSystem path exists: {xsystem_path.exists()}")

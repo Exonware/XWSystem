@@ -13,7 +13,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from xlib.xsystem.security import PathValidator, PathSecurityError, ResourceLimiter
+from exonware.xsystem.security import PathValidator, PathSecurityError, ResourceLimiter
 
 
 @pytest.mark.xsystem_security

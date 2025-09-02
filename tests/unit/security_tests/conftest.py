@@ -15,7 +15,7 @@ if src_path not in sys.path:
 def path_validator_module():
     """Provide PathValidator module for testing."""
     try:
-        from xlib.xsystem.security.path_validator import PathValidator
+        from exonware.xsystem.security.path_validator import PathValidator
         return PathValidator
     except ImportError as e:
         pytest.skip(f"PathValidator import failed: {e}")

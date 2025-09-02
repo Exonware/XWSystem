@@ -33,8 +33,8 @@ def run_performance_tests():
     try:
         import coverage
         pytest_args.extend([
-            "--cov=xlib.xsystem.threading",
-            "--cov=xlib.xsystem.performance",
+            "--cov=exonware.xsystem.threading",
+            "--cov=exonware.xsystem.performance",
             "--cov-report=term-missing"
         ])
     except ImportError:

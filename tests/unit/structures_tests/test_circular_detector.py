@@ -13,7 +13,7 @@ if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
 try:
-    from xlib.xsystem.structures.circular_detector import CircularReferenceDetector
+    from exonware.xsystem.structures.circular_detector import CircularReferenceDetector
 except ImportError as e:
     pytest.skip(f"CircularReferenceDetector import failed: {e}", allow_module_level=True)
 

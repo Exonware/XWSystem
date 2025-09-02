@@ -17,7 +17,7 @@ if src_path not in sys.path:
 
 # Import components being tested
 try:
-    from xlib.xsystem.io.atomic_file import AtomicFileWriter, atomic_write, safe_write_text, safe_write_bytes
+    from exonware.xsystem.io.atomic_file import AtomicFileWriter, atomic_write, safe_write_text, safe_write_bytes
 except ImportError as e:
     pytest.skip(f"AtomicFileWriter import failed: {e}", allow_module_level=True)
 

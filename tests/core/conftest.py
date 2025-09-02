@@ -15,7 +15,7 @@ if src_path not in sys.path:
 def xsystem_module():
     """Provide xsystem module for testing."""
     try:
-        import xlib.xsystem as xsystem
+        import exonware.xsystem as xsystem
         return xsystem
     except ImportError as e:
         pytest.skip(f"xSystem module import failed: {e}")

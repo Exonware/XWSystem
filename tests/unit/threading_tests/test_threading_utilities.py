@@ -12,7 +12,7 @@ from unittest.mock import Mock
 # Import the actual xsystem threading utilities
 # Navigate to the correct xsystem location - avoid module name conflicts
 project_root = Path(__file__).parent.parent.parent.parent.parent.parent
-xsystem_path = project_root / "src" / "xlib" / "xsystem"
+xsystem_path = project_root / "src" / "exonware" / "xsystem"
 
 # Import directly from file paths to avoid threading module name conflict
 try:
