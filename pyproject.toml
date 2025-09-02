@@ -33,6 +33,12 @@ dependencies = [
     
     # Performance monitoring and system utilities
     "psutil>=5.8.0",
+    
+    # HTTP client and networking
+    "httpx>=0.24.0",
+    
+    # Cryptographic operations and security
+    "cryptography>=3.4.0",
 ]
 [[project.authors]]
 name = "Eng. Muhammad AlShehri"
