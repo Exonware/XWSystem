@@ -157,3 +157,28 @@ class XmlSerializer(aSerialization):
 class XmlError(Exception):
     """Base exception for XML serialization errors."""
     pass
+
+
+# Module-level convenience functions for consistent API
+def dumps(data: Any, **kwargs: Any) -> str:
+    """Serialize data to XML string with default settings."""
+    serializer = XmlSerializer(**kwargs)
+    return serializer.dumps(data)
+
+
+def loads(s: str, **kwargs: Any) -> Any:
+    """Deserialize XML string with default settings."""
+    serializer = XmlSerializer(**kwargs)
+    return serializer.loads(s)
+
+
+def load_file(file_path: Union[str, Path], **kwargs: Any) -> Any:
+    """Load XML from file with default settings."""
+    serializer = XmlSerializer(**kwargs)
+    return serializer.load_file(file_path)
+
+
+def save_file(data: Any, file_path: Union[str, Path], **kwargs: Any) -> None:
+    """Save data to XML file with default settings."""
+    serializer = XmlSerializer(**kwargs)
+    return serializer.save_file(data, file_path)
