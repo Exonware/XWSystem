@@ -176,6 +176,44 @@ class JsonSerializer(aSerialization):
         except Exception as e:
             self._handle_serialization_error("deserialization", e)
 
+    def dumps_binary(self, data: Any) -> bytes:
+        """
+        Serialize data to JSON bytes.
+
+        Args:
+            data: Data to serialize
+
+        Returns:
+            JSON bytes
+
+        Raises:
+            JsonError: If serialization fails
+        """
+        try:
+            text_result = self.dumps_text(data)
+            return text_result.encode('utf-8')
+        except Exception as e:
+            self._handle_serialization_error("binary serialization", e)
+
+    def loads_bytes(self, data: bytes) -> Any:
+        """
+        Deserialize JSON bytes to Python object.
+
+        Args:
+            data: JSON bytes to deserialize
+
+        Returns:
+            Deserialized Python object
+
+        Raises:
+            JsonError: If deserialization fails
+        """
+        try:
+            text_data = data.decode('utf-8')
+            return self.loads_text(text_data)
+        except Exception as e:
+            self._handle_serialization_error("binary deserialization", e)
+
 
 # Convenience functions for common use cases
 def dumps(data: Any, **kwargs: Any) -> str:

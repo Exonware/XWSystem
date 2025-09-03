@@ -13,7 +13,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from exonware.xsystem.security import PathValidator, PathSecurityError, ResourceLimiter
+from exonware.xsystem.security import PathValidator, PathSecurityError, ResourceLimits
 
 
 @pytest.mark.xsystem_security
@@ -55,25 +55,25 @@ class TestPathValidatorEdgeCases:
 
 
 @pytest.mark.xsystem_security
-class TestResourceLimiterEdgeCases:
+class TestResourceLimitsEdgeCases:
     """Test edge cases for resource limiting."""
     
     def test_memory_bomb_protection(self):
         """Test protection against memory bombs."""
-        limiter = ResourceLimiter(max_memory_mb=100)
+        limiter = ResourceLimits(max_depth=10, max_resources=100)
         
         # This should be caught by resource limiting
         with pytest.raises(Exception):
-            limiter.check_memory_usage()
+            limiter.check_depth(15)  # Exceeds max_depth
     
     def test_concurrent_resource_exhaustion(self):
         """Test concurrent resource exhaustion attempts."""
-        limiter = ResourceLimiter(max_concurrent_operations=5)
+        limiter = ResourceLimits(max_resources=5)
         
         # Simulate many concurrent operations
         for i in range(10):
             try:
-                limiter.acquire_operation_slot()
+                limiter.increment_resource_count()
             except Exception:
                 # Expected to fail after 5 operations
                 break
@@ -86,7 +86,7 @@ class TestSecurityIntegration:
     def test_combined_path_and_resource_validation(self):
         """Test combined path and resource validation."""
         validator = PathValidator()
-        limiter = ResourceLimiter()
+        limiter = ResourceLimits()
         
         with tempfile.TemporaryDirectory() as tmpdir:
             safe_path = Path(tmpdir) / "safe_file.txt"

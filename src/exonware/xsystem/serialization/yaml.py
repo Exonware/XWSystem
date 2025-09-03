@@ -235,6 +235,44 @@ class YamlSerializer(aSerialization):
         except Exception as e:
             self._handle_serialization_error("deserialization", e)
 
+    def dumps_binary(self, data: Any) -> bytes:
+        """
+        Serialize data to YAML bytes.
+
+        Args:
+            data: Data to serialize
+
+        Returns:
+            YAML bytes
+
+        Raises:
+            YamlError: If serialization fails
+        """
+        try:
+            text_result = self.dumps_text(data)
+            return text_result.encode('utf-8')
+        except Exception as e:
+            self._handle_serialization_error("binary serialization", e)
+
+    def loads_bytes(self, data: bytes) -> Any:
+        """
+        Deserialize YAML bytes to Python object.
+
+        Args:
+            data: YAML bytes to deserialize
+
+        Returns:
+            Deserialized Python object
+
+        Raises:
+            YamlError: If deserialization fails
+        """
+        try:
+            text_data = data.decode('utf-8')
+            return self.loads_text(text_data)
+        except Exception as e:
+            self._handle_serialization_error("binary deserialization", e)
+
 
 
 
