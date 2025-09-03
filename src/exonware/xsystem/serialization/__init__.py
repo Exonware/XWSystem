@@ -47,10 +47,21 @@ SCHEMA-BASED FORMATS (7):
 ✅ BENEFITS:
 - ONE import gets 24 serialization formats
 - Production-grade reliability (no custom parsers)
-- Consistent API across all formats
+- Consistent API across all formats (sync AND async)
 - Security validation & atomic file operations
 - Schema-based formats for enterprise applications
+- Unified async support with automatic fallbacks
+- Streaming and batch operations built-in
 - Minimizes dependencies in consuming projects
+
+🔄 ASYNC SUPPORT:
+Every serializer automatically supports async operations:
+- serializer.dumps_async() - async serialization
+- serializer.loads_async() - async deserialization  
+- serializer.save_file_async() - async file I/O with aiofiles
+- serializer.load_file_async() - async file loading
+- serializer.serialize_batch() - concurrent batch operations
+- serializer.stream_serialize() - async streaming support
 """
 
 from .iSerialization import iSerialization
@@ -86,6 +97,25 @@ from .orc import OrcSerializer, OrcError
 from .capnproto import CapnProtoSerializer, CapnProtoError
 from .flatbuffers import FlatBuffersSerializer, FlatBuffersError
 
+# Auto-detection and format intelligence
+from .format_detector import FormatDetector, detect_format, get_format_suggestions, is_binary_format
+from .auto_serializer import (
+    AutoSerializer, auto_serialize, auto_deserialize, 
+    auto_save_file, auto_load_file
+)
+
+# xSerialization - Self-transforming intelligent serializer
+from .xSerialization import (
+    xSerialization, create_auto_serializer,
+    dumps, loads, save_file, load_file
+)
+
+# Flyweight pattern for memory optimization
+from .flyweight import (
+    get_serializer, get_flyweight_stats, clear_serializer_cache, 
+    get_cache_info, create_serializer, SerializerPool
+)
+
 __all__ = [
     # Interface and base class
     "iSerialization",
@@ -118,4 +148,17 @@ __all__ = [
     "OrcSerializer", "OrcError",
     "CapnProtoSerializer", "CapnProtoError",
     "FlatBuffersSerializer", "FlatBuffersError",
+    
+    # Auto-detection and intelligence
+    "FormatDetector", "detect_format", "get_format_suggestions", "is_binary_format",
+    "AutoSerializer", "auto_serialize", "auto_deserialize", 
+    "auto_save_file", "auto_load_file",
+    
+    # xSerialization - Self-transforming intelligent serializer
+    "xSerialization", "create_auto_serializer",
+    "dumps", "loads", "save_file", "load_file",
+    
+    # Flyweight optimization
+    "get_serializer", "get_flyweight_stats", "clear_serializer_cache", 
+    "get_cache_info", "create_serializer", "SerializerPool",
 ]

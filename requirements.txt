@@ -32,6 +32,9 @@ pymongo>=3.12.0                  # BSON support (MongoDB binary format)
 msgpack>=1.0.0                   # MessagePack - compact binary (47% smaller than JSON)
 cbor2>=5.0.0                     # CBOR - RFC 8949 binary standard
 
+# Security and Cryptography
+bcrypt>=4.0.0                    # Secure password hashing (replaces insecure SHA-256)
+
 # =============================================================================
 # NEW: SCHEMA-BASED ENTERPRISE FORMATS (7 new formats)
 # =============================================================================

@@ -21,15 +21,13 @@ dependencies = [
     "msgpack>=1.0.0",
     "cbor2>=5.0.0",
     
-    # NEW: Schema-based serialization dependencies (8 new formats)
+    # NEW: Schema-based serialization dependencies (stable enterprise formats)
     "fastavro>=1.4.0",
     "protobuf>=3.19.0", 
-    "thrift>=0.15.0",
     "pyarrow>=8.0.0",
     "pandas>=1.3.0",
-    "pyorc>=0.6.0",
-    "pycapnp>=1.1.0",
     "flatbuffers>=2.0.0",
+    # Note: pycapnp, thrift, pyorc moved to optional dependencies due to build complexity
     
     # Performance monitoring and system utilities
     "psutil>=5.8.0",
@@ -39,6 +37,13 @@ dependencies = [
     
     # Cryptographic operations and security
     "cryptography>=3.4.0",
+    "bcrypt>=4.0.0",
+    
+    # Async I/O operations
+    "aiofiles>=0.8.0",
+    
+    # Type checking support
+    "typing-extensions>=4.0.0",
 ]
 [[project.authors]]
 name = "Eng. Muhammad AlShehri"
@@ -58,7 +63,14 @@ msgpack = [ "msgpack>=1.0.0",]
 cbor = [ "cbor2>=5.0.0",]
 http = [ "httpx>=0.24.0",]
 crypto = [ "cryptography>=41.0.0",]
-all = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "cryptography>=41.0.0", "importlib-metadata>=6.0.0; python_version<'3.8'",]
+# Enterprise serialization formats (optional for maximum compatibility)
+enterprise-advanced = [ "thrift>=0.15.0", "pyorc>=0.6.0",]
+enterprise-capnproto = [ "pycapnp>=1.1.0",]  # Separate due to complex build requirements
+enterprise = [ "fastavro>=1.4.0", "protobuf>=3.19.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "flatbuffers>=2.0.0",]
+# Complete installation with all stable formats
+complete = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "flatbuffers>=2.0.0",]
+# Maximum completeness (includes complex build dependencies)
+all = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "thrift>=0.15.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "pyorc>=0.6.0", "pycapnp>=1.1.0", "flatbuffers>=2.0.0",]
 
 [project.urls]
 Homepage = "https://exonware.com"

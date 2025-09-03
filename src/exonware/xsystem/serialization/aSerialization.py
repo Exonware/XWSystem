@@ -20,9 +20,13 @@ custom file handling, following the production library principle.
 """
 
 import sys
+import ast
+import types
+import logging
+import base64
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, Optional, TextIO, Union
+from typing import Any, AsyncIterator, BinaryIO, Dict, List, Optional, TextIO, Union, Set
 
 from .iSerialization import iSerialization
 from ..config.logging_setup import get_logger
@@ -47,6 +51,12 @@ class aSerialization(iSerialization, ABC):
     """
     Abstract base class providing common serialization functionality 
     with xSystem integration for security, validation, and file operations.
+    
+    🔄 ASYNC INTEGRATION:
+       All serializers automatically inherit async capabilities through the unified
+       iSerialization interface. Default async implementations delegate to sync
+       methods via asyncio.to_thread(). Override async methods for performance
+       when there's a real benefit (file I/O, streaming, network operations).
     
     🚨 IMPLEMENTATION REMINDER FOR ALL SERIALIZERS:
        DO NOT HARDCODE SERIALIZATION LOGIC - USE OFFICIAL LIBRARIES!
@@ -74,6 +84,9 @@ class aSerialization(iSerialization, ABC):
         base_path: Optional[Union[str, Path]] = None,
         text_encoding: str = 'utf-8',
         base64_encoding: str = 'ascii',
+        allow_unsafe: bool = False,
+        enable_sandboxing: bool = True,
+        trusted_types: Optional[Set[type]] = None,
     ) -> None:
         """
         Initialize abstract serialization with xSystem utilities.
@@ -87,14 +100,29 @@ class aSerialization(iSerialization, ABC):
             base_path: Base path for path validation (None for no restriction)
             text_encoding: Text encoding for file operations (default: utf-8 for Arabic/international support)
             base64_encoding: Encoding for base64 strings (default: ascii - standard for base64)
+            allow_unsafe: Allow unsafe operations without warnings (for binary formats)
+            enable_sandboxing: Enable sandboxing for untrusted data deserialization
+            trusted_types: Set of types considered safe for deserialization (None = use defaults)
         """
         self.validate_input = validate_input
         self.max_depth = max_depth
         self.max_size_mb = max_size_mb
         self.use_atomic_writes = use_atomic_writes
         self.validate_paths = validate_paths
+        self.allow_unsafe = allow_unsafe
         self.text_encoding = text_encoding
         self.base64_encoding = base64_encoding
+        self.enable_sandboxing = enable_sandboxing
+        
+        # Set up trusted types for sandboxing
+        self.trusted_types = trusted_types or {
+            # Basic safe types
+            str, int, float, bool, type(None),
+            # Collections
+            list, dict, tuple, set, frozenset,
+            # Common safe types
+            bytes, bytearray,
+        }
 
         # Initialize xSystem components
         if validate_input:
@@ -117,9 +145,27 @@ class aSerialization(iSerialization, ABC):
             'base_path': str(base_path) if base_path else None,
             'text_encoding': text_encoding,
             'base64_encoding': base64_encoding,
+            'enable_sandboxing': enable_sandboxing,
+            'trusted_types': [t.__name__ for t in self.trusted_types],
         }
 
         logger.debug(f"Initialized {self.format_name} serializer with validation: {validate_input}")
+
+    def _is_risky_format(self) -> bool:
+        """Check if this format is considered risky for security."""
+        risky_formats = {'Pickle', 'Marshal', 'CBOR', 'BSON', 'MessagePack'}
+        return self.format_name in risky_formats
+
+    def _issue_security_warning_if_needed(self, operation: str = "deserialization") -> None:
+        """Issue security warning for risky formats if not explicitly allowed."""
+        if not self.allow_unsafe and self._is_risky_format():
+            import warnings
+            warnings.warn(
+                f"{self.format_name} {operation} can be unsafe with untrusted data. "
+                f"Ensure data comes from a trusted source or set allow_unsafe=True to suppress this warning.",
+                UserWarning,
+                stacklevel=3
+            )
 
     # =============================================================================
     # VALIDATION AND SECURITY METHODS
@@ -142,7 +188,8 @@ class aSerialization(iSerialization, ABC):
             # Validate structure depth and safety
             self._data_validator.validate_data_structure(data)
             
-            logger.debug(f"Data validation passed for {self.format_name}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Data validation passed for {self.format_name}")
 
         except ValidationError as e:
             raise SerializationError(
@@ -156,6 +203,131 @@ class aSerialization(iSerialization, ABC):
                 format_name=self.format_name,
                 original_error=e
             ) from e
+
+    def _validate_deserialized_data_sandbox(self, data: Any, source: str = "unknown") -> None:
+        """
+        Validate deserialized data in a sandbox to prevent malicious code execution.
+        
+        This method checks for potentially dangerous objects, functions, modules,
+        and other constructs that could be used for code execution attacks.
+        
+        Args:
+            data: Deserialized data to validate
+            source: Source of the data (for logging)
+            
+        Raises:
+            SerializationError: If dangerous content is detected
+        """
+        if not self.enable_sandboxing:
+            return
+            
+        try:
+            self._recursive_sandbox_check(data, set(), 0)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Sandbox validation passed for {self.format_name} data from {source}")
+        except Exception as e:
+            raise SerializationError(
+                f"Sandbox validation failed for {self.format_name} data: {e}",
+                format_name=self.format_name,
+                original_error=e
+            ) from e
+    
+    def _recursive_sandbox_check(self, obj: Any, visited: Set[int], depth: int) -> None:
+        """
+        Recursively check object for dangerous content.
+        
+        Args:
+            obj: Object to check
+            visited: Set of already visited object IDs (cycle detection)
+            depth: Current recursion depth
+            
+        Raises:
+            SerializationError: If dangerous content is detected
+        """
+        # Prevent infinite recursion and cycles
+        if depth > self.max_depth:
+            raise SerializationError(f"Sandbox check exceeded max depth {self.max_depth}")
+        
+        obj_id = id(obj)
+        if obj_id in visited:
+            return  # Already checked
+        visited.add(obj_id)
+        
+        # Check object type
+        obj_type = type(obj)
+        
+        # Allow trusted types
+        if obj_type in self.trusted_types:
+            # For collections, recursively check contents
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    self._recursive_sandbox_check(key, visited, depth + 1)
+                    self._recursive_sandbox_check(value, visited, depth + 1)
+            elif isinstance(obj, (list, tuple, set, frozenset)):
+                for item in obj:
+                    self._recursive_sandbox_check(item, visited, depth + 1)
+            return
+        
+        # Check for dangerous types
+        dangerous_types = {
+            types.FunctionType, types.MethodType, types.LambdaType,
+            types.GeneratorType, types.CoroutineType,
+            types.ModuleType, types.CodeType, types.FrameType,
+            type, type(type), type(lambda: None),
+        }
+        
+        if obj_type in dangerous_types:
+            raise SerializationError(
+                f"Dangerous type detected: {obj_type.__name__}. "
+                f"This could indicate a code injection attempt."
+            )
+        
+        # Check for dangerous attributes
+        dangerous_attrs = {
+            '__code__', '__func__', '__globals__', '__closure__',
+            '__dict__', '__class__', '__bases__', '__mro__',
+            '__subclasshook__', '__import__', 'eval', 'exec',
+            '__builtins__', '__loader__', '__package__'
+        }
+        
+        if hasattr(obj, '__dict__'):
+            obj_dict = getattr(obj, '__dict__', {})
+            for attr_name in dangerous_attrs:
+                if attr_name in obj_dict:
+                    raise SerializationError(
+                        f"Dangerous attribute detected: {attr_name}. "
+                        f"This could indicate a code injection attempt."
+                    )
+        
+        # Check for objects with dangerous methods
+        if hasattr(obj, '__reduce__') or hasattr(obj, '__reduce_ex__'):
+            # These methods are used by pickle and can be exploited
+            if not self.allow_unsafe:
+                raise SerializationError(
+                    f"Object with __reduce__ method detected: {obj_type.__name__}. "
+                    f"This could be used for code execution attacks."
+                )
+        
+        # Check string content for potential code injection
+        if isinstance(obj, str):
+            suspicious_patterns = [
+                'import ', '__import__', 'eval(', 'exec(',
+                'subprocess', 'os.system', 'os.popen',
+                '__builtins__', 'globals()', 'locals()',
+                'compile(', 'memoryview', 'bytearray'
+            ]
+            obj_lower = obj.lower()
+            for pattern in suspicious_patterns:
+                if pattern in obj_lower:
+                    logger.warning(f"Suspicious string pattern detected: {pattern}")
+                    # Don't fail for strings, just log warning
+                    break
+        
+        # For unknown types, check if they have safe attributes only
+        if hasattr(obj, '__dict__'):
+            for attr_name, attr_value in getattr(obj, '__dict__', {}).items():
+                if not attr_name.startswith('_'):  # Skip private attributes
+                    self._recursive_sandbox_check(attr_value, visited, depth + 1)
 
     def _validate_file_path(self, file_path: Union[str, Path]) -> Path:
         """Validate file path using xSystem path validator."""
@@ -269,82 +441,72 @@ class aSerialization(iSerialization, ABC):
 
     def loads(self, data: Union[str, bytes]) -> Any:
         """
-        Deserialize from string or bytes.
+        Deserialize from string or bytes with automatic sandboxing.
         
         Automatically handles both text and binary data based on input type
-        and format capabilities.
+        and format capabilities. Applies sandboxing validation to prevent
+        code injection attacks.
         """
+        # Perform deserialization
         if isinstance(data, bytes):
-            return self.loads_bytes(data)
+            result = self.loads_bytes(data)
         else:
-            return self.loads_text(data)
+            result = self.loads_text(data)
+        
+        # Apply sandboxing validation to the result
+        self._validate_deserialized_data_sandbox(result, "loads")
+        
+        return result
 
     # Text format fallback for binary formats that support base64
     def _convert_binary_to_text(self, binary_data: bytes) -> str:
         """Convert binary data to base64 text for text-based interfaces."""
-        import base64
         return base64.b64encode(binary_data).decode(self.base64_encoding)
 
     def _convert_text_to_binary(self, text_data: str) -> bytes:
         """Convert base64 text back to binary data."""
-        import base64
         return base64.b64decode(text_data.encode(self.base64_encoding))
 
     # Default implementations that delegate appropriately
+    @abstractmethod
     def dumps_text(self, data: Any) -> str:
         """
-        Default implementation for text serialization.
+        Abstract method for text serialization.
         
-        Binary formats should override this to provide base64 encoding
-        or raise NotImplementedError if not supported.
+        All text formats must implement this method.
+        Binary formats can optionally implement this for base64 support.
         """
-        if self.is_binary_format:
-            # For binary formats, serialize to bytes then convert to base64
-            binary_data = self.dumps_binary(data)
-            return self._convert_binary_to_text(binary_data)
-        else:
-            # Text formats must implement this directly
-            raise NotImplementedError(f"{self.format_name} must implement dumps_text()")
+        pass
 
+    @abstractmethod
     def dumps_binary(self, data: Any) -> bytes:
         """
-        Default implementation for binary serialization.
+        Abstract method for binary serialization.
         
-        Text formats should raise NotImplementedError.
-        Binary formats must implement this directly.
+        All binary formats must implement this method.
+        Text formats should raise NotImplementedError if called.
         """
-        if not self.is_binary_format:
-            raise NotImplementedError(f"{self.format_name} is a text format and doesn't support binary serialization")
-        else:
-            # Binary formats must implement this directly
-            raise NotImplementedError(f"{self.format_name} must implement dumps_binary()")
+        pass
 
+    @abstractmethod
     def loads_text(self, data: str) -> Any:
         """
-        Default implementation for text deserialization.
+        Abstract method for text deserialization.
         
-        All formats should support this (binary formats via base64).
+        All text formats must implement this method.
+        Binary formats can optionally implement this for base64 support.
         """
-        if self.is_binary_format:
-            # For binary formats, convert base64 text to bytes then deserialize
-            binary_data = self._convert_text_to_binary(data)
-            return self.loads_bytes(binary_data)
-        else:
-            # Text formats must implement this directly
-            raise NotImplementedError(f"{self.format_name} must implement loads_text()")
+        pass
 
+    @abstractmethod
     def loads_bytes(self, data: bytes) -> Any:
         """
-        Default implementation for binary deserialization.
+        Abstract method for binary deserialization.
         
-        Text formats should raise NotImplementedError.
-        Binary formats must implement this directly.
+        All binary formats must implement this method.
+        Text formats should raise NotImplementedError if called.
         """
-        if not self.is_binary_format:
-            raise NotImplementedError(f"{self.format_name} is a text format and doesn't support binary deserialization")
-        else:
-            # Binary formats must implement this directly
-            raise NotImplementedError(f"{self.format_name} must implement loads_bytes()")
+        pass
 
     # =============================================================================
     # SMART DELEGATION - FILE-LIKE OBJECT METHODS
@@ -515,6 +677,9 @@ class aSerialization(iSerialization, ABC):
         Raises:
             SerializationError: If loading fails
         """
+        # Issue security warning for risky formats
+        self._issue_security_warning_if_needed("file deserialization")
+        
         try:
             # Validate and resolve path
             validated_path = self._validate_file_path(file_path)
@@ -537,6 +702,9 @@ class aSerialization(iSerialization, ABC):
             # Validate loaded data if configured
             if self.validate_input:
                 self._validate_data_security(data)
+            
+            # Apply sandboxing validation to prevent code injection
+            self._validate_deserialized_data_sandbox(data, f"file:{validated_path}")
             
             logger.info(f"Successfully loaded {self.format_name} data from {validated_path}")
             return data
@@ -679,6 +847,169 @@ class aSerialization(iSerialization, ABC):
             Current configuration dictionary
         """
         return self.get_configuration()
+
+    # =============================================================================
+    # ASYNC IMPLEMENTATIONS - Default implementations using asyncio.to_thread
+    # =============================================================================
+
+    async def dumps_async(self, data: Any) -> Union[str, bytes]:
+        """
+        Async version of dumps() - delegates to sync version via asyncio.to_thread.
+        Override in specific serializers for native async implementation when beneficial.
+        """
+        import asyncio
+        return await asyncio.to_thread(self.dumps, data)
+
+    async def dumps_text_async(self, data: Any) -> str:
+        """Async version of dumps_text()."""
+        import asyncio
+        return await asyncio.to_thread(self.dumps_text, data)
+
+    async def dumps_binary_async(self, data: Any) -> bytes:
+        """Async version of dumps_binary()."""
+        import asyncio
+        return await asyncio.to_thread(self.dumps_binary, data)
+
+    async def loads_async(self, data: Union[str, bytes]) -> Any:
+        """Async version of loads()."""
+        import asyncio
+        return await asyncio.to_thread(self.loads, data)
+
+    async def loads_text_async(self, data: str) -> Any:
+        """Async version of loads_text()."""
+        import asyncio
+        return await asyncio.to_thread(self.loads_text, data)
+
+    async def loads_bytes_async(self, data: bytes) -> Any:
+        """Async version of loads_bytes()."""
+        import asyncio
+        return await asyncio.to_thread(self.loads_bytes, data)
+
+    async def save_file_async(self, data: Any, file_path: Union[str, Path]) -> None:
+        """
+        Async file save with aiofiles when available, fallback to thread.
+        """
+        try:
+            import aiofiles
+            
+            # Serialize data first
+            serialized_data = await self.dumps_async(data)
+            
+            # Determine mode based on format type
+            mode = 'wb' if self.is_binary_format else 'w'
+            encoding = None if self.is_binary_format else self.text_encoding
+            
+            async with aiofiles.open(file_path, mode, encoding=encoding) as f:
+                await f.write(serialized_data)
+                
+        except ImportError:
+            # Fallback to sync version in thread
+            import asyncio
+            await asyncio.to_thread(self.save_file, data, file_path)
+
+    async def load_file_async(self, file_path: Union[str, Path]) -> Any:
+        """
+        Async file load with aiofiles when available, fallback to thread.
+        """
+        try:
+            import aiofiles
+            
+            # Determine mode based on format type
+            mode = 'rb' if self.is_binary_format else 'r'
+            encoding = None if self.is_binary_format else self.text_encoding
+            
+            async with aiofiles.open(file_path, mode, encoding=encoding) as f:
+                content = await f.read()
+                
+            return await self.loads_async(content)
+            
+        except ImportError:
+            # Fallback to sync version in thread
+            import asyncio
+            return await asyncio.to_thread(self.load_file, file_path)
+
+    async def stream_serialize(self, data: Any, chunk_size: int = 8192) -> AsyncIterator[Union[str, bytes]]:
+        """
+        Default streaming implementation: serialize all, then yield chunks.
+        Override for formats that support true streaming.
+        """
+        if not self.supports_streaming:
+            raise NotImplementedError(f"{self.format_name} does not support streaming")
+        
+        # Default implementation: serialize all, then chunk
+        serialized_data = await self.dumps_async(data)
+        
+        for i in range(0, len(serialized_data), chunk_size):
+            yield serialized_data[i:i + chunk_size]
+
+    async def stream_deserialize(self, data_stream: AsyncIterator[Union[str, bytes]]) -> Any:
+        """
+        Default streaming deserialization: collect all chunks, then deserialize.
+        Override for formats that support true streaming.
+        """
+        if not self.supports_streaming:
+            raise NotImplementedError(f"{self.format_name} does not support streaming")
+        
+        # Collect all chunks
+        chunks = []
+        async for chunk in data_stream:
+            chunks.append(chunk)
+        
+        # Combine chunks based on format type
+        if self.is_binary_format:
+            combined_data = b''.join(chunks)
+        else:
+            combined_data = ''.join(chunks)
+        
+        return await self.loads_async(combined_data)
+
+    async def serialize_batch(self, data_list: List[Any]) -> List[Union[str, bytes]]:
+        """
+        Concurrent batch serialization using asyncio.gather.
+        """
+        import asyncio
+        
+        tasks = [self.dumps_async(data) for data in data_list]
+        return await asyncio.gather(*tasks)
+
+    async def deserialize_batch(self, data_list: List[Union[str, bytes]]) -> List[Any]:
+        """
+        Concurrent batch deserialization using asyncio.gather.
+        """
+        import asyncio
+        
+        tasks = [self.loads_async(data) for data in data_list]
+        return await asyncio.gather(*tasks)
+
+    async def save_batch_files(self, data_dict: Dict[Union[str, Path], Any]) -> None:
+        """
+        Concurrent batch file saving using asyncio.gather.
+        """
+        import asyncio
+        
+        tasks = [self.save_file_async(data, path) for path, data in data_dict.items()]
+        await asyncio.gather(*tasks)
+
+    async def load_batch_files(self, file_paths: List[Union[str, Path]]) -> Dict[Union[str, Path], Any]:
+        """
+        Concurrent batch file loading using asyncio.gather.
+        """
+        import asyncio
+        
+        tasks = [self.load_file_async(path) for path in file_paths]
+        results = await asyncio.gather(*tasks)
+        
+        return dict(zip(file_paths, results))
+
+    async def validate_data_async(self, data: Any) -> bool:
+        """Async version of validate_data()."""
+        import asyncio
+        return await asyncio.to_thread(self.validate_data, data)
+
+    async def estimate_size_async(self, data: Any) -> int:
+        """Async version of estimate_size()."""
+        import asyncio
+        return await asyncio.to_thread(self.estimate_size, data)
 
     # =============================================================================
     # ABSTRACT METHODS - MUST BE IMPLEMENTED BY CONCRETE CLASSES

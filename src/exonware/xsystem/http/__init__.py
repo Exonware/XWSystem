@@ -11,10 +11,11 @@ Provides high-performance HTTP client with retry mechanisms,
 connection pooling, and comprehensive error handling.
 """
 
-from .client import HttpClient, HttpError, RetryConfig
+from .client import HttpClient, AsyncHttpClient, HttpError, RetryConfig
 
 __all__ = [
     "HttpClient",
+    "AsyncHttpClient",
     "HttpError", 
     "RetryConfig",
 ]

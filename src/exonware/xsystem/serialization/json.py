@@ -32,6 +32,8 @@ class JsonSerializer(aSerialization):
     Enhanced JSON serializer with security validation, custom encoders,
     and performance optimizations for production use.
     """
+    
+    __slots__ = ('indent', 'sort_keys', 'ensure_ascii')
 
     def __init__(
         self,

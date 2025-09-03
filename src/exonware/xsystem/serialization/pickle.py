@@ -20,6 +20,40 @@ from pathlib import Path
 from .iSerialization import iSerialization
 from .aSerialization import aSerialization
 
+class SecureUnpickler(pickle.Unpickler):
+    """
+    Secure unpickler that restricts what classes can be loaded.
+    """
+    
+    def __init__(self, file, *, allowed_classes=None, blocked_classes=None):
+        super().__init__(file)
+        self.allowed_classes = allowed_classes or set()
+        self.blocked_classes = blocked_classes or set()
+    
+    def find_class(self, module, name):
+        """
+        Override find_class to restrict class loading.
+        """
+        full_name = f"{module}.{name}"
+        
+        # Check blocked classes first
+        if self.blocked_classes and full_name in self.blocked_classes:
+            raise pickle.UnpicklingError(f"Blocked class: {full_name}")
+        
+        # If allowed_classes is specified, only allow those
+        if self.allowed_classes and full_name not in self.allowed_classes:
+            raise pickle.UnpicklingError(f"Class not in allowed list: {full_name}")
+        
+        # Additional security checks for dangerous modules
+        dangerous_modules = {
+            'subprocess', 'os', 'sys', 'importlib', '__builtin__', 'builtins'
+        }
+        
+        if module in dangerous_modules:
+            raise pickle.UnpicklingError(f"Dangerous module blocked: {module}")
+        
+        return super().find_class(module, name)
+
 
 class PickleSerializer(aSerialization):
     """
@@ -48,10 +82,12 @@ class PickleSerializer(aSerialization):
         use_atomic_writes: bool = True,
         max_depth: int = 1000,
         max_size_mb: int = 100,
-        allow_unsafe: bool = False
+        allow_unsafe: bool = False,
+        allowed_classes: Optional[Set[str]] = None,
+        blocked_classes: Optional[Set[str]] = None
     ) -> None:
         """
-        Initialize Pickle serializer.
+        Initialize Pickle serializer with enhanced security.
         
         Args:
             protocol: Pickle protocol version (0-5)
@@ -63,6 +99,8 @@ class PickleSerializer(aSerialization):
             max_depth: Maximum nesting depth
             max_size_mb: Maximum data size in MB
             allow_unsafe: Allow potentially unsafe operations
+            allowed_classes: Set of allowed class names for deserialization
+            blocked_classes: Set of blocked class names for deserialization
         """
         super().__init__(
             validate_input=validate_input,
@@ -76,12 +114,20 @@ class PickleSerializer(aSerialization):
         self._fix_imports = fix_imports
         self._buffer_callback = buffer_callback
         self._allow_unsafe = allow_unsafe
+        self._allowed_classes = allowed_classes or set()
+        self._blocked_classes = blocked_classes or {
+            # Dangerous classes that should be blocked by default
+            'subprocess.Popen', 'os.system', '__builtin__.eval', '__builtin__.exec',
+            'builtins.eval', 'builtins.exec', 'builtins.compile',
+            'importlib.import_module', '__import__'
+        }
         
         if not allow_unsafe:
             import warnings
             warnings.warn(
-                "Pickle serializer should only be used with trusted data. "
-                "Set allow_unsafe=True to suppress this warning.",
+                "⚠️  SECURITY WARNING: Pickle can execute arbitrary code during deserialization. "
+                "Only use with trusted data sources. Consider using JSON, MessagePack, or CBOR "
+                "for untrusted data. Set allow_unsafe=True to suppress this warning.",
                 UserWarning,
                 stacklevel=2
             )
@@ -201,7 +247,7 @@ class PickleSerializer(aSerialization):
     
     def loads_bytes(self, data: bytes) -> Any:
         """
-        Deserialize pickle bytes directly.
+        Deserialize pickle bytes with enhanced security.
         
         Args:
             data: Pickle bytes to deserialize
@@ -211,6 +257,7 @@ class PickleSerializer(aSerialization):
             
         Raises:
             ValueError: If data validation fails
+            pickle.UnpicklingError: If security validation fails
             
         WARNING: This can execute arbitrary code. Only use with trusted data.
         """
@@ -221,19 +268,29 @@ class PickleSerializer(aSerialization):
             # Additional security warning
             import warnings
             warnings.warn(
-                "Unpickling can execute arbitrary code. "
+                "⚠️  SECURITY: Unpickling can execute arbitrary code. "
                 "Only proceed if you trust the data source.",
                 UserWarning,
                 stacklevel=2
             )
         
         try:
-            result = pickle.loads(
-                data,
-                fix_imports=self._fix_imports,
-                encoding="ASCII",
-                errors="strict"
-            )
+            # Use secure unpickler if security constraints are specified
+            if self._allowed_classes or self._blocked_classes:
+                buffer = io.BytesIO(data)
+                unpickler = SecureUnpickler(
+                    buffer,
+                    allowed_classes=self._allowed_classes,
+                    blocked_classes=self._blocked_classes
+                )
+                result = unpickler.load()
+            else:
+                result = pickle.loads(
+                    data,
+                    fix_imports=self._fix_imports,
+                    encoding="ASCII",
+                    errors="strict"
+                )
             
             if self.validate_input:
                 self._validate_data_security(result)

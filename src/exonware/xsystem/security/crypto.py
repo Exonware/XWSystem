@@ -24,6 +24,12 @@ try:
 except ImportError:
     CRYPTOGRAPHY_AVAILABLE = False
 
+try:
+    import bcrypt
+    BCRYPT_AVAILABLE = True
+except ImportError:
+    BCRYPT_AVAILABLE = False
+
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.security.crypto")
@@ -81,7 +87,10 @@ class SecureHash:
         """
         if isinstance(data, str):
             data = data.encode('utf-8')
-        return hashlib.blake2b(data, key=key).hexdigest()
+        if key is None:
+            return hashlib.blake2b(data).hexdigest()
+        else:
+            return hashlib.blake2b(data, key=key).hexdigest()
 
     @staticmethod
     def hmac_sha256(data: Union[str, bytes], key: Union[str, bytes]) -> str:
@@ -564,38 +573,147 @@ class SecureStorage:
 
 
 # Convenience functions
-def hash_password(password: str, salt: Optional[str] = None) -> tuple[str, str]:
+def hash_password(password: str, rounds: int = 12) -> str:
     """
-    Hash password with salt.
+    Hash password using bcrypt (secure, slow hashing).
+    
+    This replaces the previous insecure SHA-256 + salt implementation.
+    Bcrypt is specifically designed for password hashing with:
+    - Built-in salt generation
+    - Configurable work factor (rounds)
+    - Resistance to rainbow table attacks
+    - Time-tested security
 
     Args:
         password: Password to hash
-        salt: Optional salt (will generate if not provided)
+        rounds: Cost factor (4-31, default 12). Higher = more secure but slower
 
     Returns:
-        Tuple of (hashed_password, salt)
+        Bcrypt hash string (includes salt and cost factor)
+        
+    Raises:
+        CryptoError: If bcrypt is not available
     """
-    if salt is None:
-        salt = SecureRandom.token_hex(16)
+    if not BCRYPT_AVAILABLE:
+        # Fallback to PBKDF2 if bcrypt is not available
+        logger.warning("bcrypt not available, falling back to PBKDF2. Install bcrypt for better security: pip install bcrypt")
+        return _hash_password_pbkdf2(password)
     
-    hashed = SecureHash.sha256(password + salt)
-    return hashed, salt
+    if not (4 <= rounds <= 31):
+        raise CryptoError("bcrypt rounds must be between 4 and 31")
+    
+    # Convert password to bytes
+    password_bytes = password.encode('utf-8')
+    
+    # Generate salt and hash
+    salt = bcrypt.gensalt(rounds=rounds)
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    
+    return hashed.decode('utf-8')
 
 
-def verify_password(password: str, hashed_password: str, salt: str) -> bool:
+def verify_password(password: str, hashed_password: str) -> bool:
     """
-    Verify password against hash.
+    Verify password against bcrypt hash.
 
     Args:
         password: Password to verify
-        hashed_password: Stored password hash
-        salt: Salt used for hashing
+        hashed_password: Stored bcrypt hash
 
     Returns:
         True if password is correct
+        
+    Raises:
+        CryptoError: If bcrypt is not available and hash is not PBKDF2 format
     """
-    computed_hash = SecureHash.sha256(password + salt)
-    return hmac.compare_digest(computed_hash, hashed_password)
+    if not BCRYPT_AVAILABLE:
+        # Check if it's a PBKDF2 hash (fallback format)
+        if hashed_password.startswith('pbkdf2:'):
+            return _verify_password_pbkdf2(password, hashed_password)
+        else:
+            raise CryptoError("bcrypt not available and hash format not recognized. Install bcrypt: pip install bcrypt")
+    
+    try:
+        password_bytes = password.encode('utf-8')
+        hashed_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hashed_bytes)
+    except ValueError as e:
+        logger.warning(f"Invalid bcrypt hash format: {e}")
+        return False
+
+
+def _hash_password_pbkdf2(password: str) -> str:
+    """
+    Fallback password hashing using PBKDF2 when bcrypt is not available.
+    
+    Args:
+        password: Password to hash
+        
+    Returns:
+        PBKDF2 hash string with format: pbkdf2:iterations:salt:hash
+    """
+    if not CRYPTOGRAPHY_AVAILABLE:
+        raise CryptoError("cryptography library is required for PBKDF2 fallback. Install with: pip install cryptography")
+    
+    # Generate random salt
+    salt = secrets.token_bytes(32)
+    iterations = 100000  # OWASP recommended minimum
+    
+    # Derive key using PBKDF2
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=iterations,
+    )
+    key = kdf.derive(password.encode('utf-8'))
+    
+    # Format: pbkdf2:iterations:salt:hash (all base64 encoded)
+    salt_b64 = b64encode(salt).decode('ascii')
+    key_b64 = b64encode(key).decode('ascii')
+    
+    return f"pbkdf2:{iterations}:{salt_b64}:{key_b64}"
+
+
+def _verify_password_pbkdf2(password: str, hashed_password: str) -> bool:
+    """
+    Verify password against PBKDF2 hash (fallback).
+    
+    Args:
+        password: Password to verify
+        hashed_password: PBKDF2 hash string
+        
+    Returns:
+        True if password is correct
+    """
+    if not CRYPTOGRAPHY_AVAILABLE:
+        raise CryptoError("cryptography library is required for PBKDF2 verification")
+    
+    try:
+        # Parse hash format: pbkdf2:iterations:salt:hash
+        parts = hashed_password.split(':')
+        if len(parts) != 4 or parts[0] != 'pbkdf2':
+            return False
+        
+        iterations = int(parts[1])
+        salt = b64decode(parts[2].encode('ascii'))
+        expected_key = b64decode(parts[3].encode('ascii'))
+        
+        # Derive key using same parameters
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=len(expected_key),
+            salt=salt,
+            iterations=iterations,
+        )
+        derived_key = kdf.derive(password.encode('utf-8'))
+        
+        # Constant-time comparison
+        return hmac.compare_digest(derived_key, expected_key)
+        
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Invalid PBKDF2 hash format: {e}")
+        return False
 
 
 def generate_api_key(length: int = 32) -> str:
@@ -606,3 +724,148 @@ def generate_api_key(length: int = 32) -> str:
 def generate_session_token(length: int = 32) -> str:
     """Generate secure session token."""
     return SecureRandom.token_urlsafe(length)
+
+
+# Async security operations
+async def hash_password_async(password: str, rounds: int = 12) -> str:
+    """
+    Async version of hash_password using thread pool.
+    
+    Args:
+        password: Password to hash
+        rounds: Cost factor (4-31, default 12)
+        
+    Returns:
+        Bcrypt hash string
+    """
+    import asyncio
+    return await asyncio.to_thread(hash_password, password, rounds)
+
+
+async def verify_password_async(password: str, hashed_password: str) -> bool:
+    """
+    Async version of verify_password using thread pool.
+    
+    Args:
+        password: Password to verify
+        hashed_password: Stored bcrypt hash
+        
+    Returns:
+        True if password is correct
+    """
+    import asyncio
+    return await asyncio.to_thread(verify_password, password, hashed_password)
+
+
+class AsyncSecureStorage:
+    """Async version of SecureStorage for non-blocking operations."""
+    
+    def __init__(self, key: Optional[bytes] = None) -> None:
+        """Initialize async secure storage."""
+        self._storage = SecureStorage(key)
+    
+    async def store(self, key: str, value: Any, metadata: Optional[Dict[str, Any]] = None) -> None:
+        """Store value securely (async)."""
+        import asyncio
+        await asyncio.to_thread(self._storage.store, key, value, metadata)
+    
+    async def retrieve(self, key: str) -> Any:
+        """Retrieve value securely (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._storage.retrieve, key)
+    
+    async def exists(self, key: str) -> bool:
+        """Check if key exists (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._storage.exists, key)
+    
+    async def delete(self, key: str) -> bool:
+        """Delete key from storage (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._storage.delete, key)
+    
+    async def list_keys(self) -> list[str]:
+        """Get list of all storage keys (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._storage.list_keys)
+    
+    async def get_metadata(self, key: str) -> Dict[str, Any]:
+        """Get metadata for a key (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._storage.get_metadata, key)
+    
+    async def clear(self) -> None:
+        """Clear all stored data (async)."""
+        import asyncio
+        await asyncio.to_thread(self._storage.clear)
+
+
+class AsyncSymmetricEncryption:
+    """Async version of SymmetricEncryption for non-blocking operations."""
+    
+    def __init__(self, key: Optional[bytes] = None) -> None:
+        """Initialize async symmetric encryption."""
+        self._encryption = SymmetricEncryption(key)
+    
+    @property
+    def key(self) -> bytes:
+        """Get the encryption key."""
+        return self._encryption.key
+    
+    async def encrypt(self, data: Union[str, bytes]) -> bytes:
+        """Encrypt data (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.encrypt, data)
+    
+    async def decrypt(self, encrypted_data: bytes) -> bytes:
+        """Decrypt data (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.decrypt, encrypted_data)
+    
+    async def encrypt_string(self, text: str) -> str:
+        """Encrypt string and return base64 encoded result (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.encrypt_string, text)
+    
+    async def decrypt_string(self, encrypted_text: str) -> str:
+        """Decrypt base64 encoded encrypted string (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.decrypt_string, encrypted_text)
+
+
+class AsyncAsymmetricEncryption:
+    """Async version of AsymmetricEncryption for non-blocking operations."""
+    
+    def __init__(self, private_key: Optional[bytes] = None, public_key: Optional[bytes] = None) -> None:
+        """Initialize async asymmetric encryption."""
+        self._encryption = AsymmetricEncryption(private_key, public_key)
+    
+    @classmethod
+    async def generate_key_pair_async(cls, key_size: int = 2048) -> tuple['AsyncAsymmetricEncryption', bytes, bytes]:
+        """Generate new RSA key pair (async)."""
+        import asyncio
+        encryption, private_pem, public_pem = await asyncio.to_thread(
+            AsymmetricEncryption.generate_key_pair, key_size
+        )
+        async_encryption = cls(private_pem, public_pem)
+        return async_encryption, private_pem, public_pem
+    
+    async def encrypt(self, data: Union[str, bytes]) -> bytes:
+        """Encrypt data with public key (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.encrypt, data)
+    
+    async def decrypt(self, encrypted_data: bytes) -> bytes:
+        """Decrypt data with private key (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.decrypt, encrypted_data)
+    
+    async def sign(self, data: Union[str, bytes]) -> bytes:
+        """Sign data with private key (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.sign, data)
+    
+    async def verify(self, data: Union[str, bytes], signature: bytes) -> bool:
+        """Verify signature with public key (async)."""
+        import asyncio
+        return await asyncio.to_thread(self._encryption.verify, data, signature)

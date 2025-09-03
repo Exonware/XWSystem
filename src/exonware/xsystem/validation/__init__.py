@@ -1,43 +1,19 @@
 """
+Company: eXonware.com
+Author: Eng. Muhammad AlShehri
+Email: connect@exonware.com
+Version: 0.0.1
+Generation Date: January 31, 2025
+
 xSystem Validation Package
 
-Provides data validation utilities for type safety and security.
+Declarative validation with type hints, automatic coercion, and Pydantic-style models.
 """
 
-from .data_validator import (
-    DataValidator, 
-    ValidationError,
-    PathValidationError,
-    DepthValidationError,
-    MemoryValidationError,
-    check_data_depth,
-    validate_path_input,
-    validate_resolution_depth,
-    estimate_memory_usage
-)
-from .type_safety import (
-    GenericSecurityError,
-    SafeTypeValidator,
-    is_immutable_type,
-    is_safe_type,
-    validate_untrusted_data,
-)
+from .declarative import xModel, Field, ValidationError
 
 __all__ = [
-    # Data Validator
-    "DataValidator",
+    "xModel",
+    "Field", 
     "ValidationError",
-    "PathValidationError",
-    "DepthValidationError", 
-    "MemoryValidationError",
-    "check_data_depth",
-    "validate_path_input",
-    "validate_resolution_depth",
-    "estimate_memory_usage",
-    # Type Safety
-    "SafeTypeValidator",
-    "GenericSecurityError",
-    "validate_untrusted_data",
-    "is_safe_type",
-    "is_immutable_type",
 ]

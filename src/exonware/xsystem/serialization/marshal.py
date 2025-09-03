@@ -37,6 +37,8 @@ class MarshalSerializer(aSerialization):
     used for .pyc files. It's faster than pickle but more limited.
     """
     
+    __slots__ = ('_version', '_supported_types')
+    
     def __init__(
         self,
         version: int = marshal.version,
@@ -44,7 +46,8 @@ class MarshalSerializer(aSerialization):
         validate_paths: bool = True,
         use_atomic_writes: bool = True,
         max_depth: int = 100,
-        max_size_mb: int = 50
+        max_size_mb: int = 50,
+        allow_unsafe: bool = False
     ) -> None:
         """
         Initialize Marshal serializer.
@@ -56,13 +59,15 @@ class MarshalSerializer(aSerialization):
             use_atomic_writes: Use atomic file operations
             max_depth: Maximum nesting depth
             max_size_mb: Maximum data size in MB
+            allow_unsafe: Allow unsafe deserialization without warnings
         """
         super().__init__(
             validate_input=validate_input,
             validate_paths=validate_paths,
             use_atomic_writes=use_atomic_writes,
             max_depth=max_depth,
-            max_size_mb=max_size_mb
+            max_size_mb=max_size_mb,
+            allow_unsafe=allow_unsafe
         )
         
         self._version = version
@@ -177,6 +182,10 @@ class MarshalSerializer(aSerialization):
             import base64
             marshal_bytes = base64.b64decode(data.encode('ascii'))
             
+            # Check size limits before loading
+            if len(marshal_bytes) > self.max_size_mb * 1024 * 1024:
+                raise ValueError(f"Data size exceeds limit: {len(marshal_bytes)} bytes > {self.max_size_mb}MB")
+            
             result = marshal.loads(marshal_bytes)
             
             if self.validate_input:
@@ -226,6 +235,10 @@ class MarshalSerializer(aSerialization):
         """
         if not isinstance(data, (bytes, bytearray)):
             raise ValueError(f"Expected bytes or bytearray, got {type(data)}")
+        
+        # Check size limits before loading
+        if len(data) > self.max_size_mb * 1024 * 1024:
+            raise ValueError(f"Data size exceeds limit: {len(data)} bytes > {self.max_size_mb}MB")
         
         try:
             result = marshal.loads(data)

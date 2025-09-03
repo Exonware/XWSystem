@@ -11,20 +11,21 @@
 ## 📖 **Table of Contents**
 
 1. [Overview](#overview)
-2. [Installation](#installation)
-3. [Serialization (24 Formats)](#serialization-24-formats)
-4. [Security & Cryptography](#security--cryptography)
-5. [Threading Utilities](#threading-utilities)
-6. [I/O Operations](#io-operations)
-7. [HTTP Client](#http-client)
-8. [Data Structures](#data-structures)
-9. [Design Patterns](#design-patterns)
-10. [Performance Monitoring](#performance-monitoring)
-11. [Runtime Utilities](#runtime-utilities)
-12. [Plugin System](#plugin-system)
-13. [Configuration](#configuration)
-14. [Error Handling](#error-handling)
-15. [Best Practices](#best-practices)
+2. [Project Phases](#project-phases)
+3. [Installation](#installation)
+4. [Serialization (24 Formats)](#serialization-24-formats)
+5. [Security & Cryptography](#security--cryptography)
+6. [Threading Utilities](#threading-utilities)
+7. [I/O Operations](#io-operations)
+8. [HTTP Client](#http-client)
+9. [Data Structures](#data-structures)
+10. [Design Patterns](#design-patterns)
+11. [Performance Monitoring](#performance-monitoring)
+12. [Runtime Utilities](#runtime-utilities)
+13. [Plugin System](#plugin-system)
+14. [Configuration](#configuration)
+15. [Error Handling](#error-handling)
+16. [Best Practices](#best-practices)
 
 ---
 
@@ -107,6 +108,24 @@ src/exonware/xsystem/
     ├── data_validator.py         # Input validation
     └── type_safety.py            # Type checking
 ```
+
+---
+
+## 🚀 **Project Phases**
+
+xSystem follows a structured 5-phase development approach designed to deliver enterprise-grade functionality while maintaining rapid iteration and continuous improvement.
+
+### **Current Phase: 🧪 Version 0 - Experimental Stage**
+- **Focus:** Fast applications & usage, refactoring to perfection of software patterns and design
+- **Status:** 🟢 **ACTIVE** - Foundation complete with 24 serialization formats, enterprise-grade security, and comprehensive testing
+
+### **Development Roadmap:**
+- **Version 1 (Q1 2026):** Production Ready - Enterprise deployment and hardening
+- **Version 2 (Q2 2026):** Mars Standard Draft Implementation - Cross-platform interoperability
+- **Version 3 (Q3 2026):** RUST Core & Facades - High-performance multi-language support
+- **Version 4 (Q4 2026):** Mars Standard Implementation - Full compliance and enterprise deployment
+
+📖 **[View Complete Project Phases Documentation](PROJECT_PHASES.md)**
 
 ---
 

@@ -43,6 +43,8 @@ class YamlSerializer(aSerialization):
     Enhanced YAML serializer with security validation, custom encoders,
     and performance optimizations for production use.
     """
+    
+    __slots__ = ('default_flow_style', 'sort_keys', 'width', 'indent')
 
     def __init__(
         self,
