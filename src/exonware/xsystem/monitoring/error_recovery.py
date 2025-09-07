@@ -1,5 +1,5 @@
 """
-Error Recovery and Resilience Mechanisms for xSystem Library.
+Error Recovery and Resilience Mechanisms for XSystem Library.
 
 This module provides comprehensive error recovery, circuit breaker patterns,
 retry mechanisms, and graceful degradation for production deployment.

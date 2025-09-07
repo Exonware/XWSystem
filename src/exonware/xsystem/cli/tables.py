@@ -2,13 +2,13 @@
 Table Formatting Utilities
 ==========================
 
-Production-grade table formatting for xSystem.
+Production-grade table formatting for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generated: 2025-01-27
+Generation Date: September 05, 2025
 """
 
 import sys
@@ -17,23 +17,8 @@ from dataclasses import dataclass
 from enum import Enum
 
 # Import colors from our existing color module
-try:
-    from .colors import colorize, Colors, Style
-except ImportError:
-    # Fallback if colors not available
-    def colorize(text: str, color=None, style=None) -> str:
-        return text
-    
-    class Colors:
-        GREEN = "green"
-        YELLOW = "yellow"
-        RED = "red"
-        BLUE = "blue"
-        CYAN = "cyan"
-        WHITE = "white"
-    
-    class Style:
-        BOLD = "bold"
+# Explicit import - colors module is part of the same package
+from .colors import colorize, Colors, Style
 
 
 class Alignment(Enum):

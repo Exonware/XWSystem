@@ -2,12 +2,12 @@
 Process Pool Utilities
 ======================
 
-Production-grade process pools for xSystem.
+Production-grade process pools for XSystem.
 
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Company: eXonware.com
-Generated: 2025-01-27
+Generation Date: September 05, 2025
 """
 
 import asyncio
@@ -47,6 +47,7 @@ class ProcessPool:
     
     def __init__(self, 
                  max_workers: Optional[int] = None,
+                 size: Optional[int] = None,  # Alias for max_workers for backward compatibility
                  initializer: Optional[Callable] = None,
                  initargs: tuple = (),
                  timeout: Optional[float] = None):
@@ -55,10 +56,15 @@ class ProcessPool:
         
         Args:
             max_workers: Maximum number of worker processes
+            size: Alias for max_workers (for backward compatibility)
             initializer: Function to run in each worker on startup
             initargs: Arguments for initializer function
             timeout: Default timeout for tasks
         """
+        # Handle backward compatibility with 'size' parameter
+        if size is not None and max_workers is None:
+            max_workers = size
+        
         self.max_workers = max_workers or mp.cpu_count()
         self.initializer = initializer
         self.initargs = initargs
@@ -110,48 +116,54 @@ class ProcessPool:
         start_time = time.time()
         
         # Submit task to executor
-        future = self._executor.submit(fn, *args, **kwargs)
-        self._active_tasks[task_id] = future
-        
-        # Add completion callback
-        def task_completed(fut):
-            execution_time = time.time() - start_time
+        try:
+            future = self._executor.submit(fn, *args, **kwargs)
+            self._active_tasks[task_id] = future
             
-            try:
-                result = fut.result(timeout=timeout or self.timeout)
-                task_result = TaskResult(
-                    task_id=task_id,
-                    result=result,
-                    success=True,
-                    execution_time=execution_time
-                )
-                self._stats['tasks_completed'] += 1
-                self._stats['total_execution_time'] += execution_time
+            # Add completion callback
+            def task_completed(fut):
+                execution_time = time.time() - start_time
                 
-            except Exception as e:
-                task_result = TaskResult(
-                    task_id=task_id,
-                    result=None,
-                    success=False,
-                    error=str(e),
-                    execution_time=execution_time
-                )
-                self._stats['tasks_failed'] += 1
+                try:
+                    result = fut.result(timeout=timeout or self.timeout)
+                    task_result = TaskResult(
+                        task_id=task_id,
+                        result=result,
+                        success=True,
+                        execution_time=execution_time
+                    )
+                    self._stats['tasks_completed'] += 1
+                    self._stats['total_execution_time'] += execution_time
+                    
+                except Exception as e:
+                    task_result = TaskResult(
+                        task_id=task_id,
+                        result=None,
+                        success=False,
+                        error=str(e),
+                        execution_time=execution_time
+                    )
+                    self._stats['tasks_failed'] += 1
+                
+                # Store result and cleanup
+                self._completed_tasks.append(task_result)
+                if task_id in self._active_tasks:
+                    del self._active_tasks[task_id]
+                
+                logger.debug(f"Task {task_id} completed in {execution_time:.3f}s")
             
-            # Store result and cleanup
-            self._completed_tasks.append(task_result)
-            if task_id in self._active_tasks:
-                del self._active_tasks[task_id]
+            future.add_done_callback(task_completed)
+            self._stats['tasks_submitted'] += 1
             
-            logger.debug(f"Task {task_id} completed in {execution_time:.3f}s")
-        
-        future.add_done_callback(task_completed)
-        self._stats['tasks_submitted'] += 1
-        
-        logger.debug(f"Submitted task {task_id}")
-        return task_id
+            logger.debug(f"Submitted task {task_id}")
+            return task_id
+            
+        except Exception as e:
+            # Handle any submission errors
+            logger.error(f"Failed to submit task {task_id}: {e}")
+            raise
     
-    def get_result(self, task_id: str, timeout: Optional[float] = None) -> Optional[TaskResult]:
+    def get_result(self, task_id: str, timeout: Optional[float] = None) -> Optional[Any]:
         """
         Get result of a completed task.
         
@@ -160,12 +172,13 @@ class ProcessPool:
             timeout: Timeout for waiting
             
         Returns:
-            TaskResult or None if not found
+            Task result or None if not found
         """
         # Check completed tasks first
         for result in self._completed_tasks:
             if result.task_id == task_id:
-                return result
+                logger.debug(f"Found completed task {task_id} with result: {result.result}")
+                return result.result
         
         # Check if task is still active
         if task_id in self._active_tasks:
@@ -177,19 +190,14 @@ class ProcessPool:
                 # Should be in completed tasks now
                 for result in self._completed_tasks:
                     if result.task_id == task_id:
-                        return result
+                        return result.result
                         
             except concurrent.futures.TimeoutError:
                 logger.warning(f"Task {task_id} timed out")
                 return None
             except Exception as e:
                 logger.error(f"Task {task_id} failed: {e}")
-                return TaskResult(
-                    task_id=task_id,
-                    result=None,
-                    success=False,
-                    error=str(e)
-                )
+                return None
         
         return None
     
@@ -477,9 +485,7 @@ class AsyncProcessPool:
 
 def is_process_pool_available() -> bool:
     """Check if process pool functionality is available."""
-    try:
-        import multiprocessing
-        import concurrent.futures
-        return True
-    except ImportError:
-        return False
+    # multiprocessing and concurrent.futures are built-in Python modules
+    import multiprocessing
+    import concurrent.futures
+    return True

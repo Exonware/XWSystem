@@ -3,9 +3,9 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
-xSystem Enterprise Features Package
+XSystem Enterprise Features Package
 
 Provides enterprise-grade features including:
 - Schema registry integration (Confluent, AWS Glue)
@@ -16,7 +16,7 @@ Provides enterprise-grade features including:
 """
 
 from .schema_registry import (
-    SchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
+    ASchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
     SchemaRegistryError, SchemaNotFoundError, SchemaValidationError
 )
 from .distributed_tracing import (
@@ -30,7 +30,7 @@ from .auth import (
 
 __all__ = [
     # Schema Registry
-    "SchemaRegistry",
+    "ASchemaRegistry",
     "ConfluentSchemaRegistry", 
     "AwsGlueSchemaRegistry",
     "SchemaRegistryError",

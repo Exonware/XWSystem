@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\parquet.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced Apache Parquet serialization with security, validation and performance optimizations.
 """
@@ -16,8 +17,10 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pandas as pd
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
+
 
 logger = get_logger("xsystem.serialization.parquet")
 
@@ -29,9 +32,9 @@ class ParquetError(SerializationError):
         super().__init__(message, "PARQUET", original_error)
 
 
-class ParquetSerializer(aSerialization):
+class ParquetSerializer(ASerialization):
     """
-    Enhanced Apache Parquet serializer with schema validation and xSystem integration.
+    Enhanced Apache Parquet serializer with schema validation and XSystem integration.
     
     Apache Parquet is a columnar storage format optimized for analytics workloads.
     
@@ -59,7 +62,7 @@ class ParquetSerializer(aSerialization):
         use_pandas_metadata: bool = True,
     ) -> None:
         """
-        Initialize Parquet serializer with compression and performance options.
+        Initialize Parquet serializer with security options.
 
         Args:
             validate_input: Whether to validate input data for security
@@ -68,14 +71,7 @@ class ParquetSerializer(aSerialization):
             use_atomic_writes: Whether to use atomic file operations
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
-            compression: Compression algorithm
-            use_dictionary: Whether to use dictionary encoding
-            row_group_size: Size of row groups in bytes
-            use_pandas_metadata: Whether to store pandas metadata
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -85,13 +81,14 @@ class ParquetSerializer(aSerialization):
             base_path=base_path,
         )
         
-        # Parquet-specific configuration
+        # Initialize Parquet-specific attributes
         self.compression = compression
         self.use_dictionary = use_dictionary
         self.row_group_size = row_group_size
         self.use_pandas_metadata = use_pandas_metadata
         
-        # Update configuration with Parquet-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'compression': compression,
             'use_dictionary': use_dictionary,
@@ -150,7 +147,8 @@ class ParquetSerializer(aSerialization):
         """
         try:
             # Validate data using base class
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             
             # Serialize to Parquet bytes
             parquet_bytes = self.dumps_binary(data)
@@ -160,9 +158,9 @@ class ParquetSerializer(aSerialization):
             return base64.b64encode(parquet_bytes).decode('ascii')
             
         except SerializationError as e:
-            self._handle_serialization_error("serialization", e)
+            raise ParquetError(f"Serialization failed: {e}", e)
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise ParquetError(f"Serialization failed: {e}", e)
 
     def loads(self, data: Union[bytes, str]) -> Any:
         """
@@ -188,12 +186,13 @@ class ParquetSerializer(aSerialization):
             return self.loads_bytes(parquet_bytes)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise ParquetError(f"Deserialization failed: {e}", e)
 
     def dumps_binary(self, data: Any) -> bytes:
         """Serialize data to Parquet bytes."""
         try:
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             df = self._to_dataframe(data)
             table = pa.Table.from_pandas(df, preserve_index=False)
             
@@ -202,7 +201,7 @@ class ParquetSerializer(aSerialization):
             pq.write_table(table, buffer, compression=self.compression, use_dictionary=self.use_dictionary, row_group_size=self.row_group_size)
             return buffer.getvalue()
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise ParquetError(f"Serialization failed: {e}", e)
 
     def loads_bytes(self, data: bytes) -> Any:
         """Deserialize Parquet bytes."""
@@ -217,7 +216,16 @@ class ParquetSerializer(aSerialization):
             else:
                 return df.to_dict('records')
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise ParquetError(f"Deserialization failed: {e}", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise ParquetError("Parquet is a binary format and does not support text-based serialization.")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise ParquetError("Parquet is a binary format and does not support text-based serialization.")
+
 
     def loads_dataframe(self, data: Union[bytes, str]) -> pd.DataFrame:
         """
@@ -248,7 +256,7 @@ class ParquetSerializer(aSerialization):
             return table.to_pandas()
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise ParquetError(f"Deserialization failed: {e}", e)
 
 
 # Convenience functions for common use cases

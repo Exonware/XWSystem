@@ -3,9 +3,9 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
-xSystem Caching Package
+XSystem Caching Package
 
 Comprehensive caching framework with LRU, LFU, TTL, and advanced caching strategies.
 Production-grade caching utilities for high-performance applications.

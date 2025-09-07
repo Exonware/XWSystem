@@ -300,6 +300,22 @@ def has_circular_references(obj: Any, max_depth: int = 100) -> bool:
     return detector.is_circular(obj)
 
 
+class CircularDetector(CircularReferenceDetector):
+    """Alias for CircularReferenceDetector for backward compatibility."""
+    
+    def __init__(self, max_depth: int = 100):
+        """Initialize circular detector."""
+        super().__init__(max_depth)
+    
+    def detect(self, obj: Any) -> bool:
+        """Detect circular references (alias for is_circular)."""
+        return self.is_circular(obj)
+    
+    def check(self, obj: Any) -> bool:
+        """Check for circular references (alias for is_circular)."""
+        return self.is_circular(obj)
+
+
 def safe_traverse(obj: Any, visitor_func: callable, max_depth: int = 100) -> Any:
     """
     Safely traverse an object while avoiding circular references.

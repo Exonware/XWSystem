@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\sqlite3.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 SQLite3 Serializer Implementation
 
@@ -16,7 +17,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 
 
 class Sqlite3Error(SerializationError):
@@ -26,7 +28,7 @@ class Sqlite3Error(SerializationError):
         super().__init__(message, "SQLite3", original_error)
 
 
-class Sqlite3Serializer(aSerialization):
+class Sqlite3Serializer(ASerialization):
     """
     SQLite3 serializer using built-in sqlite3 module.
     

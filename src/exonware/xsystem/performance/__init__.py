@@ -1,5 +1,5 @@
 """
-xSystem Performance Management Package.
+XSystem Performance Management Package.
 
 This package provides generic performance management functionality that can be
 used by any library in the xComBot framework.

@@ -3,9 +3,9 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 05, 2025
 
-Logging configuration setup for xSystem.
+Logging configuration setup for XSystem.
 
 Provides centralized logging setup functions and logger factory.
 This module handles the implementation details of logging configuration.
@@ -40,16 +40,13 @@ def setup_logging(
     if logging.getLogger().disabled:
         return
 
-    # Try to check xSystem config if available
-    try:
-        from .logging import logging_config
+    # Try to check XSystem config if available
+    # Import is explicit - internal package import should always be available
+    from .logging import logging_config
 
-        if not logging_config.enabled:
-            logging.disable(logging.CRITICAL)
-            return
-    except ImportError:
-        # xSystem config not available, continue with normal setup
-        pass
+    if not logging_config.enabled:
+        logging.disable(logging.CRITICAL)
+        return
 
     logger = logging.getLogger()
     logger.setLevel(level)
@@ -96,3 +93,24 @@ def get_logger(name=None) -> logging.Logger:
         return logger
 
     return logging.getLogger(name)
+
+
+class LoggingSetup:
+    """Logging setup manager for XSystem framework."""
+    
+    def __init__(self):
+        """Initialize logging setup."""
+        self._configured = False
+    
+    def setup_logging(self, level=logging.INFO, **kwargs):
+        """Setup logging configuration."""
+        setup_logging(level=level, **kwargs)
+        self._configured = True
+    
+    def configure_logger(self, name: str) -> logging.Logger:
+        """Configure a logger with the specified name."""
+        return get_logger(name)
+    
+    def is_configured(self) -> bool:
+        """Check if logging is configured."""
+        return self._configured

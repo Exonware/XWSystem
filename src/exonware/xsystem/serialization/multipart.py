@@ -1,14 +1,15 @@
+#exonware\xsystem\serialization\multipart.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Multipart (HTTP) Serializer Implementation
 
 Provides multipart/form-data serialization with file upload support,
-boundary management, and integration with xSystem utilities.
+boundary management, and integration with XSystem utilities.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -20,11 +21,11 @@ import uuid
 import io
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
 
-class MultipartSerializer(aSerialization):
+class MultipartSerializer(ASerialization):
     """
     Multipart/form-data serializer for HTTP file uploads.
     
@@ -73,7 +74,7 @@ class MultipartSerializer(aSerialization):
     
     def _generate_boundary(self) -> str:
         """Generate a unique boundary string."""
-        return f"----xSystemBoundary{uuid.uuid4().hex}"
+        return f"----XSystemBoundary{uuid.uuid4().hex}"
     
     @property
     def format_name(self) -> str:

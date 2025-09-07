@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\plistlib.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Plistlib Serializer Implementation
 
@@ -15,7 +16,8 @@ import plistlib
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 
 
 class PlistlibError(SerializationError):
@@ -25,7 +27,7 @@ class PlistlibError(SerializationError):
         super().__init__(message, "Plistlib", original_error)
 
 
-class PlistlibSerializer(aSerialization):
+class PlistlibSerializer(ASerialization):
     """
     Plistlib serializer using built-in plistlib module.
     

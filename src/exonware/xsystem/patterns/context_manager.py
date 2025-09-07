@@ -319,3 +319,47 @@ class ThreadSafeSingleton(type):
             if cls not in cls._instances:
                 cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
+
+
+class ContextManager:
+    """Context manager implementation for patterns."""
+    
+    def __init__(self, name: str = "context"):
+        """Initialize context manager."""
+        self.name = name
+        self._contexts: Dict[str, Any] = {}
+        self._active = False
+    
+    def __enter__(self):
+        """Enter context."""
+        self._active = True
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit context."""
+        self._active = False
+        self._contexts.clear()
+    
+    def add_context(self, key: str, value: Any) -> None:
+        """Add context value."""
+        self._contexts[key] = value
+    
+    def get_context(self, key: str) -> Any:
+        """Get context value."""
+        return self._contexts.get(key)
+    
+    def has_context(self, key: str) -> bool:
+        """Check if context exists."""
+        return key in self._contexts
+    
+    def remove_context(self, key: str) -> bool:
+        """Remove context."""
+        return self._contexts.pop(key, None) is not None
+    
+    def is_active(self) -> bool:
+        """Check if context is active."""
+        return self._active
+    
+    def get_all_contexts(self) -> Dict[str, Any]:
+        """Get all contexts."""
+        return self._contexts.copy()

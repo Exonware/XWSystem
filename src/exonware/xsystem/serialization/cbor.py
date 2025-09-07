@@ -1,40 +1,29 @@
+#exonware\xsystem\serialization\cbor.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 CBOR (Concise Binary Object Representation) Serializer Implementation
 
 Provides CBOR serialization with RFC 8949 compliance, binary format support,
-and integration with xSystem utilities for security and validation.
+and integration with XSystem utilities for security and validation.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import io
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
-try:
-    import cbor2
-    _CBOR_AVAILABLE = True
-except ImportError:
-    _CBOR_AVAILABLE = False
-    
-    # Define dummy module for type hints when cbor2 is not available
-    cbor2 = type('cbor2', (), {
-        'dumps': lambda *args, **kwargs: None,
-        'loads': lambda *args, **kwargs: None,
-        'CBORError': Exception,
-        'CBORDecodeError': Exception,
-        'CBOREncodeError': Exception,
-    })()
+import cbor2
+_CBOR_AVAILABLE = True
 
 
-class CborSerializer(aSerialization):
+class CborSerializer(ASerialization):
     """
     CBOR (Concise Binary Object Representation) serializer.
     

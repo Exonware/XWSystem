@@ -1,5 +1,5 @@
 """
-Memory Monitoring and Leak Detection for xSystem Library.
+Memory Monitoring and Leak Detection for XSystem Library.
 
 This module provides comprehensive memory monitoring, leak detection,
 and automatic cleanup mechanisms for production deployment.

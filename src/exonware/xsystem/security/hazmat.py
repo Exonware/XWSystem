@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Hazardous Materials (Hazmat) Layer - Low-level cryptographic primitives.
 
@@ -23,22 +23,19 @@ Features:
 import os
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-try:
-    from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519, x25519, padding
-    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-    from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305, AESCCM, AESOCB3
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-    from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
-    from cryptography.hazmat.primitives.kdf.x963kdf import X963KDF
-    from cryptography.hazmat.backends import default_backend
-    from cryptography import x509
-    from cryptography.x509.oid import NameOID, ExtensionOID
-    CRYPTOGRAPHY_AVAILABLE = True
-except ImportError:
-    CRYPTOGRAPHY_AVAILABLE = False
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519, x25519, padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM, ChaCha20Poly1305, AESCCM, AESOCB3
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+from cryptography.hazmat.primitives.kdf.x963kdf import X963KDF
+from cryptography.hazmat.backends import default_backend
+from cryptography import x509
+from cryptography.x509.oid import NameOID, ExtensionOID
+CRYPTOGRAPHY_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 

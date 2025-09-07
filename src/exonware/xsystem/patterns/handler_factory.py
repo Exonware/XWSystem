@@ -3,8 +3,9 @@ Generic handler factory pattern combining all xsystem utilities.
 """
 
 import logging
-from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
+
+from .contracts import IHandler
 
 from ..io.atomic_file import AtomicFileWriter, atomic_write
 from ..security.path_validator import PathSecurityError, PathValidator
@@ -306,57 +307,40 @@ class GenericHandlerFactory(ThreadSafeFactory[T]):
             self.circular_detector.reset()
 
 
-class HandlerInterface(ABC):
-    """
-    Abstract base class for handlers that work with GenericHandlerFactory.
+class HandlerFactory(GenericHandlerFactory):
+    """Simplified handler factory for backward compatibility."""
+    
+    def __init__(self, base_path: Optional[str] = None):
+        """Initialize handler factory with basic settings."""
+        super().__init__(
+            base_path=base_path,
+            enable_security=True,
+            enable_circular_detection=True,
+            max_circular_depth=50
+        )
+    
+    def create_handler(self, name: str, *args, **kwargs) -> Any:
+        """Create a handler instance."""
+        handler_class = self.get_handler(name)
+        if handler_class is None:
+            raise ValueError(f"Handler '{name}' not found")
+        
+        return handler_class(*args, **kwargs)
+    
+    def register_handler(self, name: str, handler_class: Type[T], extensions: Optional[List[str]] = None):
+        """Register a handler class."""
+        self.register_safe(name, handler_class, extensions)
+    
+    def unregister_handler(self, name: str):
+        """Unregister a handler."""
+        self.unregister(name)
+    
+    def list_handlers(self) -> List[str]:
+        """List all registered handlers."""
+        return self.get_available_formats()
+    
+    def has_handler(self, name: str) -> bool:
+        """Check if handler is registered."""
+        return self.has_handler(name)
 
-    This provides a standard interface that handlers should implement.
-    """
 
-    @abstractmethod
-    def can_handle(self, data: Any) -> bool:
-        """
-        Check if this handler can process the given data.
-
-        Args:
-            data: Data to check
-
-        Returns:
-            True if handler can process the data
-        """
-        pass
-
-    @abstractmethod
-    def process(self, data: Any, **kwargs) -> Any:
-        """
-        Process the data.
-
-        Args:
-            data: Data to process
-            **kwargs: Additional processing options
-
-        Returns:
-            Processed data
-        """
-        pass
-
-    def validate_input(self, data: Any) -> bool:
-        """
-        Validate input data before processing.
-
-        Args:
-            data: Data to validate
-
-        Returns:
-            True if data is valid
-        """
-        return True
-
-    def get_supported_formats(self) -> List[str]:
-        """
-        Get list of formats this handler supports.
-
-        Returns:
-            List of supported format names
-        """
-        return []

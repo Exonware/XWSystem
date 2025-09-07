@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\configparser.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 ConfigParser Serializer Implementation
 
@@ -15,7 +16,8 @@ import configparser
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 
 
 class ConfigParserError(SerializationError):
@@ -25,7 +27,7 @@ class ConfigParserError(SerializationError):
         super().__init__(message, "ConfigParser", original_error)
 
 
-class ConfigParserSerializer(aSerialization):
+class ConfigParserSerializer(ASerialization):
     """
     ConfigParser serializer using built-in configparser module.
     

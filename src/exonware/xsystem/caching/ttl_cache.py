@@ -2,7 +2,7 @@
 TTL (Time To Live) Cache Implementation
 ======================================
 
-Production-grade TTL caching for xSystem.
+Production-grade TTL caching for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri

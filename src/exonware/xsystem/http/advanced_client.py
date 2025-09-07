@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Advanced HTTP client with HTTP/2, streaming, pluggable transports, and modern features.
 """
@@ -12,15 +12,13 @@ import asyncio
 import ssl
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Dict, List, Optional, Union, Protocol, runtime_checkable
+from typing import Any, AsyncIterator, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-try:
-    import httpx
-    HTTPX_AVAILABLE = True
-except ImportError:
-    HTTPX_AVAILABLE = False
-    httpx = None
+from .contracts import Transport
+
+import httpx
+HTTPX_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 from ..monitoring.error_recovery import retry_with_backoff
@@ -29,17 +27,6 @@ from .client import HttpError, RetryConfig
 logger = get_logger("xsystem.http.advanced_client")
 
 
-@runtime_checkable
-class Transport(Protocol):
-    """Protocol for pluggable HTTP transports."""
-    
-    async def handle_async_request(self, request: Any) -> Any:
-        """Handle an async HTTP request."""
-        ...
-    
-    def handle_request(self, request: Any) -> Any:
-        """Handle a sync HTTP request."""
-        ...
 
 
 @dataclass

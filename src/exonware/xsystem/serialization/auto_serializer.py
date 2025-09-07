@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\auto_serializer.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Automatic serializer that detects format and delegates to appropriate serializer.
 """
@@ -12,7 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Type, Union
 
 from .format_detector import FormatDetector, detect_format
-from .iSerialization import iSerialization
+from .contracts import ISerialization
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.auto_serializer")
@@ -35,10 +36,10 @@ class AutoSerializer:
             confidence_threshold: Minimum confidence for format detection
         """
         self._detector = FormatDetector(confidence_threshold)
-        self._serializer_cache: Dict[str, iSerialization] = {}
+        self._serializer_cache: Dict[str, ISerialization] = {}
         self._default_format = default_format
     
-    def _get_serializer_class(self, format_name: str) -> Type[iSerialization]:
+    def _get_serializer_class(self, format_name: str) -> Type[ISerialization]:
         """
         Get serializer class for format name.
         
@@ -96,7 +97,7 @@ class AutoSerializer:
         except (ImportError, AttributeError) as e:
             raise ImportError(f"Serializer for {format_name} not available: {e}")
     
-    def _get_serializer(self, format_name: str) -> iSerialization:
+    def _get_serializer(self, format_name: str) -> ISerialization:
         """
         Get cached serializer instance for format.
         

@@ -321,7 +321,7 @@ with AtomicFileWriter("important.json") as writer:
     writer.write(json.dumps(data))
 ```
 
-#### **Serialization (24 Formats) - The Crown Jewel**
+#### **Serialization (30 Formats) - The Crown Jewel**
 ```python
 from exonware.xsystem import (
     # Text formats (8 formats)
@@ -333,7 +333,11 @@ from exonware.xsystem import (
     DbmSerializer, ShelveSerializer, PlistlibSerializer,
     # 🆕 NEW: Schema-based enterprise formats (7 formats)
     AvroSerializer, ProtobufSerializer, ThriftSerializer,
-    ParquetSerializer, OrcSerializer, CapnProtoSerializer, FlatBuffersSerializer
+    ParquetSerializer, OrcSerializer, CapnProtoSerializer, FlatBuffersSerializer,
+    # 🆕 NEW: Key-value stores (3 formats)
+    LevelDbSerializer, LmdbSerializer, ZarrSerializer,
+    # 🆕 NEW: Scientific & analytics (3 formats)
+    Hdf5Serializer, FeatherSerializer, GraphDbSerializer
 )
 
 # Text formats (human-readable)
@@ -365,6 +369,16 @@ pqs = ParquetSerializer()          # Apache Parquet - columnar analytics
 ors = OrcSerializer()              # Apache ORC - optimized row columnar
 cps = CapnProtoSerializer()        # Cap'n Proto - infinite speed (optional)
 fbs = FlatBuffersSerializer()      # FlatBuffers - zero-copy access
+
+# 🆕 NEW: Key-value stores (3 formats)
+ldbs = LevelDbSerializer()         # LevelDB/RocksDB - fast key-value store
+lmdb = LmdbSerializer()            # LMDB - memory-mapped database
+zarr = ZarrSerializer()            # Zarr - chunked compressed arrays
+
+# 🆕 NEW: Scientific & analytics (3 formats)
+hdf5 = Hdf5Serializer()            # HDF5 - hierarchical tree, partial fast access
+feather = FeatherSerializer()      # Feather/Arrow - columnar, zero-copy, fast I/O
+graphdb = GraphDbSerializer()      # Neo4j/Dgraph - graph structure, optimized for relationships
 
 # Same API, any format - that's the magic!
 data = {"users": 1000, "active": True, "tags": ["fast", "reliable"]}

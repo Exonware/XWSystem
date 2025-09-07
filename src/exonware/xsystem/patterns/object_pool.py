@@ -1,5 +1,5 @@
 """
-Generic object pool implementation for xSystem framework.
+Generic object pool implementation for XSystem framework.
 
 This module provides a reusable object pool that can be used across different
 components to reduce memory allocation overhead and improve performance.

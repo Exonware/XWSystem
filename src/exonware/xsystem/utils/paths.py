@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Path utilities for xSystem.
+Path utilities for XSystem.
 Provides common path operations and project root detection.
 """
 
@@ -105,3 +105,42 @@ def setup_python_path(
         sys.path.insert(0, src_path_str)
 
     return project_root, src_path
+
+
+class PathUtils:
+    """Utility class for path operations."""
+    
+    @staticmethod
+    def get_project_root(from_file: Optional[str] = None, levels_up: int = 7) -> Path:
+        """Get the project root directory."""
+        return get_project_root(from_file, levels_up)
+    
+    @staticmethod
+    def get_src_path(from_file: Optional[str] = None, levels_up: int = 7) -> Path:
+        """Get the src directory path."""
+        return get_src_path(from_file, levels_up)
+    
+    @staticmethod
+    def setup_paths(from_file: Optional[str] = None, levels_up: int = 7) -> tuple[Path, Path]:
+        """Setup project and src paths."""
+        return setup_paths(from_file, levels_up)
+    
+    @staticmethod
+    def normalize_path(path: str) -> Path:
+        """Normalize a path string."""
+        return Path(path).resolve()
+    
+    @staticmethod
+    def ensure_dir(path: Path) -> Path:
+        """Ensure directory exists."""
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+    
+    @staticmethod
+    def is_relative_to(path: Path, other: Path) -> bool:
+        """Check if path is relative to another path."""
+        try:
+            path.relative_to(other)
+            return True
+        except ValueError:
+            return False

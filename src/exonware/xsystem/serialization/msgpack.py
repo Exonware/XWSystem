@@ -1,45 +1,29 @@
+#exonware\xsystem\serialization\msgpack.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 MessagePack Serializer Implementation
 
 Provides MessagePack serialization with binary format support, compression,
-and integration with xSystem utilities for security and validation.
+and integration with XSystem utilities for security and validation.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import io
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
-try:
-    import msgpack
-    _MSGPACK_AVAILABLE = True
-except ImportError:
-    _MSGPACK_AVAILABLE = False
-    
-    # Define dummy classes for type hints when msgpack is not available
-    class _DummyPacker:
-        pass
-    
-    class _DummyUnpacker:
-        pass
-    
-    msgpack = type('msgpack', (), {
-        'packb': lambda *args, **kwargs: None,
-        'unpackb': lambda *args, **kwargs: None,
-        'Packer': _DummyPacker,
-        'Unpacker': _DummyUnpacker,
-    })()
+import msgpack
+_MSGPACK_AVAILABLE = True
 
 
-class MsgPackSerializer(aSerialization):
+class MsgPackSerializer(ASerialization):
     """
     MessagePack serializer with binary format support and compression.
     

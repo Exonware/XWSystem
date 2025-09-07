@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\capnproto.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 05, 2025
 
 Enhanced Cap'n Proto serialization with security, validation and performance optimizations.
 """
@@ -12,12 +13,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Type
 
-try:
-    import capnp
-except ImportError:
-    capnp = None
+# Explicit import - dependency managed via pyproject.toml optional dependencies
+# Install with: pip install exonware-xsystem[enterprise-capnproto]
+import capnp
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.capnproto")
@@ -30,9 +31,9 @@ class CapnProtoError(SerializationError):
         super().__init__(message, "CAPNPROTO", original_error)
 
 
-class CapnProtoSerializer(aSerialization):
+class CapnProtoSerializer(ASerialization):
     """
-    Enhanced Cap'n Proto serializer with schema validation and xSystem integration.
+    Enhanced Cap'n Proto serializer with schema validation and XSystem integration.
     
     Cap'n Proto is an infinitely fast data interchange format and capability-based RPC system.
     
@@ -75,15 +76,6 @@ class CapnProtoSerializer(aSerialization):
             base_path: Base path for path validation
             traversal_limit: Message traversal limit for security
         """
-        # Check if pycapnp is available
-        if capnp is None:
-            raise CapnProtoError(
-                "Cap'n Proto requires pycapnp which needs C++ build tools.\n"
-                "Install with: pip install pycapnp\n"
-                "Note: This is optional - you have 23 other serialization formats available!"
-            )
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -92,7 +84,13 @@ class CapnProtoSerializer(aSerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        
+        if capnp is None:
+            raise CapnProtoError(
+                "Cap'n Proto requires pycapnp which needs C++ build tools.\n"
+                "Install with: pip install pycapnp\n"
+                "Note: This is optional - you have 23 other serialization formats available!"
+            )
+            
         # Cap'n Proto-specific configuration
         self.schema_file = Path(schema_file) if schema_file else None
         self.struct_name = struct_name
@@ -104,7 +102,8 @@ class CapnProtoSerializer(aSerialization):
         if self.schema_file and self.struct_name:
             self._load_schema()
         
-        # Update configuration with Cap'n Proto-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'schema_file': str(self.schema_file) if self.schema_file else None,
             'struct_name': struct_name,
@@ -392,6 +391,14 @@ class CapnProtoSerializer(aSerialization):
             
         except Exception as e:
             self._handle_serialization_error("deserialization", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise CapnProtoError("Cap'n Proto is a binary format and does not support text-based serialization.")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise CapnProtoError("Cap'n Proto is a binary format and does not support text-based serialization.")
 
 
 # Convenience functions for common use cases

@@ -2,12 +2,12 @@
 Pipe Communication Utilities
 ============================
 
-Production-grade pipes for xSystem.
+Production-grade pipes for XSystem.
 
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Company: eXonware.com
-Generated: 2025-01-27
+Generation Date: September 05, 2025
 """
 
 import asyncio
@@ -61,10 +61,11 @@ class Pipe:
     
     def _create_windows_pipe(self):
         """Create Windows named pipe."""
+        # Import is explicit - if missing, user should install pywin32 for Windows optimizations
+        import win32pipe
+        import win32file
+        
         try:
-            import win32pipe
-            import win32file
-            
             # Create named pipe
             self._pipe_handle = win32pipe.CreateNamedPipe(
                 self.pipe_name,
@@ -80,9 +81,9 @@ class Pipe:
             self._read_handle = self._pipe_handle
             self._write_handle = self._pipe_handle
             
-        except ImportError:
-            # Fallback to multiprocessing pipe
-            logger.warning("pywin32 not available, using multiprocessing pipe")
+        except Exception as e:
+            # Fallback to multiprocessing pipe if named pipe creation fails
+            logger.warning(f"Windows named pipe creation failed: {e}, using multiprocessing pipe")
             self._read_conn, self._write_conn = mp.Pipe(self.duplex)
             self._read_handle = self._read_conn
             self._write_handle = self._write_conn
@@ -423,11 +424,125 @@ class AsyncPipe:
         await self.close()
 
 
+class PipeManager:
+    """
+    Manager for pipe creation and management.
+    
+    Provides a high-level interface for creating and managing pipes
+    for inter-process communication.
+    """
+    
+    def __init__(self):
+        """Initialize pipe manager."""
+        self._pipes = {}
+        self._next_id = 0
+        self._lock = threading.RLock()
+    
+    def create_pipe(self, duplex: bool = True, buffer_size: int = 8192) -> tuple:
+        """
+        Create a new pipe.
+        
+        Args:
+            duplex: Whether pipe supports bidirectional communication
+            buffer_size: Buffer size for data transfer
+            
+        Returns:
+            Tuple of (read_end, write_end) or (pipe_id, pipe_object)
+        """
+        with self._lock:
+            pipe_id = f"pipe_{self._next_id}"
+            self._next_id += 1
+            
+            try:
+                # Create pipe using multiprocessing
+                read_conn, write_conn = mp.Pipe(duplex)
+                
+                # Store pipe info
+                self._pipes[pipe_id] = {
+                    'read_conn': read_conn,
+                    'write_conn': write_conn,
+                    'duplex': duplex,
+                    'buffer_size': buffer_size
+                }
+                
+                if duplex:
+                    return (read_conn, write_conn)
+                else:
+                    return (read_conn, write_conn)
+                    
+            except Exception as e:
+                logger.error(f"Failed to create pipe: {e}")
+                return (None, None)
+    
+    def close_pipe(self, pipe_id: str) -> bool:
+        """
+        Close a pipe by ID.
+        
+        Args:
+            pipe_id: ID of the pipe to close
+            
+        Returns:
+            True if successful
+        """
+        with self._lock:
+            if pipe_id not in self._pipes:
+                return False
+            
+            try:
+                pipe_info = self._pipes[pipe_id]
+                pipe_info['read_conn'].close()
+                pipe_info['write_conn'].close()
+                del self._pipes[pipe_id]
+                
+                logger.debug(f"Closed pipe {pipe_id}")
+                return True
+                
+            except Exception as e:
+                logger.error(f"Failed to close pipe {pipe_id}: {e}")
+                return False
+    
+    def get_pipe_info(self, pipe_id: str) -> dict:
+        """
+        Get information about a pipe.
+        
+        Args:
+            pipe_id: ID of the pipe
+            
+        Returns:
+            Dictionary with pipe information
+        """
+        with self._lock:
+            return self._pipes.get(pipe_id, {})
+    
+    def list_pipes(self) -> list:
+        """
+        List all active pipes.
+        
+        Returns:
+            List of pipe IDs
+        """
+        with self._lock:
+            return list(self._pipes.keys())
+    
+    def close_all_pipes(self) -> int:
+        """
+        Close all pipes.
+        
+        Returns:
+            Number of pipes closed
+        """
+        with self._lock:
+            closed_count = 0
+            for pipe_id in list(self._pipes.keys()):
+                if self.close_pipe(pipe_id):
+                    closed_count += 1
+            
+            return closed_count
+
+
 def is_pipes_available() -> bool:
     """Check if pipe functionality is available."""
-    try:
-        import multiprocessing
-        import pickle
-        return True
-    except ImportError:
-        return False
+    # multiprocessing and pickle are built-in Python modules
+    import multiprocessing
+    import pickle
+    return True

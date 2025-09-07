@@ -2,7 +2,7 @@
 Datetime Parsing Utilities
 ==========================
 
-Production-grade datetime parsing for xSystem.
+Production-grade datetime parsing for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
@@ -159,3 +159,63 @@ def parse_timestamp(timestamp: Union[int, float, str]) -> Optional[datetime]:
     except (ValueError, OSError, OverflowError) as e:
         logger.debug(f"Failed to parse timestamp '{timestamp}': {e}")
         return None
+
+
+class DateTimeParser:
+    """Advanced datetime parser with multiple format support."""
+    
+    def __init__(self, default_timezone: Optional[timezone] = None):
+        self.default_timezone = default_timezone or timezone.utc
+        self._cache = {}
+    
+    def parse(self, text: str) -> Optional[datetime]:
+        """Parse datetime from text with caching."""
+        if not text:
+            return None
+        
+        # Check cache first
+        if text in self._cache:
+            return self._cache[text]
+        
+        result = parse_datetime(text, self.default_timezone)
+        if result:
+            self._cache[text] = result
+        
+        return result
+    
+    def parse_date(self, text: str) -> Optional[date]:
+        """Parse date from text."""
+        dt = self.parse(text)
+        return dt.date() if dt else None
+    
+    def parse_time(self, text: str) -> Optional[time]:
+        """Parse time from text."""
+        return parse_time(text)
+    
+    def parse_iso8601(self, text: str) -> Optional[datetime]:
+        """Parse ISO 8601 datetime string."""
+        return parse_iso8601(text)
+    
+    def parse_timestamp(self, timestamp: Union[int, float, str]) -> Optional[datetime]:
+        """Parse Unix timestamp to datetime."""
+        return parse_timestamp(timestamp)
+    
+    def clear_cache(self):
+        """Clear parsing cache."""
+        self._cache.clear()
+    
+    def get_cache_size(self) -> int:
+        """Get cache size."""
+        return len(self._cache)
+    
+    def is_valid_datetime(self, text: str) -> bool:
+        """Check if text is a valid datetime."""
+        return self.parse(text) is not None
+    
+    def is_valid_date(self, text: str) -> bool:
+        """Check if text is a valid date."""
+        return self.parse_date(text) is not None
+    
+    def is_valid_time(self, text: str) -> bool:
+        """Check if text is a valid time."""
+        return self.parse_time(text) is not None

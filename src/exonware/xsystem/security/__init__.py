@@ -1,5 +1,5 @@
 """
-xSystem Security Package
+XSystem Security Package
 
 Provides security utilities including path validation and resource limits.
 """

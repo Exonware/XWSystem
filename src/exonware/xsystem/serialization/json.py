@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\json.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced JSON serialization with security, validation and performance optimizations.
 """
@@ -14,20 +15,16 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, TextIO
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError, JsonError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.json")
 
 
-class JsonError(SerializationError):
-    """JSON-specific serialization error."""
-    
-    def __init__(self, message: str, original_error: Optional[Exception] = None):
-        super().__init__(message, "JSON", original_error)
 
 
-class JsonSerializer(aSerialization):
+class JsonSerializer(ASerialization):
     """
     Enhanced JSON serializer with security validation, custom encoders,
     and performance optimizations for production use.
@@ -61,7 +58,7 @@ class JsonSerializer(aSerialization):
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
         """
-        # Initialize base class with xSystem integration
+        # Initialize base class with XSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,

@@ -1,25 +1,26 @@
+#exonware\xsystem\serialization\formdata.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 FormData (URL-encoded) Serializer Implementation
 
 Provides URL-encoded form data serialization with proper encoding,
-nested data support, and integration with xSystem utilities.
+nested data support, and integration with XSystem utilities.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import urllib.parse
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
 
-class FormDataSerializer(aSerialization):
+class FormDataSerializer(ASerialization):
     """
     FormData (application/x-www-form-urlencoded) serializer.
     

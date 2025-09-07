@@ -563,3 +563,41 @@ def register_imports_batch(
     )
 
     return results
+
+
+class ImportRegistry:
+    """Registry for managing import statements and __all__ lists."""
+    
+    def __init__(self, project_root: Optional[Path] = None):
+        """Initialize import registry."""
+        self.project_root = project_root or Path.cwd().resolve()
+        self._registered_imports = {}
+    
+    def register_imports(self, target_package: str, source_folders: List[str], auto_markers: Optional[Tuple[str, str]] = None) -> bool:
+        """Register imports for a package."""
+        return register_imports(
+            target_package=target_package,
+            source_folders=source_folders,
+            project_root=self.project_root,
+            auto_markers=auto_markers
+        )
+    
+    def batch_register_imports(self, tasks: List[Dict[str, Any]], auto_markers: Optional[Tuple[str, str]] = None) -> Dict[str, bool]:
+        """Batch register imports for multiple packages."""
+        return batch_register_imports(
+            tasks=tasks,
+            project_root=self.project_root,
+            auto_markers=auto_markers
+        )
+    
+    def get_package_imports(self, package_name: str) -> List[str]:
+        """Get imports for a package."""
+        return self._registered_imports.get(package_name, [])
+    
+    def clear_registry(self):
+        """Clear the import registry."""
+        self._registered_imports.clear()
+    
+    def list_registered_packages(self) -> List[str]:
+        """List all registered packages."""
+        return list(self._registered_imports.keys())

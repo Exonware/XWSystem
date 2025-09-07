@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\thrift.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced Apache Thrift serialization with security, validation and performance optimizations.
 """
@@ -15,11 +16,16 @@ from typing import Any, Dict, List, Optional, Union, Type
 from thrift.protocol import TBinaryProtocol, TCompactProtocol, TJSONProtocol
 from thrift.transport import TTransport
 from thrift.Thrift import TException, TMessageType, TType
+from thrift.protocol.TBinaryProtocol import TProtocolFactory
 
 # Use TException as base class since TBase doesn't exist in this Thrift version
 TBase = TException
 
-from .aSerialization import aSerialization, SerializationError
+# Check if thrift is available
+_thrift_available = True
+
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.thrift")
@@ -32,9 +38,9 @@ class ThriftError(SerializationError):
         super().__init__(message, "THRIFT", original_error)
 
 
-class ThriftSerializer(aSerialization):
+class ThriftSerializer(ASerialization):
     """
-    Enhanced Apache Thrift serializer with protocol selection and xSystem integration.
+    Enhanced Apache Thrift serializer with protocol selection and XSystem integration.
     
     Apache Thrift is a software framework for scalable cross-language services development.
     It combines a software stack with a code generation engine to build services.
@@ -60,11 +66,11 @@ class ThriftSerializer(aSerialization):
         base_path: Optional[Union[str, Path]] = None,
     ) -> None:
         """
-        Initialize Thrift serializer with protocol and security options.
+        Initialize Thrift serializer with security options.
 
         Args:
-            thrift_class: Thrift struct/class (required for serialization)
-            protocol: Thrift protocol to use (binary, compact, json)
+            thrift_class: Generated Thrift class for serialization
+            protocol: 'binary', 'compact', or 'json'
             validate_input: Whether to validate input data for security
             max_depth: Maximum nesting depth allowed
             max_size_mb: Maximum data size in MB
@@ -72,9 +78,6 @@ class ThriftSerializer(aSerialization):
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -83,19 +86,22 @@ class ThriftSerializer(aSerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        
-        # Thrift-specific configuration
+        if not _thrift_available:
+            raise ThriftError(
+                "Thrift serialization requires the 'thrift' library.\n"
+                "Install with: pip install thrift\n"
+                "Note: This is optional - you have 23 other serialization formats available!"
+            )
+            
         self.thrift_class = thrift_class
-        self.protocol = protocol.lower()
+        self.protocol = protocol
+        self.protocol_factory = self._get_protocol_factory()
         
-        # Validate protocol
-        if self.protocol not in ['binary', 'compact', 'json']:
-            raise ThriftError(f"Unsupported protocol: {protocol}. Use 'binary', 'compact', or 'json'")
-        
-        # Update configuration with Thrift-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'thrift_class': thrift_class.__name__ if thrift_class else None,
-            'protocol': self.protocol,
+            'protocol': protocol,
         })
 
     @property
@@ -134,7 +140,7 @@ class ThriftSerializer(aSerialization):
         if not issubclass(self.thrift_class, TBase):
             raise ThriftError(f"Thrift class must inherit from TBase, got {type(self.thrift_class)}")
 
-    def _get_protocol_factory(self):
+    def _get_protocol_factory(self) -> TProtocolFactory:
         """Get the appropriate protocol factory based on configuration."""
         if self.protocol == 'binary':
             return TBinaryProtocol.TBinaryProtocolFactory()
@@ -271,8 +277,7 @@ class ThriftSerializer(aSerialization):
             
             # Serialize using JSON protocol
             transport = TTransport.TMemoryBuffer()
-            protocol_factory = self._get_protocol_factory()
-            protocol = protocol_factory.getProtocol(transport)
+            protocol = self.protocol_factory.getProtocol(transport)
             
             thrift_obj.write(protocol)
             
@@ -304,8 +309,7 @@ class ThriftSerializer(aSerialization):
             
             # Deserialize using JSON protocol
             transport = TTransport.TMemoryBuffer(data.encode('utf-8'))
-            protocol_factory = self._get_protocol_factory()
-            protocol = protocol_factory.getProtocol(transport)
+            protocol = self.protocol_factory.getProtocol(transport)
             
             thrift_obj = self.thrift_class()
             thrift_obj.read(protocol)
@@ -372,16 +376,16 @@ class ThriftSerializer(aSerialization):
         try:
             self._validate_thrift_class()
             
-            # Deserialize using appropriate protocol
+            # Create a new instance of the Thrift class
+            obj = self.thrift_class()
+            
+            # Deserialize from bytes
             transport = TTransport.TMemoryBuffer(data)
-            protocol_factory = self._get_protocol_factory()
-            protocol = protocol_factory.getProtocol(transport)
+            protocol = self._get_protocol_factory().getProtocol(transport)
+            obj.read(protocol)
             
-            thrift_obj = self.thrift_class()
-            thrift_obj.read(protocol)
-            
-            # Convert to dictionary for consistent API
-            return self._thrift_to_dict(thrift_obj)
+            # Convert to dictionary for a consistent API
+            return self._thrift_to_dict(obj)
             
         except Exception as e:
             self._handle_serialization_error("deserialization", e)

@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\flyweight.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 05, 2025
 
 Flyweight Pattern Implementation for Serializers
 
@@ -17,11 +18,11 @@ from typing import Any, Dict, Hashable, Optional, Type, TypeVar, Union
 from weakref import WeakValueDictionary
 
 from ..config.logging_setup import get_logger
-from .iSerialization import iSerialization
+from .contracts import ISerialization
 
 logger = get_logger("xsystem.serialization.flyweight")
 
-T = TypeVar('T', bound=iSerialization)
+T = TypeVar('T', bound=ISerialization)
 
 
 class SerializerFlyweight:
@@ -34,7 +35,7 @@ class SerializerFlyweight:
     
     def __init__(self):
         """Initialize the flyweight factory."""
-        self._instances: WeakValueDictionary[str, iSerialization] = WeakValueDictionary()
+        self._instances: WeakValueDictionary[str, ISerialization] = WeakValueDictionary()
         self._lock = threading.RLock()
         self._stats = {
             'created': 0,
@@ -240,7 +241,7 @@ class SerializerPool:
         """
         self.max_size = max_size
         self.eviction_policy = eviction_policy
-        self._instances: Dict[str, iSerialization] = {}
+        self._instances: Dict[str, ISerialization] = {}
         self._access_order: Dict[str, int] = {}  # For LRU
         self._access_count: Dict[str, int] = {}  # For LFU
         self._insertion_order: Dict[str, int] = {}  # For FIFO
@@ -318,7 +319,7 @@ class SerializerPool:
 
 
 # Factory function for easy serializer creation with flyweight optimization
-def create_serializer(format_name: str, **config: Any) -> iSerialization:
+def create_serializer(format_name: str, **config: Any) -> ISerialization:
     """
     Create a serializer instance by format name using flyweight pattern.
     
@@ -342,50 +343,28 @@ def create_serializer(format_name: str, **config: Any) -> iSerialization:
         FormDataSerializer, MultipartSerializer
     )
     
-    # Enterprise formats (optional dependencies)
+    # Enterprise formats (explicit imports - dependencies managed via pyproject.toml)
+    # These imports will fail if optional dependencies are not installed
+    # This is the correct approach per DEV_GUIDELINES.md - no try/except for imports
     optional_serializers = {}
     
-    try:
-        from . import AvroSerializer
-        optional_serializers['avro'] = AvroSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import ProtobufSerializer
-        optional_serializers['protobuf'] = ProtobufSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import ThriftSerializer
-        optional_serializers['thrift'] = ThriftSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import ParquetSerializer
-        optional_serializers['parquet'] = ParquetSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import OrcSerializer
-        optional_serializers['orc'] = OrcSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import CapnProtoSerializer
-        optional_serializers['capnproto'] = CapnProtoSerializer
-    except ImportError:
-        pass
-        
-    try:
-        from . import FlatBuffersSerializer
-        optional_serializers['flatbuffers'] = FlatBuffersSerializer
-    except ImportError:
-        pass
+    # Import enterprise serializers explicitly
+    # If these fail, it means the optional dependencies are not installed
+    # Users should install with: pip install exonware-xsystem[enterprise]
+    from . import (
+        AvroSerializer, ProtobufSerializer, ThriftSerializer,
+        ParquetSerializer, OrcSerializer, CapnProtoSerializer, FlatBuffersSerializer
+    )
+    
+    optional_serializers.update({
+        'avro': AvroSerializer,
+        'protobuf': ProtobufSerializer,
+        'thrift': ThriftSerializer,
+        'parquet': ParquetSerializer,
+        'orc': OrcSerializer,
+        'capnproto': CapnProtoSerializer,
+        'flatbuffers': FlatBuffersSerializer
+    })
     
     # Core formats (always available)
     format_map = {

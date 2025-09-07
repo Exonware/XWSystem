@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 05, 2025
 
 Colored terminal output utilities with cross-platform support.
 """
@@ -13,12 +13,11 @@ import sys
 from enum import Enum
 from typing import Optional, Union
 
-try:
-    import colorama
-    colorama.init(autoreset=True)
-    COLORAMA_AVAILABLE = True
-except ImportError:
-    COLORAMA_AVAILABLE = False
+# Explicit import - colorama is a required dependency for CLI functionality
+# This ensures consistent cross-platform colored output
+import colorama
+colorama.init(autoreset=True)
+COLORAMA_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 

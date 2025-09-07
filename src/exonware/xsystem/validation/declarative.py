@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Pydantic-style declarative validation with type hints and automatic coercion.
 """
@@ -93,7 +93,7 @@ class Field:
 
 
 class ModelMeta(type):
-    """Metaclass for xModel to handle type hints and field processing."""
+    """Metaclass for XModel to handle type hints and field processing."""
     
     def __new__(mcs, name, bases, namespace, **kwargs):
         # Get type hints from the class
@@ -129,7 +129,7 @@ class ModelMeta(type):
         return super().__new__(mcs, name, bases, namespace)
 
 
-class xModel(metaclass=ModelMeta):
+class XModel(metaclass=ModelMeta):
     """
     Base class for declarative validation models (Pydantic-style).
     
@@ -442,12 +442,12 @@ class xModel(metaclass=ModelMeta):
             raise ValidationError(f"Value must be one of: {field_config.enum}")
     
     @classmethod
-    def model_validate(cls, data: Dict[str, Any]) -> 'xModel':
+    def model_validate(cls, data: Dict[str, Any]) -> 'XModel':
         """Create and validate model from dictionary data."""
         return cls(**data)
     
     @classmethod
-    def model_validate_json(cls, json_data: str) -> 'xModel':
+    def model_validate_json(cls, json_data: str) -> 'XModel':
         """Create and validate model from JSON string."""
         data = json.loads(json_data)
         return cls.model_validate(data)

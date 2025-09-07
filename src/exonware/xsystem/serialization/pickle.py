@@ -1,14 +1,15 @@
+#exonware\xsystem\serialization\pickle.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Python Pickle Serializer Implementation
 
 Provides Python pickle serialization with protocol version control,
-security considerations, and integration with xSystem utilities.
+security considerations, and integration with XSystem utilities.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -17,8 +18,8 @@ import pickletools
 import io
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
 class SecureUnpickler(pickle.Unpickler):
     """
@@ -55,7 +56,7 @@ class SecureUnpickler(pickle.Unpickler):
         return super().find_class(module, name)
 
 
-class PickleSerializer(aSerialization):
+class PickleSerializer(ASerialization):
     """
     Python Pickle serializer with security considerations.
     

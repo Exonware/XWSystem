@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 HTTP client with retry mechanisms, connection pooling, and error handling.
 """
@@ -14,39 +14,13 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
-try:
-    import httpx
-    HTTPX_AVAILABLE = True
-except ImportError:
-    HTTPX_AVAILABLE = False
-    # Define dummy classes for type hints when httpx is not available
-    class httpx:
-        class ConnectError(Exception):
-            pass
-        class TimeoutException(Exception):
-            pass
-        class Response:
-            pass
-        class Client:
-            pass
-        class AsyncClient:
-            pass
-        class Limits:
-            pass
+import httpx
 
 from ..config.logging_setup import get_logger
 from ..monitoring.error_recovery import retry_with_backoff
+from .errors import HttpError
 
 logger = get_logger("xsystem.http.client")
-
-
-class HttpError(Exception):
-    """Base exception for HTTP client errors."""
-    
-    def __init__(self, message: str, status_code: Optional[int] = None, response_data: Optional[Any] = None):
-        super().__init__(message)
-        self.status_code = status_code
-        self.response_data = response_data
 
 
 @dataclass
@@ -87,8 +61,7 @@ class HttpClient:
             retry_config: Retry configuration
             default_headers: Default headers for all requests
         """
-        if not HTTPX_AVAILABLE:
-            raise HttpError("httpx is required for HTTP client. Install with: pip install httpx")
+        # httpx is now required
             
         self.base_url = base_url
         self.retry_config = retry_config or RetryConfig()
@@ -349,8 +322,7 @@ class AsyncHttpClient:
             retry_config: Retry configuration
             default_headers: Default headers for all requests
         """
-        if not HTTPX_AVAILABLE:
-            raise HttpError("httpx is required for HTTP client. Install with: pip install httpx")
+        # httpx is now required
             
         self.base_url = base_url
         self.retry_config = retry_config or RetryConfig()

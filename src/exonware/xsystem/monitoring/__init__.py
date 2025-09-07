@@ -1,5 +1,5 @@
 """
-xSystem Monitoring Package
+XSystem Monitoring Package
 
 Provides performance monitoring, metrics collection, system observation utilities,
 memory monitoring, error recovery, and resilience mechanisms.

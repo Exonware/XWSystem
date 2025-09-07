@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 Cryptographic utilities for secure data handling and protection.
 """
@@ -15,29 +15,16 @@ import time
 from base64 import b64decode, b64encode
 from typing import Any, Dict, Optional, Union
 
-try:
-    from cryptography.fernet import Fernet
-    from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import rsa, padding
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-    CRYPTOGRAPHY_AVAILABLE = True
-except ImportError:
-    CRYPTOGRAPHY_AVAILABLE = False
-
-try:
-    import bcrypt
-    BCRYPT_AVAILABLE = True
-except ImportError:
-    BCRYPT_AVAILABLE = False
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+import bcrypt
 
 from ..config.logging_setup import get_logger
+from .errors import CryptographicError
 
 logger = get_logger("xsystem.security.crypto")
-
-
-class CryptoError(Exception):
-    """Base exception for cryptographic operations."""
-    pass
 
 
 class SecureHash:
@@ -207,8 +194,6 @@ class SymmetricEncryption:
         Args:
             key: Encryption key (32 bytes) or None to generate new key
         """
-        if not CRYPTOGRAPHY_AVAILABLE:
-            raise CryptoError("cryptography library is required. Install with: pip install cryptography")
             
         if key is None:
             key = Fernet.generate_key()
@@ -219,8 +204,6 @@ class SymmetricEncryption:
     @classmethod
     def generate_key(cls) -> bytes:
         """Generate new encryption key."""
-        if not CRYPTOGRAPHY_AVAILABLE:
-            raise CryptoError("cryptography library is required. Install with: pip install cryptography")
         return Fernet.generate_key()
 
     @classmethod
@@ -235,8 +218,6 @@ class SymmetricEncryption:
         Returns:
             Tuple of (key, salt)
         """
-        if not CRYPTOGRAPHY_AVAILABLE:
-            raise CryptoError("cryptography library is required. Install with: pip install cryptography")
             
         if salt is None:
             salt = secrets.token_bytes(16)
@@ -315,8 +296,6 @@ class AsymmetricEncryption:
             private_key: Private key in PEM format
             public_key: Public key in PEM format
         """
-        if not CRYPTOGRAPHY_AVAILABLE:
-            raise CryptoError("cryptography library is required. Install with: pip install cryptography")
             
         self.private_key = None
         self.public_key = None
@@ -338,8 +317,6 @@ class AsymmetricEncryption:
         Returns:
             Tuple of (encryption instance, private_key_pem, public_key_pem)
         """
-        if not CRYPTOGRAPHY_AVAILABLE:
-            raise CryptoError("cryptography library is required. Install with: pip install cryptography")
             
         private_key = rsa.generate_private_key(
             public_exponent=65537,
@@ -371,7 +348,7 @@ class AsymmetricEncryption:
             Encrypted data
         """
         if not self.public_key:
-            raise CryptoError("Public key not available for encryption")
+            raise CryptographicError("Public key not available for encryption")
             
         if isinstance(data, str):
             data = data.encode('utf-8')
@@ -396,7 +373,7 @@ class AsymmetricEncryption:
             Decrypted data
         """
         if not self.private_key:
-            raise CryptoError("Private key not available for decryption")
+            raise CryptographicError("Private key not available for decryption")
             
         return self.private_key.decrypt(
             encrypted_data,
@@ -418,7 +395,7 @@ class AsymmetricEncryption:
             Digital signature
         """
         if not self.private_key:
-            raise CryptoError("Private key not available for signing")
+            raise CryptographicError("Private key not available for signing")
             
         if isinstance(data, str):
             data = data.encode('utf-8')
@@ -444,7 +421,7 @@ class AsymmetricEncryption:
             True if signature is valid
         """
         if not self.public_key:
-            raise CryptoError("Public key not available for verification")
+            raise CryptographicError("Public key not available for verification")
             
         if isinstance(data, str):
             data = data.encode('utf-8')
@@ -592,15 +569,12 @@ def hash_password(password: str, rounds: int = 12) -> str:
         Bcrypt hash string (includes salt and cost factor)
         
     Raises:
-        CryptoError: If bcrypt is not available
+        CryptographicError: If bcrypt is not available
     """
-    if not BCRYPT_AVAILABLE:
-        # Fallback to PBKDF2 if bcrypt is not available
-        logger.warning("bcrypt not available, falling back to PBKDF2. Install bcrypt for better security: pip install bcrypt")
-        return _hash_password_pbkdf2(password)
+    return _hash_password_pbkdf2(password)
     
     if not (4 <= rounds <= 31):
-        raise CryptoError("bcrypt rounds must be between 4 and 31")
+        raise CryptographicError("bcrypt rounds must be between 4 and 31")
     
     # Convert password to bytes
     password_bytes = password.encode('utf-8')
@@ -624,14 +598,11 @@ def verify_password(password: str, hashed_password: str) -> bool:
         True if password is correct
         
     Raises:
-        CryptoError: If bcrypt is not available and hash is not PBKDF2 format
+        CryptographicError: If bcrypt is not available and hash is not PBKDF2 format
     """
-    if not BCRYPT_AVAILABLE:
-        # Check if it's a PBKDF2 hash (fallback format)
-        if hashed_password.startswith('pbkdf2:'):
-            return _verify_password_pbkdf2(password, hashed_password)
-        else:
-            raise CryptoError("bcrypt not available and hash format not recognized. Install bcrypt: pip install bcrypt")
+    # Check if it's a PBKDF2 hash (fallback format)
+    if hashed_password.startswith('pbkdf2:'):
+        return _verify_password_pbkdf2(password, hashed_password)
     
     try:
         password_bytes = password.encode('utf-8')
@@ -652,8 +623,7 @@ def _hash_password_pbkdf2(password: str) -> str:
     Returns:
         PBKDF2 hash string with format: pbkdf2:iterations:salt:hash
     """
-    if not CRYPTOGRAPHY_AVAILABLE:
-        raise CryptoError("cryptography library is required for PBKDF2 fallback. Install with: pip install cryptography")
+    # cryptography is now required
     
     # Generate random salt
     salt = secrets.token_bytes(32)
@@ -686,8 +656,7 @@ def _verify_password_pbkdf2(password: str, hashed_password: str) -> bool:
     Returns:
         True if password is correct
     """
-    if not CRYPTOGRAPHY_AVAILABLE:
-        raise CryptoError("cryptography library is required for PBKDF2 verification")
+    # cryptography is now required
     
     try:
         # Parse hash format: pbkdf2:iterations:salt:hash

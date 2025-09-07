@@ -2,12 +2,12 @@
 Message Queue Utilities
 =======================
 
-Production-grade message queues for xSystem.
+Production-grade message queues for XSystem.
 
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Company: eXonware.com
-Generated: 2025-01-27
+Generation Date: September 05, 2025
 """
 
 import asyncio
@@ -226,6 +226,38 @@ class MessageQueue(Generic[T]):
         self._shutdown.set()
         logger.info("Message queue shutdown initiated")
     
+    def send(self, message: T, priority: int = 0, timeout: Optional[float] = None) -> bool:
+        """
+        Send a message (alias for put method).
+        
+        Args:
+            message: Message to send
+            priority: Message priority
+            timeout: Timeout for sending
+            
+        Returns:
+            True if successful
+        """
+        return self.put(message, priority, timeout)
+    
+    def receive(self, timeout: Optional[float] = None) -> Optional[T]:
+        """
+        Receive a message (alias for get method).
+        
+        Args:
+            timeout: Timeout for receiving
+            
+        Returns:
+            Received message or None
+        """
+        return self.get(timeout)
+    
+    def close(self):
+        """
+        Close the message queue (alias for shutdown method).
+        """
+        self.shutdown()
+    
     def __enter__(self):
         """Context manager entry."""
         return self
@@ -389,9 +421,7 @@ class AsyncMessageQueue(Generic[T]):
 
 def is_message_queue_available() -> bool:
     """Check if message queue functionality is available."""
-    try:
-        import queue
-        import multiprocessing
-        return True
-    except ImportError:
-        return False
+    # queue and multiprocessing are built-in Python modules
+    import queue
+    import multiprocessing
+    return True

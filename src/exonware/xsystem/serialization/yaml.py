@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\yaml.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced YAML serialization with security, validation and performance optimizations.
 """
@@ -13,32 +14,17 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, TextIO
 
-try:
-    import yaml
-    from yaml import SafeLoader, SafeDumper
-    YAML_AVAILABLE = True
-except ImportError:
-    YAML_AVAILABLE = False
-    # Define dummy classes for type hints when YAML is not available
-    class SafeLoader:
-        pass
-    class SafeDumper:
-        pass
+import yaml
+from yaml import SafeLoader, SafeDumper
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import YamlError, SerializationError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.yaml")
 
 
-class YamlError(SerializationError):
-    """YAML-specific serialization error."""
-    
-    def __init__(self, message: str, original_error: Optional[Exception] = None):
-        super().__init__(message, "YAML", original_error)
-
-
-class YamlSerializer(aSerialization):
+class YamlSerializer(ASerialization):
     """
     Enhanced YAML serializer with security validation, custom encoders,
     and performance optimizations for production use.
@@ -74,10 +60,9 @@ class YamlSerializer(aSerialization):
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
         """
-        if not YAML_AVAILABLE:
-            raise YamlError("PyYAML is required for YAML serialization. Install with: pip install PyYAML")
+        # YAML is now required
             
-        # Initialize base class with xSystem integration
+        # Initialize base class with XSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,

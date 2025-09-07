@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\shelve.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Shelve Serializer Implementation
 
@@ -17,7 +18,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 import warnings
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 
 
 class ShelveError(SerializationError):
@@ -27,7 +29,7 @@ class ShelveError(SerializationError):
         super().__init__(message, "Shelve", original_error)
 
 
-class ShelveSerializer(aSerialization):
+class ShelveSerializer(ASerialization):
     """
     Shelve serializer using built-in shelve module.
     

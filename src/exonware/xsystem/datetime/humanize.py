@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Human-friendly datetime formatting and parsing utilities.
 """
@@ -373,3 +373,39 @@ def natural_time_range(start: datetime, end: datetime) -> str:
     start_str = start.strftime("%b %d, %Y %I:%M %p").lstrip('0')
     end_str = end.strftime("%b %d, %Y %I:%M %p").lstrip('0')
     return f"{start_str} - {end_str}"
+
+
+class DateTimeHumanizer:
+    """Human-friendly datetime formatting and parsing utilities."""
+    
+    def __init__(self, locale: str = "en_US"):
+        """Initialize humanizer with locale."""
+        self.locale = locale
+    
+    def humanize_timedelta(self, td: timedelta, precision: int = 2, max_units: int = 2) -> str:
+        """Convert timedelta to human-readable string."""
+        return humanize_timedelta(td, precision, max_units)
+    
+    def humanize_datetime(self, dt: datetime, relative_to: Optional[datetime] = None) -> str:
+        """Convert datetime to human-readable string."""
+        return humanize_datetime(dt, relative_to)
+    
+    def humanize_date(self, date_obj: Union[datetime, str], relative_to: Optional[datetime] = None) -> str:
+        """Convert date to human-readable string."""
+        return humanize_date(date_obj, relative_to)
+    
+    def humanize_time(self, time_obj: Union[datetime, str], relative_to: Optional[datetime] = None) -> str:
+        """Convert time to human-readable string."""
+        return humanize_time(time_obj, relative_to)
+    
+    def natural_time_range(self, start: datetime, end: datetime) -> str:
+        """Convert time range to natural string."""
+        return natural_time_range(start, end)
+    
+    def parse_natural_time(self, text: str, relative_to: Optional[datetime] = None) -> Optional[datetime]:
+        """Parse natural time expressions."""
+        return parse_natural_time(text, relative_to)
+    
+    def format_relative_time(self, dt: datetime, relative_to: Optional[datetime] = None) -> str:
+        """Format datetime as relative time."""
+        return format_relative_time(dt, relative_to)

@@ -2,7 +2,7 @@
 Inter-Process Communication (IPC) Module
 ========================================
 
-Production-grade IPC utilities for xSystem.
+Production-grade IPC utilities for XSystem.
 
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com

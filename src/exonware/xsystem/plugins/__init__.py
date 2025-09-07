@@ -3,17 +3,25 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
-xSystem Plugins Package
+XSystem Plugins Package
 
 Provides plugin discovery, registration and management system
 with support for entry points and dynamic loading.
 """
 
-from .base import PluginManager, PluginBase, PluginRegistry
+from .base import APluginManager, APlugin, APluginRegistry
+
+# Convenience aliases following DEV_GUIDELINES.md naming conventions
+PluginManager = APluginManager
+PluginBase = APlugin
+PluginRegistry = APluginRegistry
 
 __all__ = [
+    "APluginManager",
+    "APlugin", 
+    "APluginRegistry",
     "PluginManager",
     "PluginBase", 
     "PluginRegistry",

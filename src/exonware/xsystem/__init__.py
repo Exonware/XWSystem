@@ -1,11 +1,12 @@
+#exonware/xsystem/__init__.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 05, 2025
 
-xSystem - Enterprise-grade Python framework with AI-powered performance optimization.
+XSystem - Enterprise-grade Python framework with AI-powered performance optimization.
 
 🚀 QUICK START:
     from xsystem import JsonSerializer, HttpClient, SecureHash
@@ -22,7 +23,7 @@ xSystem - Enterprise-grade Python framework with AI-powered performance optimiza
     password_hash = SecureHash.sha256("user_password")
 
 📚 FEATURE OVERVIEW:
-    - 24+ serialization formats (JSON, YAML, MessagePack, Avro, Protobuf, Cap'n Proto, etc.)
+    - 30+ serialization formats (JSON, YAML, MessagePack, Avro, Protobuf, Cap'n Proto, LevelDB, LMDB, Zarr, HDF5, Feather, GraphDB, etc.)
     - Military-grade security with hazmat layer
     - Advanced HTTP client with retry logic  
     - Performance monitoring and circuit breakers
@@ -30,8 +31,8 @@ xSystem - Enterprise-grade Python framework with AI-powered performance optimiza
     - Enterprise features (schema registry, tracing, auth)
 
 🎯 COMMON PATTERNS:
-    # Serialization (24+ formats: Text, Binary, Enterprise)
-    from xsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, AvroSerializer, ProtobufSerializer
+    # Serialization (30+ formats: Text, Binary, Enterprise, Key-Value, Scientific)
+    from xsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, AvroSerializer, ProtobufSerializer, LevelDbSerializer, LmdbSerializer, ZarrSerializer, Hdf5Serializer, FeatherSerializer, GraphDbSerializer
     
     # Security & Crypto
     from xsystem import SecureHash, SymmetricEncryption, PathValidator
@@ -61,8 +62,8 @@ from .config.logging_setup import get_logger, setup_logging
 
 # Serialization utilities (24 formats total + intelligent auto-detection)
 from .serialization import (
-    iSerialization,
-    aSerialization,
+    ISerialization,
+    ASerialization,
     SerializationError,
     # Core 12 formats
     JsonSerializer, JsonError,
@@ -84,7 +85,7 @@ from .serialization import (
     ShelveSerializer, ShelveError,
     PlistlibSerializer, PlistlibError,
     # Intelligent auto-detection
-    xSerialization, dumps, loads, save_file, load_file,
+    XSerialization, dumps, loads, save_file, load_file,
     # Flyweight optimization
     get_serializer, get_flyweight_stats, clear_serializer_cache, 
     get_cache_info, create_serializer, SerializerPool,
@@ -138,7 +139,7 @@ from .patterns.import_registry import (
 from .security.path_validator import PathSecurityError, PathValidator
 from .security.crypto import (
     AsymmetricEncryption, AsyncAsymmetricEncryption,
-    CryptoError,
+    CryptographicError,
     SecureHash,
     SecureRandom,
     SecureStorage, AsyncSecureStorage,
@@ -185,7 +186,8 @@ from .cli.progress import ProgressBar, SpinnerProgress, MultiProgress, ProgressC
 from .cli.tables import Table, TableFormatter, Column, Alignment, BorderStyle
 
 # Validation utilities
-from .validation.declarative import xModel, Field, ValidationError
+from .validation.declarative import XModel, Field, ValidationError
+from .validation.data_validator import DataValidator
 
 # Security hazmat layer
 from .security.hazmat import (
@@ -302,11 +304,11 @@ from .monitoring import (  # Performance Monitor; Memory Monitoring; Error Recov
 )
 
 # Validation utilities
-from .validation import xModel, Field, ValidationError
+from .validation import XModel, Field, ValidationError
 
 # Enterprise utilities
 from .enterprise import (
-    SchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
+    ASchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
     SchemaRegistryError, SchemaNotFoundError, SchemaValidationError,
     TracingManager, OpenTelemetryTracer, JaegerTracer,
     TracingError, SpanContext, TraceContext,
@@ -314,13 +316,11 @@ from .enterprise import (
     AuthenticationError, AuthorizationError, TokenExpiredError
 )
 
-# Protocol definitions for better type safety
-from .protocols import (
-    Serializable, AsyncSerializable, Hashable, Encryptable, 
-    Validatable, Cacheable, Monitorable, Configurable,
-    SerializationData, HashAlgorithm, EncryptionKey, ValidationRule,
-    CacheKey, ConfigValue
-)
+# Note: Protocol definitions are now in their respective module contracts files:
+# - serialization/contracts.py for serialization protocols
+# - caching/contracts.py for caching protocols  
+# - security/contracts.py for security protocols
+# - validation/contracts.py for validation protocols
 
 __version__ = "0.0.1"
 
@@ -334,7 +334,7 @@ def quick_serialize(data, format="json", **kwargs):
     
     Args:
         data: Data to serialize
-        format: Format name - supports all xSystem formats:
+        format: Format name - supports all XSystem formats:
                Text: json, yaml, toml, xml, csv, ini/configparser, formdata, multipart
                Binary: bson, msgpack, cbor, pickle, marshal, dbm, shelve, plist
                Enterprise: avro, protobuf, thrift, parquet, orc, capnproto, flatbuffers
@@ -383,8 +383,8 @@ def quick_deserialize(data, format="auto", **kwargs):
         {'hello': 'world'}
     """
     if format == "auto":
-        from .serialization import xSerialization
-        return xSerialization().loads(data, **kwargs)
+        from .serialization import XSerialization
+        return XSerialization().loads(data, **kwargs)
     else:
         from .serialization import create_serializer
         serializer = create_serializer(format)
@@ -472,7 +472,9 @@ def list_available_formats():
     all_formats = [
         'json', 'yaml', 'toml', 'xml', 'csv', 'ini', 'formdata', 'multipart',  # Text
         'bson', 'msgpack', 'cbor', 'pickle', 'marshal', 'dbm', 'shelve', 'plist',  # Binary
-        'avro', 'protobuf', 'thrift', 'parquet', 'orc', 'capnproto', 'flatbuffers'  # Enterprise
+        'avro', 'protobuf', 'thrift', 'parquet', 'orc', 'capnproto', 'flatbuffers',  # Enterprise
+        'leveldb', 'lmdb', 'zarr',  # Key-value stores
+        'hdf5', 'feather', 'graphdb'  # Scientific & analytics
     ]
     
     available = []
@@ -492,6 +494,8 @@ def list_available_formats():
         'text': [f for f in available if f in ['json', 'yaml', 'toml', 'xml', 'csv', 'ini', 'formdata', 'multipart']],
         'binary': [f for f in available if f in ['bson', 'msgpack', 'cbor', 'pickle', 'marshal', 'dbm', 'shelve', 'plist']],
         'enterprise': [f for f in available if f in ['avro', 'protobuf', 'thrift', 'parquet', 'orc', 'capnproto', 'flatbuffers']],
+        'keyvalue': [f for f in available if f in ['leveldb', 'lmdb', 'zarr']],
+        'scientific': [f for f in available if f in ['hdf5', 'feather', 'graphdb']],
         'total_count': len(available)
     }
 
@@ -500,9 +504,9 @@ def list_available_formats():
 # =============================================================================
 
 __all__ = [
-        # Serialization (17 formats)
-    "iSerialization",
-    "aSerialization", 
+        # Serialization (30 formats)
+    "ISerialization",
+    "ASerialization", 
     "SerializationError",
     # Core 12 formats
     "JsonSerializer", "JsonError",
@@ -523,8 +527,25 @@ __all__ = [
     "DbmSerializer", "DbmError",
     "ShelveSerializer", "ShelveError",
     "PlistlibSerializer", "PlistlibError",
+    # Schema-based formats (7 enterprise formats)
+    "AvroSerializer", "AvroError",
+    "ProtobufSerializer", "ProtobufError",
+    "ThriftSerializer", "ThriftError",
+    "ParquetSerializer", "ParquetError",
+    "OrcSerializer", "OrcError",
+    "CapnProtoSerializer", "CapnProtoError",
+    "FlatBuffersSerializer", "FlatBuffersError",
+    # Key-value stores (3 additional formats)
+    "LevelDbSerializer", "LevelDbError",
+    "LmdbSerializer", "LmdbError",
+    "ZarrSerializer", "ZarrError",
+    
+    # Scientific & analytics (3 additional formats)
+    "Hdf5Serializer", "Hdf5Error",
+    "FeatherSerializer", "FeatherError",
+    "GraphDbSerializer", "GraphDbError",
     # Intelligent auto-detection
-    "xSerialization", "dumps", "loads", "save_file", "load_file",
+    "XSerialization", "dumps", "loads", "save_file", "load_file",
     # Flyweight optimization
     "get_serializer", "get_flyweight_stats", "clear_serializer_cache", 
     "get_cache_info", "create_serializer", "SerializerPool",
@@ -561,7 +582,7 @@ __all__ = [
     "PathValidator",
     "PathSecurityError",
     "AsymmetricEncryption", "AsyncAsymmetricEncryption",
-    "CryptoError",
+    "CryptographicError",
     "SecureHash",
     "SecureRandom",
     "SecureStorage", "AsyncSecureStorage",
@@ -659,7 +680,6 @@ __all__ = [
     "PerformanceStats",
     "create_performance_monitor",
     "performance_context",
-    "enhanced_error_context",
     "calculate_performance_summary",
     "format_performance_report",
     # Memory Monitoring
@@ -730,12 +750,12 @@ __all__ = [
     "Console",
     
         # Validation
-    "xModel",
+    "XModel",
     "Field", 
     "ValidationError",
     
     # Enterprise Features
-    "SchemaRegistry", "ConfluentSchemaRegistry", "AwsGlueSchemaRegistry",
+    "ASchemaRegistry", "ConfluentSchemaRegistry", "AwsGlueSchemaRegistry",
     "SchemaRegistryError", "SchemaNotFoundError", "SchemaValidationError",
     "TracingManager", "OpenTelemetryTracer", "JaegerTracer",
     "TracingError", "SpanContext", "TraceContext",

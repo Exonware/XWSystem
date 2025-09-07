@@ -1,8 +1,8 @@
 """
-Performance mode definitions for xSystem framework.
+Performance mode definitions for XSystem framework.
 
 This module provides enums and utilities for managing performance optimization
-modes across different components of the xSystem framework.
+modes across different components of the XSystem framework.
 """
 
 import gc
@@ -39,6 +39,14 @@ class PerformanceMode(Enum):
             return cls[value.upper()]
         except KeyError:
             raise ValueError(f"Invalid performance mode: {value}")
+
+
+class PerformanceModes:
+    """Performance mode constants for backward compatibility and simple usage."""
+    
+    FAST = "fast"
+    BALANCED = "balanced"
+    MEMORY_OPTIMIZED = "memory_optimized"
 
 
 @dataclass

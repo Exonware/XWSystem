@@ -3,11 +3,11 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Performance Configuration Management
 
-Centralized configuration for xSystem performance limits, timeouts, and optimization settings.
+Centralized configuration for XSystem performance limits, timeouts, and optimization settings.
 """
 
 from typing import Any, Dict, Final, Optional
@@ -92,7 +92,7 @@ class SecurityLimits:
 
 @dataclass
 class PerformanceLimits:
-    """Master configuration for all xSystem performance limits."""
+    """Master configuration for all XSystem performance limits."""
     
     # Component-specific limits
     serialization: SerializationLimits = field(default_factory=SerializationLimits)
@@ -121,7 +121,7 @@ class PerformanceConfig:
     """
     Centralized performance configuration manager.
     
-    Manages performance limits, timeouts, and optimization settings for xSystem.
+    Manages performance limits, timeouts, and optimization settings for XSystem.
     Supports environment variable overrides and runtime configuration updates.
     """
     
@@ -134,6 +134,7 @@ class PerformanceConfig:
         """
         self._limits = PerformanceLimits()
         self._config_file = config_file
+        self._mode = "balanced"  # Default mode
         self._load_from_environment()
         
         if config_file:
@@ -295,6 +296,32 @@ class PerformanceConfig:
                     setattr(self._limits, key, value)
         
         logger.info(f"Updated performance limits: {kwargs}")
+    
+    def set_mode(self, mode: str) -> None:
+        """Set performance mode."""
+        self._mode = mode
+        logger.info(f"Performance mode set to: {mode}")
+    
+    def get_mode(self) -> str:
+        """Get current performance mode."""
+        return self._mode
+    
+    def optimize(self) -> None:
+        """Optimize performance settings based on current mode."""
+        if self._mode == "fast":
+            # Optimize for speed
+            self._limits.serialization.max_size_mb = 100.0
+            self._limits.serialization.max_depth = 200
+        elif self._mode == "memory_optimized":
+            # Optimize for memory
+            self._limits.serialization.max_size_mb = 25.0
+            self._limits.serialization.max_depth = 50
+        else:  # balanced
+            # Balanced settings
+            self._limits.serialization.max_size_mb = 50.0
+            self._limits.serialization.max_depth = 100
+        
+        logger.info(f"Performance optimized for mode: {self._mode}")
     
     def export_config(self, format: str = 'json') -> Dict[str, Any]:
         """

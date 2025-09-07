@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Asynchronous I/O operations for non-blocking file handling.
 """
@@ -17,14 +17,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, AsyncContextManager, BinaryIO, List, Optional, TextIO, Union
 
-try:
-    import aiofiles
-    import aiofiles.os
-    AIOFILES_AVAILABLE = True
-except ImportError:
-    AIOFILES_AVAILABLE = False
-    # Provide fallback for type hints
-    aiofiles = None
+import aiofiles
+import aiofiles.os
+AIOFILES_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 from .atomic_file import FileOperationError

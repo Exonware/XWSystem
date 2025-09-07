@@ -1,14 +1,15 @@
+#exonware\xsystem\serialization\csv.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 CSV (Comma-Separated Values) Serializer Implementation
 
 Provides CSV serialization with dialect support, header management,
-and integration with xSystem utilities for security and validation.
+and integration with XSystem utilities for security and validation.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -16,11 +17,11 @@ import csv
 import io
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
 
-class CsvSerializer(aSerialization):
+class CsvSerializer(ASerialization):
     """
     CSV (Comma-Separated Values) serializer.
     

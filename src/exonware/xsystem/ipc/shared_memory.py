@@ -2,12 +2,12 @@
 Shared Memory Utilities
 =======================
 
-Production-grade shared memory management for xSystem.
+Production-grade shared memory management for XSystem.
 
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Company: eXonware.com
-Generated: 2025-01-27
+Generation Date: September 05, 2025
 """
 
 import os
@@ -292,6 +292,35 @@ class SharedMemoryManager:
                 segment.close()
             self._segments.clear()
     
+    def attach_segment(self, name: str) -> SharedData:
+        """
+        Attach to an existing shared memory segment.
+        
+        Args:
+            name: Name of the segment to attach to
+            
+        Returns:
+            SharedData object
+        """
+        return self.get_segment(name)
+    
+    def detach_segment(self, segment: SharedData) -> bool:
+        """
+        Detach from a shared memory segment.
+        
+        Args:
+            segment: SharedData segment to detach from
+            
+        Returns:
+            True if successful
+        """
+        try:
+            segment.close()
+            return True
+        except Exception as e:
+            logger.error(f"Failed to detach segment: {e}")
+            return False
+    
     def __enter__(self):
         """Context manager entry."""
         return self
@@ -320,10 +349,100 @@ def shared_data(name: str, size: int = 1024 * 1024):
         segment.close()
 
 
+class SharedMemory:
+    """
+    Simple shared memory interface for backward compatibility.
+    
+    Provides a simplified interface to shared memory functionality.
+    """
+    
+    def __init__(self, name: str = None, size: int = 1024 * 1024):
+        """
+        Initialize shared memory.
+        
+        Args:
+            name: Name for the shared memory segment
+            size: Size of the memory segment
+        """
+        self.name = name or f"xsystem_shared_{os.getpid()}"
+        self.size = size
+        self._manager = SharedMemoryManager()
+        self._segment = None
+    
+    def create(self, name: str, size: int) -> str:
+        """
+        Create a shared memory segment.
+        
+        Args:
+            name: Name for the segment
+            size: Size of the segment
+            
+        Returns:
+            Memory ID
+        """
+        self.name = name
+        self.size = size
+        self._segment = self._manager.create_segment(name, size)
+        return f"memory_{name}"
+    
+    def attach(self, name: str) -> str:
+        """
+        Attach to an existing shared memory segment.
+        
+        Args:
+            name: Name of the segment
+            
+        Returns:
+            Memory handle
+        """
+        self.name = name
+        self._segment = self._manager.attach_segment(name)
+        return f"handle_{name}"
+    
+    def detach(self, handle: str = None) -> bool:
+        """
+        Detach from the shared memory segment.
+        
+        Args:
+            handle: Optional handle to detach (for backward compatibility)
+        
+        Returns:
+            True if successful
+        """
+        if self._segment:
+            self._manager.detach_segment(self._segment)
+            self._segment = None
+            return True
+        return False
+    
+    def close(self) -> bool:
+        """
+        Close the shared memory segment.
+        
+        Returns:
+            True if successful
+        """
+        if self._segment:
+            self._manager.close_segment(self._segment)
+            self._segment = None
+            return True
+        return False
+    
+    def destroy(self, name: str = None) -> bool:
+        """
+        Destroy the shared memory segment (alias for close method).
+        
+        Args:
+            name: Optional name parameter (for backward compatibility)
+        
+        Returns:
+            True if successful
+        """
+        return self.close()
+
+
 def is_shared_memory_available() -> bool:
     """Check if shared memory functionality is available."""
-    try:
-        import mmap
-        return True
-    except ImportError:
-        return False
+    # mmap is a built-in Python module, always available
+    import mmap
+    return True

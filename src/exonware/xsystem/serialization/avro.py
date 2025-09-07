@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\avro.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced Apache Avro serialization with security, validation and performance optimizations.
 """
@@ -15,30 +16,24 @@ from typing import Any, Dict, List, Optional, Union
 
 import fastavro
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import AvroError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.avro")
 
-
-class AvroError(SerializationError):
-    """Avro-specific serialization error."""
-    
-    def __init__(self, message: str, original_error: Optional[Exception] = None):
-        super().__init__(message, "AVRO", original_error)
-
-
-class AvroSerializer(aSerialization):
+class AvroSerializer(ASerialization):
     """
-    Enhanced Apache Avro serializer with schema validation and xSystem integration.
+    Enhanced Apache Avro serializer with schema validation and XSystem integration.
     
-    Apache Avro is a data serialization system that provides:
-    - Schema evolution support
-    - Compact binary encoding
+    Features:
     - Rich data structures
-    - Cross-language compatibility
+    - A compact, fast, binary data format
+    - A container file, to store persistent data
+    - Remote procedure call (RPC)
+    - Simple integration with dynamic languages
     
-    🚨 PRODUCTION LIBRARY: Uses fastavro - the fastest Avro library for Python
+    🚨 PRODUCTION LIBRARY: Uses fastavro - a fast, C-based implementation
     """
 
     def __init__(
@@ -46,14 +41,13 @@ class AvroSerializer(aSerialization):
         schema: Optional[Dict[str, Any]] = None,
         validate_input: bool = True,
         max_depth: int = 100,
-        max_size_mb: float = 50.0,  # Avro can handle larger datasets
+        max_size_mb: float = 100.0,
         use_atomic_writes: bool = True,
         validate_paths: bool = True,
         base_path: Optional[Union[str, Path]] = None,
-        codec: str = "deflate",  # Compression codec: null, deflate, snappy, lz4, bzip2, xz, zstandard
     ) -> None:
         """
-        Initialize Avro serializer with schema and security options.
+        Initialize Avro serializer with optional schema.
 
         Args:
             schema: Avro schema dictionary (required for serialization)
@@ -63,11 +57,7 @@ class AvroSerializer(aSerialization):
             use_atomic_writes: Whether to use atomic file operations
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
-            codec: Compression codec for Avro files
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -76,15 +66,12 @@ class AvroSerializer(aSerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        
-        # Avro-specific configuration
         self.schema = schema
-        self.codec = codec
         
-        # Update configuration with Avro-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'schema': schema,
-            'codec': codec,
         })
 
     @property
@@ -124,12 +111,13 @@ class AvroSerializer(aSerialization):
     def dumps(self, data: Any) -> str:
         """Serialize data to Avro base64 string."""
         try:
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             self._validate_schema()
             import base64
             return base64.b64encode(self.dumps_binary(data)).decode('ascii')
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise AvroError(f"Serialization failed: {e}", e)
 
     def loads(self, data: Union[bytes, str]) -> Any:
         """Deserialize Avro data."""
@@ -139,31 +127,48 @@ class AvroSerializer(aSerialization):
                 data = base64.b64decode(data.encode('ascii'))
             return self.loads_bytes(data)
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise AvroError(f"Deserialization failed: {e}", e)
 
     def dumps_binary(self, data: Any) -> bytes:
         """Serialize data to Avro bytes."""
         try:
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             self._validate_schema()
             
             # Ensure data is iterable for fastavro
             records = [data] if isinstance(data, dict) else data if isinstance(data, list) else [{"value": data}]
             
+            import io
             bytes_io = io.BytesIO()
-            fastavro.writer(bytes_io, self.schema, records, codec=self.codec)
+            fastavro.writer(bytes_io, self.schema, records)
             return bytes_io.getvalue()
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise AvroError(f"Binary serialization failed: {e}", e)
 
     def loads_bytes(self, data: bytes) -> Any:
-        """Deserialize Avro bytes."""
+        """Deserialize Avro bytes to Python object."""
         try:
-            reader = fastavro.reader(io.BytesIO(data))
-            records = list(reader)
-            return records[0] if len(records) == 1 else records
+            # Validate schema is loaded
+            self._validate_schema()
+            
+            # Use fastavro for deserialization
+            import io
+            from fastavro import schemaless_reader
+            
+            bytes_reader = io.BytesIO(data)
+            return schemaless_reader(bytes_reader, self.schema)
+            
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise AvroError(f"Binary deserialization failed: {e}", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise AvroError("Avro is a binary format and does not support text-based serialization.", "AVRO")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise AvroError("Avro is a binary format and does not support text-based serialization.", "AVRO")
 
 
 # Convenience functions for common use cases

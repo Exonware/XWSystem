@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 05, 2025
 
 Distributed Tracing Integration for Enterprise Observability
 
@@ -17,29 +17,22 @@ Provides integration with distributed tracing systems:
 
 import time
 import uuid
-from abc import ABC, abstractmethod
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
 from typing import Any, AsyncContextManager, ContextManager, Dict, Optional, Union
 from enum import Enum
 
-try:
-    from opentelemetry import trace
-    from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-    from opentelemetry.sdk.trace import TracerProvider
-    from opentelemetry.sdk.trace.export import BatchSpanProcessor
-    OPENTELEMETRY_AVAILABLE = True
-except ImportError:
-    OPENTELEMETRY_AVAILABLE = False
+from .base import ATracingProvider
+from .errors import TracingError
+
+from opentelemetry import trace
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.enterprise.distributed_tracing")
-
-
-class TracingError(Exception):
-    """Base exception for tracing operations."""
-    pass
 
 
 class SpanKind(Enum):
@@ -72,37 +65,9 @@ class TraceContext:
     service_version: str = "0.0.1"
 
 
-class TracingProvider(ABC):
-    """Abstract base class for tracing providers."""
-    
-    @abstractmethod
-    def start_span(
-        self, 
-        name: str, 
-        kind: SpanKind = SpanKind.INTERNAL,
-        parent: Optional[SpanContext] = None,
-        attributes: Optional[Dict[str, Any]] = None
-    ) -> SpanContext:
-        """Start a new span."""
-        pass
-    
-    @abstractmethod
-    def finish_span(self, span: SpanContext, status: str = "OK", error: Optional[Exception] = None) -> None:
-        """Finish a span."""
-        pass
-    
-    @abstractmethod
-    def add_span_attribute(self, span: SpanContext, key: str, value: Any) -> None:
-        """Add attribute to span."""
-        pass
-    
-    @abstractmethod
-    def add_span_event(self, span: SpanContext, name: str, attributes: Optional[Dict[str, Any]] = None) -> None:
-        """Add event to span."""
-        pass
 
 
-class OpenTelemetryTracer(TracingProvider):
+class OpenTelemetryTracer(ATracingProvider):
     """OpenTelemetry tracing provider."""
     
     def __init__(
@@ -119,8 +84,7 @@ class OpenTelemetryTracer(TracingProvider):
             jaeger_endpoint: Optional Jaeger collector endpoint
             zipkin_endpoint: Optional Zipkin endpoint
         """
-        if not OPENTELEMETRY_AVAILABLE:
-            raise TracingError("OpenTelemetry not available. Install with: pip install opentelemetry-api opentelemetry-sdk")
+        # OpenTelemetry is now required
         
         self.service_name = service_name
         self._spans: Dict[str, Any] = {}
@@ -153,15 +117,14 @@ class OpenTelemetryTracer(TracingProvider):
     
     def _setup_zipkin_exporter(self, endpoint: str) -> None:
         """Set up Zipkin exporter."""
+        # Import is explicit - if missing, user should install: pip install exonware-xsystem[observability]
+        from opentelemetry.exporter.zipkin.json import ZipkinExporter
+        
         try:
-            from opentelemetry.exporter.zipkin.json import ZipkinExporter
-            
             zipkin_exporter = ZipkinExporter(endpoint=endpoint)
             span_processor = BatchSpanProcessor(zipkin_exporter)
             trace.get_tracer_provider().add_span_processor(span_processor)
             
-        except ImportError:
-            logger.warning("Zipkin exporter not available. Install with: pip install opentelemetry-exporter-zipkin")
         except Exception as e:
             logger.warning(f"Failed to setup Zipkin exporter: {e}")
     
@@ -213,7 +176,7 @@ class OpenTelemetryTracer(TracingProvider):
             self._spans[span.span_id].add_event(name, attributes or {})
 
 
-class JaegerTracer(TracingProvider):
+class JaegerTracer(ATracingProvider):
     """Jaeger-specific tracing provider (simplified implementation)."""
     
     def __init__(self, service_name: str = "xsystem", agent_host: str = "localhost", agent_port: int = 6831):
@@ -280,19 +243,19 @@ class JaegerTracer(TracingProvider):
 
 
 class TracingManager:
-    """Central tracing manager for xSystem."""
+    """Central tracing manager for XSystem."""
     
-    def __init__(self, provider: Optional[TracingProvider] = None):
+    def __init__(self, provider: Optional[ATracingProvider] = None):
         """
         Initialize tracing manager.
         
         Args:
             provider: Tracing provider to use (defaults to no-op)
         """
-        self.provider = provider or NoOpTracingProvider()
+        self.provider = provider or NoOpATracingProvider()
         self._current_trace: Optional[TraceContext] = None
     
-    def set_provider(self, provider: TracingProvider) -> None:
+    def set_provider(self, provider: ATracingProvider) -> None:
         """Set the tracing provider."""
         self.provider = provider
     
@@ -360,7 +323,7 @@ class TracingManager:
             logger.debug(f"Trace event: {name} {attributes or {}}")
 
 
-class NoOpTracingProvider(TracingProvider):
+class NoOpATracingProvider(ATracingProvider):
     """No-op tracing provider for when tracing is disabled."""
     
     def start_span(
@@ -398,6 +361,48 @@ def get_tracing_manager() -> TracingManager:
     return _tracing_manager
 
 
-def configure_tracing(provider: TracingProvider) -> None:
+def configure_tracing(provider: ATracingProvider) -> None:
     """Configure global tracing provider."""
     _tracing_manager.set_provider(provider)
+
+
+class DistributedTracing:
+    """Distributed tracing manager for enterprise applications."""
+    
+    def __init__(self, provider: Optional[ATracingProvider] = None):
+        """Initialize distributed tracing."""
+        self.manager = TracingManager()
+        if provider:
+            self.manager.set_provider(provider)
+    
+    def start_trace(self, name: str, attributes: Optional[Dict[str, Any]] = None) -> SpanContext:
+        """Start a new trace."""
+        return self.manager.start_trace(name, attributes)
+    
+    def start_span(self, name: str, parent: Optional[SpanContext] = None, attributes: Optional[Dict[str, Any]] = None) -> SpanContext:
+        """Start a new span."""
+        return self.manager.start_span(name, parent, attributes)
+    
+    def end_span(self, span: SpanContext) -> None:
+        """End a span."""
+        self.manager.end_span(span)
+    
+    def add_span_attribute(self, span: SpanContext, key: str, value: Any) -> None:
+        """Add attribute to span."""
+        self.manager.add_span_attribute(span, key, value)
+    
+    def add_span_event(self, span: SpanContext, name: str, attributes: Optional[Dict[str, Any]] = None) -> None:
+        """Add event to span."""
+        self.manager.add_span_event(span, name, attributes)
+    
+    def set_provider(self, provider: ATracingProvider) -> None:
+        """Set tracing provider."""
+        self.manager.set_provider(provider)
+    
+    def get_current_span(self) -> Optional[SpanContext]:
+        """Get current active span."""
+        return self.manager.get_current_span()
+    
+    def is_tracing_enabled(self) -> bool:
+        """Check if tracing is enabled."""
+        return self.manager.is_tracing_enabled()

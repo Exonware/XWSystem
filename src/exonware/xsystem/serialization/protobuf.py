@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\protobuf.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced Protocol Buffers serialization with security, validation and performance optimizations.
 """
@@ -17,8 +18,10 @@ from google.protobuf import json_format
 from google.protobuf.descriptor import Descriptor
 from google.protobuf.message import Message
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
+
 
 logger = get_logger("xsystem.serialization.protobuf")
 
@@ -30,9 +33,9 @@ class ProtobufError(SerializationError):
         super().__init__(message, "PROTOBUF", original_error)
 
 
-class ProtobufSerializer(aSerialization):
+class ProtobufSerializer(ASerialization):
     """
-    Enhanced Protocol Buffers serializer with schema validation and xSystem integration.
+    Enhanced Protocol Buffers serializer with schema validation and XSystem integration.
     
     Protocol Buffers (protobuf) is Google's language-neutral, platform-neutral,
     extensible mechanism for serializing structured data.
@@ -55,26 +58,19 @@ class ProtobufSerializer(aSerialization):
         use_atomic_writes: bool = True,
         validate_paths: bool = True,
         base_path: Optional[Union[str, Path]] = None,
-        include_default_values: bool = False,
-        preserve_proto_field_names: bool = False,
     ) -> None:
         """
-        Initialize Protocol Buffers serializer with message type and security options.
+        Initialize Protobuf serializer with message type and security options.
 
         Args:
-            message_type: Protobuf message class (required for serialization)
+            message_type: Generated Protobuf message class
             validate_input: Whether to validate input data for security
             max_depth: Maximum nesting depth allowed
             max_size_mb: Maximum data size in MB
             use_atomic_writes: Whether to use atomic file operations
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
-            include_default_values: Include fields with default values in JSON output
-            preserve_proto_field_names: Use proto field names instead of camelCase
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -83,17 +79,12 @@ class ProtobufSerializer(aSerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        
-        # Protobuf-specific configuration
         self.message_type = message_type
-        self.include_default_values = include_default_values
-        self.preserve_proto_field_names = preserve_proto_field_names
         
-        # Update configuration with Protobuf-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'message_type': message_type.__name__ if message_type else None,
-            'include_default_values': include_default_values,
-            'preserve_proto_field_names': preserve_proto_field_names,
         })
 
     @property
@@ -205,11 +196,27 @@ class ProtobufSerializer(aSerialization):
         """Deserialize protobuf bytes to dictionary."""
         try:
             self._validate_message_type()
+            
+            # Create a new instance of the message type
             message = self.message_type()
+            
+            # Parse from bytes
             message.ParseFromString(data)
-            return json_format.MessageToDict(message, include_default_values=self.include_default_values, preserving_proto_field_name=self.preserve_proto_field_names)
+            
+            # Convert to dictionary for a consistent API
+            from google.protobuf.json_format import MessageToDict
+            return MessageToDict(message, preserving_proto_field_name=True)
+            
         except Exception as e:
             self._handle_serialization_error("deserialization", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise ProtobufError("Protobuf is a binary format and does not support text-based serialization.")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise ProtobufError("Protobuf is a binary format and does not support text-based serialization.")
 
     def loads_message(self, data: Union[bytes, str]) -> Message:
         """

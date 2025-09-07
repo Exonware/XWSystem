@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\orc.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced Apache ORC serialization with security, validation and performance optimizations.
 """
@@ -15,8 +16,10 @@ from typing import Any, Dict, List, Optional, Union
 import pyorc
 import pandas as pd
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
+
 
 logger = get_logger("xsystem.serialization.orc")
 
@@ -28,9 +31,9 @@ class OrcError(SerializationError):
         super().__init__(message, "ORC", original_error)
 
 
-class OrcSerializer(aSerialization):
+class OrcSerializer(ASerialization):
     """
-    Enhanced Apache ORC serializer with schema validation and xSystem integration.
+    Enhanced Apache ORC serializer with schema validation and XSystem integration.
     
     Apache ORC (Optimized Row Columnar) is a columnar storage format optimized for Hive.
     
@@ -53,28 +56,21 @@ class OrcSerializer(aSerialization):
         use_atomic_writes: bool = True,
         validate_paths: bool = True,
         base_path: Optional[Union[str, Path]] = None,
-        compression: str = "zlib",  # Compression: none, zlib, snappy, lzo, lz4, zstd
-        compression_block_size: int = 65536,  # 64KB blocks
+        compression: str = "zlib",  # Compression: none, zlib, snappy, lzo
+        compression_block_size: int = 262144,  # 256KB compression blocks
         stripe_size: int = 67108864,  # 64MB stripes
     ) -> None:
         """
-        Initialize ORC serializer with compression and performance options.
+        Initialize ORC serializer with security options.
 
         Args:
-            schema: ORC schema string (optional, will be inferred if not provided)
             validate_input: Whether to validate input data for security
             max_depth: Maximum nesting depth allowed
             max_size_mb: Maximum data size in MB
             use_atomic_writes: Whether to use atomic file operations
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
-            compression: Compression algorithm
-            compression_block_size: Size of compression blocks
-            stripe_size: Size of ORC stripes
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -84,13 +80,14 @@ class OrcSerializer(aSerialization):
             base_path=base_path,
         )
         
-        # ORC-specific configuration
+        # Initialize ORC-specific attributes
         self.schema = schema
         self.compression = compression
         self.compression_block_size = compression_block_size
         self.stripe_size = stripe_size
         
-        # Update configuration with ORC-specific options
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'schema': schema,
             'compression': compression,
@@ -204,7 +201,8 @@ class OrcSerializer(aSerialization):
         """
         try:
             # Validate data using base class
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             
             # Serialize to ORC bytes
             orc_bytes = self.dumps_binary(data)
@@ -214,9 +212,9 @@ class OrcSerializer(aSerialization):
             return base64.b64encode(orc_bytes).decode('ascii')
             
         except SerializationError as e:
-            self._handle_serialization_error("serialization", e)
+            raise OrcError(f"Serialization failed: {e}", e)
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise OrcError(f"Serialization failed: {e}", e)
 
     def loads(self, data: Union[bytes, str]) -> Any:
         """
@@ -242,7 +240,7 @@ class OrcSerializer(aSerialization):
             return self.loads_bytes(orc_bytes)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise OrcError(f"Deserialization failed: {e}", e)
 
     def dumps_binary(self, data: Any) -> bytes:
         """
@@ -259,7 +257,8 @@ class OrcSerializer(aSerialization):
         """
         try:
             # Validate data using base class
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             
             # Convert to list of dictionaries
             rows = self._prepare_data_for_orc(data)
@@ -288,49 +287,36 @@ class OrcSerializer(aSerialization):
             return buffer.getvalue()
             
         except SerializationError as e:
-            self._handle_serialization_error("serialization", e)
+            raise OrcError(f"Serialization failed: {e}", e)
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise OrcError(f"Serialization failed: {e}", e)
 
     def loads_bytes(self, data: bytes) -> List[Dict[str, Any]]:
-        """
-        Deserialize ORC bytes to Python object.
-
-        Args:
-            data: ORC bytes to deserialize
-
-        Returns:
-            List of dictionaries representing the data
-
-        Raises:
-            OrcError: If deserialization fails
-        """
+        """Deserialize ORC bytes to a list of dictionaries."""
         try:
             import io
-            buffer = io.BytesIO(data)
+            from pyorc import Reader
             
-            rows = []
-            with pyorc.Reader(buffer) as reader:
-                schema_fields = self._get_field_names(str(reader.schema))
-                
-                for row in reader:
-                    # Convert tuple to dictionary
-                    row_dict = {}
-                    for i, field_name in enumerate(schema_fields):
-                        if i < len(row):
-                            row_dict[field_name] = row[i]
-                    rows.append(row_dict)
+            # Create an in-memory buffer
+            bytes_reader = io.BytesIO(data)
             
-            # Return single item if only one row, otherwise return list
-            if len(rows) == 1 and len(rows[0]) == 1 and 'value' in rows[0]:
-                return rows[0]['value']
-            elif len(rows) == 1:
-                return rows[0]
-            else:
-                return rows
+            # Read ORC data from buffer
+            reader = Reader(bytes_reader)
+            
+            # Convert to list of dictionaries for a consistent API
+            return list(reader)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise OrcError(f"Deserialization failed: {e}", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise OrcError("ORC is a binary format and does not support text-based serialization.")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise OrcError("ORC is a binary format and does not support text-based serialization.")
+
 
     def _get_field_names(self, schema: str) -> List[str]:
         """Extract field names from ORC schema string."""
@@ -395,7 +381,7 @@ class OrcSerializer(aSerialization):
             return pd.DataFrame(rows)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise OrcError(f"Deserialization failed: {e}", e)
 
 
 # Convenience functions for common use cases

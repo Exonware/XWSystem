@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\dbm.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 DBM Serializer Implementation
 
@@ -16,7 +17,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 
 
 class DbmError(SerializationError):
@@ -26,7 +28,7 @@ class DbmError(SerializationError):
         super().__init__(message, "DBM", original_error)
 
 
-class DbmSerializer(aSerialization):
+class DbmSerializer(ASerialization):
     """
     DBM serializer using built-in dbm module.
     

@@ -2,7 +2,7 @@
 Argument Parsing Utilities
 =========================
 
-Production-grade CLI argument parsing for xSystem.
+Production-grade CLI argument parsing for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri

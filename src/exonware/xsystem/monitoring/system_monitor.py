@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 System-wide monitoring and hardware introspection utilities.
 """
@@ -15,11 +15,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Any, Tuple, Union
 from pathlib import Path
 
-try:
-    import psutil
-    PSUTIL_AVAILABLE = True
-except ImportError:
-    PSUTIL_AVAILABLE = False
+import psutil
+PSUTIL_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 

@@ -1,5 +1,5 @@
 """
-Performance Monitoring Utilities for xSystem
+Performance Monitoring Utilities for XSystem
 
 These utilities provide performance monitoring, metrics collection, and analysis
 capabilities. They were previously embedded in xData and have been extracted for
@@ -158,14 +158,10 @@ class PerformanceMonitor:
 
         # Try to import psutil for memory monitoring
         if enable_memory_monitoring:
-            try:
-                import psutil
-
-                self._psutil_available = True
-                self._process = psutil.Process()
-            except ImportError:
-                logger.debug("psutil not available - memory monitoring disabled")
-                self._psutil_available = False
+            # psutil is a required dependency for performance monitoring
+            import psutil
+            self._psutil_available = True
+            self._process = psutil.Process()
 
     def is_enabled(self) -> bool:
         """Check if monitoring is enabled."""

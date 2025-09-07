@@ -1,14 +1,15 @@
+#exonware\xsystem\serialization\marshal.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Python Marshal Serializer Implementation
 
 Provides Python marshal serialization with version control,
-limited type support, and integration with xSystem utilities.
+limited type support, and integration with XSystem utilities.
 """
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -16,11 +17,11 @@ import marshal
 import sys
 from pathlib import Path
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
 
 
-class MarshalSerializer(aSerialization):
+class MarshalSerializer(ASerialization):
     """
     Python Marshal serializer for simple Python objects.
     

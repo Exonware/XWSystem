@@ -1,5 +1,5 @@
 """
-Data Validation Utilities for xSystem
+Data Validation Utilities for XSystem
 
 These utilities provide data structure validation, path validation, and memory estimation
 capabilities. They were previously embedded in xData and have been extracted for
@@ -15,34 +15,9 @@ from ..config import (
     DEFAULT_MAX_PATH_LENGTH,
     DEFAULT_MAX_RESOLUTION_DEPTH,
 )
+from .errors import ValidationError, PathValidationError, DepthValidationError, MemoryValidationError
 
 # ======================
-# Validation Exceptions
-# ======================
-
-
-class ValidationError(Exception):
-    """Base class for validation errors."""
-
-    pass
-
-
-class PathValidationError(ValidationError):
-    """Raised when path validation fails."""
-
-    pass
-
-
-class DepthValidationError(ValidationError):
-    """Raised when depth validation fails."""
-
-    pass
-
-
-class MemoryValidationError(ValidationError):
-    """Raised when memory validation fails."""
-
-    pass
 
 
 # ======================

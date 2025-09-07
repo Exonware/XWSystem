@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\bson.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced BSON serialization with security, validation and performance optimizations.
 """
@@ -13,14 +14,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, List, Optional, Union
 
-try:
-    import bson
-    from bson import ObjectId, Binary
-    BSON_AVAILABLE = True
-except ImportError:
-    BSON_AVAILABLE = False
+import bson
+from bson import ObjectId, Binary
+BSON_AVAILABLE = True
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
 from ..io.atomic_file import AtomicFileWriter
 
@@ -34,9 +33,9 @@ class BsonError(SerializationError):
         super().__init__(message, "BSON", original_error)
 
 
-class BsonSerializer(aSerialization):
+class BsonSerializer(ASerialization):
     """
-    Enhanced BSON serializer with security validation and xSystem integration.
+    Enhanced BSON serializer with security validation and XSystem integration.
     
     BSON (Binary JSON) is primarily used by MongoDB and supports additional
     data types like ObjectId, Binary, DateTime, etc.
@@ -69,7 +68,7 @@ class BsonSerializer(aSerialization):
         if not BSON_AVAILABLE:
             raise BsonError("bson is required for BSON serialization. Install with: pip install pymongo")
             
-        # Initialize base class with xSystem integration
+        # Initialize base class with XSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,

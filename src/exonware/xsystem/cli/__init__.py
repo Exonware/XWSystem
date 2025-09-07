@@ -2,7 +2,7 @@
 Command Line Interface (CLI) Utilities
 ======================================
 
-Production-grade CLI utilities for xSystem.
+Production-grade CLI utilities for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri

@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\flatbuffers.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced FlatBuffers serialization with security, validation and performance optimizations.
 """
@@ -14,8 +15,10 @@ from typing import Any, Dict, List, Optional, Union, Type
 
 import flatbuffers
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
+
 
 logger = get_logger("xsystem.serialization.flatbuffers")
 
@@ -27,9 +30,9 @@ class FlatBuffersError(SerializationError):
         super().__init__(message, "FLATBUFFERS", original_error)
 
 
-class FlatBuffersSerializer(aSerialization):
+class FlatBuffersSerializer(ASerialization):
     """
-    Enhanced FlatBuffers serializer with schema validation and xSystem integration.
+    Enhanced FlatBuffers serializer with schema validation and XSystem integration.
     
     FlatBuffers is an efficient cross platform serialization library for C++, C#, C, Go, 
     Java, JavaScript, Lobster, Lua, TypeScript, PHP, Python, and Rust. It was originally 
@@ -58,24 +61,19 @@ class FlatBuffersSerializer(aSerialization):
         use_atomic_writes: bool = True,
         validate_paths: bool = True,
         base_path: Optional[Union[str, Path]] = None,
-        initial_size: int = 1024,  # Initial builder size
     ) -> None:
         """
-        Initialize FlatBuffers serializer with table class and security options.
+        Initialize FlatBuffers serializer with security options.
 
         Args:
-            table_class: Generated FlatBuffers table class (required for full functionality)
+            table_class: Generated FlatBuffers table class (optional)
             validate_input: Whether to validate input data for security
             max_depth: Maximum nesting depth allowed
             max_size_mb: Maximum data size in MB
             use_atomic_writes: Whether to use atomic file operations
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
-            initial_size: Initial size of the FlatBuffers builder
         """
-
-            
-        # Initialize base class with xSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,
@@ -85,14 +83,16 @@ class FlatBuffersSerializer(aSerialization):
             base_path=base_path,
         )
         
-        # FlatBuffers-specific configuration
         self.table_class = table_class
-        self.initial_size = initial_size
         
-        # Update configuration with FlatBuffers-specific options
+        # Initialize FlatBuffers-specific attributes
+        self.initial_size = 1024  # Default initial buffer size
+        
+        # Initialize configuration
+        self._config = {}
         self._config.update({
             'table_class': table_class.__name__ if table_class else None,
-            'initial_size': initial_size,
+            'initial_size': self.initial_size,
         })
 
     @property
@@ -190,7 +190,8 @@ class FlatBuffersSerializer(aSerialization):
         """
         try:
             # Validate data using base class
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             
             # Serialize to FlatBuffers bytes
             fb_bytes = self.dumps_binary(data)
@@ -200,9 +201,9 @@ class FlatBuffersSerializer(aSerialization):
             return base64.b64encode(fb_bytes).decode('ascii')
             
         except SerializationError as e:
-            self._handle_serialization_error("serialization", e)
+            raise FlatBuffersError(f"Serialization failed: {e}", e)
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise FlatBuffersError(f"Serialization failed: {e}", e)
 
     def loads(self, data: Union[bytes, str]) -> Any:
         """
@@ -228,7 +229,7 @@ class FlatBuffersSerializer(aSerialization):
             return self.loads_bytes(fb_bytes)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise FlatBuffersError(f"Deserialization failed: {e}", e)
 
     def dumps_binary(self, data: Any) -> bytes:
         """
@@ -245,7 +246,8 @@ class FlatBuffersSerializer(aSerialization):
         """
         try:
             # Validate data using base class
-            self._validate_data_security(data)
+            if self.validate_input and self._data_validator:
+                self._data_validator.validate_data_structure(data)
             self._validate_table_class()
             
             if self.table_class:
@@ -276,43 +278,28 @@ class FlatBuffersSerializer(aSerialization):
                     return self._create_generic_flatbuffer({'value': data})
             
         except SerializationError as e:
-            self._handle_serialization_error("serialization", e)
+            raise FlatBuffersError(f"Serialization failed: {e}", e)
         except Exception as e:
-            self._handle_serialization_error("serialization", e)
+            raise FlatBuffersError(f"Serialization failed: {e}", e)
 
-    def loads_bytes(self, data: bytes) -> Any:
-        """
-        Deserialize FlatBuffers bytes to Python object.
-
-        Args:
-            data: FlatBuffers bytes to deserialize
-
-        Returns:
-            Deserialized Python object
-
-        Raises:
-            FlatBuffersError: If deserialization fails
-        """
+    def loads_bytes(self, data: bytes) -> Dict[str, Any]:
+        """Deserialize FlatBuffers bytes to dictionary (generic)."""
         try:
-            self._validate_table_class()
-            
-            if self.table_class:
-                # Use specific table class if provided
-                logger.info(f"Using table class: {self.table_class.__name__}")
-                
-                # This is where you'd use the generated FlatBuffers code
-                # Example (pseudo-code):
-                # table = self.table_class.GetRootAs(data, 0)
-                # return self._table_to_dict(table)
-                
-                # For now, fall back to generic implementation
-                return self._read_generic_flatbuffer(data)
-            else:
-                # Generic implementation
-                return self._read_generic_flatbuffer(data)
+            # For generic implementation, fall back to JSON
+            # In a real-world scenario with schema, you'd parse the buffer
+            import json
+            return json.loads(data.decode('utf-8'))
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise FlatBuffersError(f"Deserialization failed: {e}", e)
+
+    def dumps_text(self, data: Any) -> str:
+        """Not supported for binary formats."""
+        raise FlatBuffersError("FlatBuffers is a binary format and does not support text-based serialization.")
+
+    def loads_text(self, data: str) -> Any:
+        """Not supported for binary formats."""
+        raise FlatBuffersError("FlatBuffers is a binary format and does not support text-based serialization.")
 
     def loads_table(self, data: Union[bytes, str]):
         """
@@ -348,7 +335,7 @@ class FlatBuffersSerializer(aSerialization):
             return self._read_generic_flatbuffer(fb_bytes)
             
         except Exception as e:
-            self._handle_serialization_error("deserialization", e)
+            raise FlatBuffersError(f"Deserialization failed: {e}", e)
 
 
 # Convenience functions for common use cases

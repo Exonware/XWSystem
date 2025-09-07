@@ -1,5 +1,5 @@
 """
-xSystem Patterns Package
+XSystem Patterns Package
 
 Provides design patterns and utilities for common programming patterns.
 """

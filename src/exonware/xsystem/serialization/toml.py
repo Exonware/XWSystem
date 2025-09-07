@@ -1,9 +1,10 @@
+#exonware\xsystem\serialization\toml.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 Enhanced TOML serialization with security, validation and performance optimizations.
 """
@@ -21,15 +22,13 @@ if TOML_READ_AVAILABLE:
 else:
     tomllib = None
 
-try:
-    import tomli_w
-    TOML_WRITE_AVAILABLE = True
-except ImportError:
-    tomli_w = None
+import tomli_w
+TOML_WRITE_AVAILABLE = True
 
 TOML_AVAILABLE = TOML_READ_AVAILABLE and TOML_WRITE_AVAILABLE
 
-from .aSerialization import aSerialization, SerializationError
+from .base import ASerialization
+from .errors import SerializationError
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.serialization.toml")
@@ -42,9 +41,9 @@ class TomlError(SerializationError):
         super().__init__(message, "TOML", original_error)
 
 
-class TomlSerializer(aSerialization):
+class TomlSerializer(ASerialization):
     """
-    Enhanced TOML serializer with security validation and xSystem integration.
+    Enhanced TOML serializer with security validation and XSystem integration.
     
     TOML (Tom's Obvious, Minimal Language) is primarily used for configuration files.
     This implementation provides secure parsing and generation with validation.
@@ -73,7 +72,7 @@ class TomlSerializer(aSerialization):
         if not TOML_AVAILABLE:
             raise TomlError("tomli and tomli-w are required for TOML serialization. Install with: pip install tomli tomli-w")
             
-        # Initialize base class with xSystem integration
+        # Initialize base class with XSystem integration
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,

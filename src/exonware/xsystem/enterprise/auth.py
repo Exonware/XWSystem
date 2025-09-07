@@ -3,7 +3,7 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
 Advanced Authentication Providers for Enterprise Integration
 
@@ -20,42 +20,19 @@ import time
 import base64
 import hashlib
 import hmac
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urlencode, parse_qs
 from enum import Enum
 
-try:
-    import jwt
-    JWT_AVAILABLE = True
-except ImportError:
-    JWT_AVAILABLE = False
+from .base import AAuthProvider, ATokenInfo, AUserInfo
+from .errors import AuthenticationError, AuthorizationError, TokenExpiredError
 
-try:
-    import requests
-    REQUESTS_AVAILABLE = True
-except ImportError:
-    REQUESTS_AVAILABLE = False
+import jwt
+import requests
 
 from ..config.logging_setup import get_logger
 
 logger = get_logger("xsystem.enterprise.auth")
-
-
-class AuthenticationError(Exception):
-    """Authentication failed."""
-    pass
-
-
-class AuthorizationError(Exception):
-    """Authorization failed."""
-    pass
-
-
-class TokenExpiredError(AuthenticationError):
-    """Token has expired."""
-    pass
 
 
 class OAuth2GrantType(Enum):
@@ -66,53 +43,7 @@ class OAuth2GrantType(Enum):
     REFRESH_TOKEN = "refresh_token"
 
 
-@dataclass
-class TokenInfo:
-    """Token information."""
-    access_token: str
-    token_type: str = "Bearer"
-    expires_in: Optional[int] = None
-    refresh_token: Optional[str] = None
-    scope: Optional[str] = None
-    issued_at: float = field(default_factory=time.time)
-    
-    def is_expired(self) -> bool:
-        """Check if token is expired."""
-        if not self.expires_in:
-            return False
-        return time.time() >= (self.issued_at + self.expires_in)
-
-
-@dataclass
-class UserInfo:
-    """User information from authentication."""
-    user_id: str
-    username: Optional[str] = None
-    email: Optional[str] = None
-    roles: List[str] = field(default_factory=list)
-    attributes: Dict[str, Any] = field(default_factory=dict)
-
-
-class AuthProvider(ABC):
-    """Abstract base class for authentication providers."""
-    
-    @abstractmethod
-    async def authenticate(self, credentials: Dict[str, Any]) -> TokenInfo:
-        """Authenticate user and return token."""
-        pass
-    
-    @abstractmethod
-    async def validate_token(self, token: str) -> UserInfo:
-        """Validate token and return user info."""
-        pass
-    
-    @abstractmethod
-    async def refresh_token(self, refresh_token: str) -> TokenInfo:
-        """Refresh access token."""
-        pass
-
-
-class OAuth2Provider(AuthProvider):
+class OAuth2Provider(AAuthProvider):
     """OAuth2 authentication provider."""
     
     def __init__(
@@ -135,8 +66,7 @@ class OAuth2Provider(AuthProvider):
             userinfo_url: Optional user info endpoint URL
             scopes: Optional list of scopes to request
         """
-        if not REQUESTS_AVAILABLE:
-            raise AuthenticationError("requests library required. Install with: pip install requests")
+        # requests is now required
         
         self.client_id = client_id
         self.client_secret = client_secret
@@ -159,7 +89,7 @@ class OAuth2Provider(AuthProvider):
         
         return f"{self.authorization_url}?{urlencode(params)}"
     
-    async def authenticate(self, credentials: Dict[str, Any]) -> TokenInfo:
+    async def authenticate(self, credentials: Dict[str, Any]) -> ATokenInfo:
         """Authenticate using OAuth2 flow."""
         import asyncio
         
@@ -177,7 +107,7 @@ class OAuth2Provider(AuthProvider):
         
         return await asyncio.to_thread(_authenticate)
     
-    def _authenticate_authorization_code(self, credentials: Dict[str, Any]) -> TokenInfo:
+    def _authenticate_authorization_code(self, credentials: Dict[str, Any]) -> ATokenInfo:
         """Authenticate using authorization code."""
         data = {
             'grant_type': OAuth2GrantType.AUTHORIZATION_CODE.value,
@@ -193,7 +123,7 @@ class OAuth2Provider(AuthProvider):
             raise AuthenticationError(f"OAuth2 authentication failed: {response.text}")
         
         token_data = response.json()
-        return TokenInfo(
+        return ATokenInfo(
             access_token=token_data['access_token'],
             token_type=token_data.get('token_type', 'Bearer'),
             expires_in=token_data.get('expires_in'),
@@ -201,7 +131,7 @@ class OAuth2Provider(AuthProvider):
             scope=token_data.get('scope')
         )
     
-    def _authenticate_client_credentials(self) -> TokenInfo:
+    def _authenticate_client_credentials(self) -> ATokenInfo:
         """Authenticate using client credentials."""
         data = {
             'grant_type': OAuth2GrantType.CLIENT_CREDENTIALS.value,
@@ -216,14 +146,14 @@ class OAuth2Provider(AuthProvider):
             raise AuthenticationError(f"OAuth2 authentication failed: {response.text}")
         
         token_data = response.json()
-        return TokenInfo(
+        return ATokenInfo(
             access_token=token_data['access_token'],
             token_type=token_data.get('token_type', 'Bearer'),
             expires_in=token_data.get('expires_in'),
             scope=token_data.get('scope')
         )
     
-    def _authenticate_resource_owner(self, credentials: Dict[str, Any]) -> TokenInfo:
+    def _authenticate_resource_owner(self, credentials: Dict[str, Any]) -> ATokenInfo:
         """Authenticate using resource owner credentials."""
         data = {
             'grant_type': OAuth2GrantType.RESOURCE_OWNER.value,
@@ -240,7 +170,7 @@ class OAuth2Provider(AuthProvider):
             raise AuthenticationError(f"OAuth2 authentication failed: {response.text}")
         
         token_data = response.json()
-        return TokenInfo(
+        return ATokenInfo(
             access_token=token_data['access_token'],
             token_type=token_data.get('token_type', 'Bearer'),
             expires_in=token_data.get('expires_in'),
@@ -248,7 +178,7 @@ class OAuth2Provider(AuthProvider):
             scope=token_data.get('scope')
         )
     
-    async def validate_token(self, token: str) -> UserInfo:
+    async def validate_token(self, token: str) -> AUserInfo:
         """Validate OAuth2 token."""
         if not self.userinfo_url:
             raise AuthenticationError("User info URL not configured")
@@ -265,7 +195,7 @@ class OAuth2Provider(AuthProvider):
                 raise AuthenticationError(f"Token validation failed: {response.text}")
             
             user_data = response.json()
-            return UserInfo(
+            return AUserInfo(
                 user_id=user_data.get('sub', user_data.get('id', 'unknown')),
                 username=user_data.get('preferred_username', user_data.get('username')),
                 email=user_data.get('email'),
@@ -274,7 +204,7 @@ class OAuth2Provider(AuthProvider):
         
         return await asyncio.to_thread(_validate)
     
-    async def refresh_token(self, refresh_token: str) -> TokenInfo:
+    async def refresh_token(self, refresh_token: str) -> ATokenInfo:
         """Refresh OAuth2 token."""
         import asyncio
         
@@ -292,7 +222,7 @@ class OAuth2Provider(AuthProvider):
                 raise AuthenticationError(f"Token refresh failed: {response.text}")
             
             token_data = response.json()
-            return TokenInfo(
+            return ATokenInfo(
                 access_token=token_data['access_token'],
                 token_type=token_data.get('token_type', 'Bearer'),
                 expires_in=token_data.get('expires_in'),
@@ -303,7 +233,7 @@ class OAuth2Provider(AuthProvider):
         return await asyncio.to_thread(_refresh)
 
 
-class JWTProvider(AuthProvider):
+class JWTProvider(AAuthProvider):
     """JWT (JSON Web Token) authentication provider."""
     
     def __init__(
@@ -324,8 +254,7 @@ class JWTProvider(AuthProvider):
             audience: Token audience
             expiration_time: Token expiration time in seconds
         """
-        if not JWT_AVAILABLE:
-            raise AuthenticationError("PyJWT library required. Install with: pip install PyJWT")
+        # PyJWT is now required
         
         self.secret_key = secret_key
         self.algorithm = algorithm
@@ -333,7 +262,7 @@ class JWTProvider(AuthProvider):
         self.audience = audience
         self.expiration_time = expiration_time
     
-    async def authenticate(self, credentials: Dict[str, Any]) -> TokenInfo:
+    async def authenticate(self, credentials: Dict[str, Any]) -> ATokenInfo:
         """Create JWT token from user credentials."""
         import asyncio
         
@@ -358,7 +287,7 @@ class JWTProvider(AuthProvider):
             
             token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
             
-            return TokenInfo(
+            return ATokenInfo(
                 access_token=token,
                 token_type="Bearer",
                 expires_in=self.expiration_time
@@ -366,7 +295,7 @@ class JWTProvider(AuthProvider):
         
         return await asyncio.to_thread(_authenticate)
     
-    async def validate_token(self, token: str) -> UserInfo:
+    async def validate_token(self, token: str) -> AUserInfo:
         """Validate JWT token."""
         import asyncio
         
@@ -380,7 +309,7 @@ class JWTProvider(AuthProvider):
                     audience=self.audience
                 )
                 
-                return UserInfo(
+                return AUserInfo(
                     user_id=payload['sub'],
                     username=payload.get('username'),
                     email=payload.get('email'),
@@ -395,7 +324,7 @@ class JWTProvider(AuthProvider):
         
         return await asyncio.to_thread(_validate)
     
-    async def refresh_token(self, refresh_token: str) -> TokenInfo:
+    async def refresh_token(self, refresh_token: str) -> ATokenInfo:
         """Refresh JWT token (create new token from existing)."""
         try:
             # Validate existing token (ignore expiration for refresh)
@@ -415,7 +344,7 @@ class JWTProvider(AuthProvider):
             
             new_token = jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
             
-            return TokenInfo(
+            return ATokenInfo(
                 access_token=new_token,
                 token_type="Bearer",
                 expires_in=self.expiration_time
@@ -425,7 +354,7 @@ class JWTProvider(AuthProvider):
             raise AuthenticationError(f"Invalid refresh token: {e}")
 
 
-class SAMLProvider(AuthProvider):
+class SAMLProvider(AAuthProvider):
     """SAML 2.0 authentication provider (simplified implementation)."""
     
     def __init__(
@@ -448,18 +377,18 @@ class SAMLProvider(AuthProvider):
         
         logger.warning("SAML provider is a simplified implementation. Use a full SAML library for production.")
     
-    async def authenticate(self, credentials: Dict[str, Any]) -> TokenInfo:
+    async def authenticate(self, credentials: Dict[str, Any]) -> ATokenInfo:
         """Authenticate using SAML (simplified)."""
         # This is a placeholder implementation
         # In practice, you'd use a library like python3-saml
         raise AuthenticationError("SAML authentication requires a full SAML library implementation")
     
-    async def validate_token(self, token: str) -> UserInfo:
+    async def validate_token(self, token: str) -> AUserInfo:
         """Validate SAML token (simplified)."""
         # This is a placeholder implementation
         raise AuthenticationError("SAML token validation requires a full SAML library implementation")
     
-    async def refresh_token(self, refresh_token: str) -> TokenInfo:
+    async def refresh_token(self, refresh_token: str) -> ATokenInfo:
         """SAML doesn't typically support token refresh."""
         raise AuthenticationError("SAML does not support token refresh")
     
@@ -472,3 +401,60 @@ class SAMLProvider(AuthProvider):
         }
         
         return f"{self.idp_url}?{urlencode(params)}"
+
+
+class EnterpriseAuth:
+    """Enterprise authentication manager."""
+    
+    def __init__(self):
+        self._providers = {}
+        self._active_provider = None
+    
+    def add_provider(self, name: str, provider: AAuthProvider):
+        """Add authentication provider."""
+        self._providers[name] = provider
+    
+    def set_active_provider(self, name: str):
+        """Set active authentication provider."""
+        if name not in self._providers:
+            raise AuthenticationError(f"Provider '{name}' not found")
+        self._active_provider = name
+    
+    def get_provider(self, name: Optional[str] = None) -> AAuthProvider:
+        """Get authentication provider."""
+        if name is None:
+            name = self._active_provider
+        
+        if name is None:
+            raise AuthenticationError("No active provider set")
+        
+        if name not in self._providers:
+            raise AuthenticationError(f"Provider '{name}' not found")
+        
+        return self._providers[name]
+    
+    async def authenticate(self, credentials: Dict[str, Any], provider: Optional[str] = None) -> ATokenInfo:
+        """Authenticate using specified or active provider."""
+        provider_instance = self.get_provider(provider)
+        return await provider_instance.authenticate(credentials)
+    
+    async def validate_token(self, token: str, provider: Optional[str] = None) -> AUserInfo:
+        """Validate token using specified or active provider."""
+        provider_instance = self.get_provider(provider)
+        return await provider_instance.validate_token(token)
+    
+    async def refresh_token(self, refresh_token: str, provider: Optional[str] = None) -> ATokenInfo:
+        """Refresh token using specified or active provider."""
+        provider_instance = self.get_provider(provider)
+        return await provider_instance.refresh_token(refresh_token)
+    
+    def list_providers(self) -> List[str]:
+        """List available providers."""
+        return list(self._providers.keys())
+    
+    def remove_provider(self, name: str):
+        """Remove authentication provider."""
+        if name in self._providers:
+            del self._providers[name]
+            if self._active_provider == name:
+                self._active_provider = None

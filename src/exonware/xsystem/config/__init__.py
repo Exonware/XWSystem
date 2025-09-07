@@ -1,5 +1,5 @@
 """
-xSystem Configuration Package
+XSystem Configuration Package
 
 Provides configuration management and performance mode utilities.
 """

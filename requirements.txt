@@ -1,11 +1,11 @@
-# xSystem Requirements - All 24 Serialization Formats
+# xSystem Requirements - All 30 Serialization Formats
 # Company: eXonware.com
 # Author: Eng. Muhammad AlShehri
 # Email: connect@exonware.com
-# Version: 0.0.2
-# Generation Date: January 31, 2025
+# Version: 0.0.1
+# Generation Date: 06-Sep-2025
 #
-# This file contains all dependencies needed for xSystem's 24 serialization formats
+# This file contains all dependencies needed for xSystem's 30 serialization formats
 # Compatible with Python 3.8+ for maximum compatibility with enterprise formats
 #
 # Usage:
@@ -17,6 +17,19 @@
 # =============================================================================
 # CORE SERIALIZATION DEPENDENCIES (17 existing formats)
 # =============================================================================
+
+# Graph Database Support
+neo4j>=4.4.0                      # Neo4j graph database driver
+pydgraph>=21.3.0                  # Dgraph graph database client
+
+# Key-Value Store Support
+plyvel>=1.5.0                     # LevelDB Python bindings
+lmdb>=1.4.0                       # Lightning Memory-Mapped Database
+zarr>=2.15.0                      # Zarr array storage format
+
+# Scientific & Analytics Support
+h5py>=3.8.0                       # HDF5 file format support
+pytz>=2023.3                      # Timezone support for datetime operations
 
 # Text Formats
 PyYAML>=5.4.0                    # YAML serialization - human-readable configs
@@ -34,6 +47,7 @@ cbor2>=5.0.0                     # CBOR - RFC 8949 binary standard
 
 # Security and Cryptography
 bcrypt>=4.0.0                    # Secure password hashing (replaces insecure SHA-256)
+cryptography>=3.4.0              # Cryptographic primitives and secure communication
 
 # =============================================================================
 # NEW: SCHEMA-BASED ENTERPRISE FORMATS (7 new formats)
@@ -89,6 +103,22 @@ orjson>=3.8.0                    # Ultra-fast JSON parsing
 pyyaml-include>=1.3.0            # YAML include support
 
 # =============================================================================
+# ENTERPRISE OBSERVABILITY DEPENDENCIES
+# =============================================================================
+
+# OpenTelemetry - Distributed Tracing and Observability
+opentelemetry-api>=1.20.0              # OpenTelemetry API for tracing
+opentelemetry-sdk>=1.20.0              # OpenTelemetry SDK implementation
+opentelemetry-exporter-jaeger>=1.17.0  # Jaeger exporter for distributed tracing
+opentelemetry-exporter-zipkin>=1.12.0  # Zipkin exporter for distributed tracing
+
+# HTTP Client and Enterprise Dependencies
+httpx>=0.24.0                    # Modern HTTP client for async operations
+requests>=2.28.0                 # HTTP library for enterprise integrations
+boto3>=1.26.0                    # AWS SDK for enterprise cloud integrations
+PyJWT>=2.6.0                     # JSON Web Token implementation for authentication
+
+# =============================================================================
 # EXONWARE ECOSYSTEM DEPENDENCIES
 # =============================================================================
 
@@ -130,11 +160,11 @@ exonware-xentity>=0.0.1    # Entity management and relationship modeling library
 # =============================================================================
 #
 # After installing requirements, verify with:
-#   python -c "from exonware.xsystem.serialization import *; print('✅ All 24 formats loaded!')"
+#   python -c "from exonware.xsystem.serialization import *; print('✅ All 30 formats loaded!')"
 #
 # Or run comprehensive verification:
 #   python tests/verify_installation.py
 #
 # Expected output:
 #   🎉 SUCCESS! exonware.xsystem is ready to use!
-#   You have access to enterprise-grade serialization with 24 formats!
+#   You have access to enterprise-grade serialization with 30 formats!

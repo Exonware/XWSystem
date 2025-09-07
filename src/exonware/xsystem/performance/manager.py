@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generic Performance Management for xSystem.
+Generic Performance Management for XSystem.
 
 This module provides a generic performance management framework that can be used
 by any library in the xComBot framework. It handles performance mode management,

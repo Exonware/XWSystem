@@ -2,7 +2,7 @@
 DateTime Utilities
 =================
 
-Production-grade datetime utilities for xSystem.
+Production-grade datetime utilities for XSystem.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri

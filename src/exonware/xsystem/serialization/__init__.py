@@ -3,11 +3,11 @@ Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: January 31, 2025
+Generation Date: September 04, 2025
 
-xSystem Serialization Package
+XSystem Serialization Package
 
-Provides comprehensive serialization utilities for 24 formats following the production library principle.
+Provides comprehensive serialization utilities for 30 formats following the production library principle.
 
 🚨 CRITICAL PRINCIPLE: NO HARDCODED SERIALIZATION LOGIC
    All serializers use established, well-tested libraries only!
@@ -44,8 +44,18 @@ SCHEMA-BASED FORMATS (7):
 23. Cap'n Proto      - pycapnp library
 24. FlatBuffers      - flatbuffers library
 
+KEY-VALUE STORES (3):
+25. LevelDB/RocksDB  - plyvel/python-rocksdb libraries
+26. LMDB            - lmdb library
+27. Zarr            - zarr library
+
+SCIENTIFIC & ANALYTICS (3):
+28. HDF5            - h5py library
+29. Feather/Arrow   - pyarrow library
+30. GraphDB         - neo4j/pydgraph libraries
+
 ✅ BENEFITS:
-- ONE import gets 24 serialization formats
+- ONE import gets 30 serialization formats
 - Production-grade reliability (no custom parsers)
 - Consistent API across all formats (sync AND async)
 - Security validation & atomic file operations
@@ -64,8 +74,8 @@ Every serializer automatically supports async operations:
 - serializer.stream_serialize() - async streaming support
 """
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization, SerializationError
+from .contracts import ISerialization
+from .base import ASerialization, SerializationError
 
 # Core 12 formats (established external + built-in libraries)
 from .json import JsonSerializer, JsonError
@@ -97,6 +107,30 @@ from .orc import OrcSerializer, OrcError
 from .capnproto import CapnProtoSerializer, CapnProtoError
 from .flatbuffers import FlatBuffersSerializer, FlatBuffersError
 
+# Key-value stores (3 additional formats)
+try:
+    from .leveldb import LevelDbSerializer, LevelDbError
+except ImportError:
+    LevelDbSerializer = None
+    LevelDbError = None
+
+try:
+    from .lmdb import LmdbSerializer, LmdbError
+except ImportError:
+    LmdbSerializer = None
+    LmdbError = None
+
+try:
+    from .zarr import ZarrSerializer, ZarrError
+except ImportError:
+    ZarrSerializer = None
+    ZarrError = None
+
+# Scientific & analytics (3 additional formats)
+from .hdf5 import Hdf5Serializer, Hdf5Error
+from .feather import FeatherSerializer, FeatherError
+from .graphdb import GraphDbSerializer, GraphDbError
+
 # Auto-detection and format intelligence
 from .format_detector import FormatDetector, detect_format, get_format_suggestions, is_binary_format
 from .auto_serializer import (
@@ -105,8 +139,8 @@ from .auto_serializer import (
 )
 
 # xSerialization - Self-transforming intelligent serializer
-from .xSerialization import (
-    xSerialization, create_auto_serializer,
+from .x_serialization import (
+    XSerialization, create_auto_serializer,
     dumps, loads, save_file, load_file
 )
 
@@ -118,8 +152,8 @@ from .flyweight import (
 
 __all__ = [
     # Interface and base class
-    "iSerialization",
-    "aSerialization", 
+    "ISerialization",
+    "ASerialization", 
     "SerializationError",
     # Core 12 formats
     "JsonSerializer", "JsonError", 
@@ -149,13 +183,23 @@ __all__ = [
     "CapnProtoSerializer", "CapnProtoError",
     "FlatBuffersSerializer", "FlatBuffersError",
     
+    # Key-value stores (3 additional formats)
+    "LevelDbSerializer", "LevelDbError",
+    "LmdbSerializer", "LmdbError", 
+    "ZarrSerializer", "ZarrError",
+    
+    # Scientific & analytics (3 additional formats)
+    "Hdf5Serializer", "Hdf5Error",
+    "FeatherSerializer", "FeatherError",
+    "GraphDbSerializer", "GraphDbError",
+    
     # Auto-detection and intelligence
     "FormatDetector", "detect_format", "get_format_suggestions", "is_binary_format",
     "AutoSerializer", "auto_serialize", "auto_deserialize", 
     "auto_save_file", "auto_load_file",
     
     # xSerialization - Self-transforming intelligent serializer
-    "xSerialization", "create_auto_serializer",
+    "XSerialization", "create_auto_serializer",
     "dumps", "loads", "save_file", "load_file",
     
     # Flyweight optimization

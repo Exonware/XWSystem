@@ -1,32 +1,30 @@
+#exonware\xsystem\serialization\xml.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
 Version: 0.0.1
-Generation Date: August 31, 2025
+Generation Date: September 04, 2025
 
 XML Serializer Implementation
 
 Uses production-grade libraries (dicttoxml + xmltodict) following
-the xSystem principle: use existing libraries, don't reinvent the wheel.
+the XSystem principle: use existing libraries, don't reinvent the wheel.
 """
 
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
 
 # Use production-grade XML libraries
-try:
-    import dicttoxml
-    import xmltodict
-    XML_AVAILABLE = True
-except ImportError:
-    XML_AVAILABLE = False
+import dicttoxml
+import xmltodict
 
-from .iSerialization import iSerialization
-from .aSerialization import aSerialization
+from .contracts import ISerialization
+from .base import ASerialization
+from .errors import XmlError
 
 
-class XmlSerializer(aSerialization):
+class XmlSerializer(ASerialization):
     """
     Ultra-simple XML serializer using production libraries.
     
@@ -54,11 +52,7 @@ class XmlSerializer(aSerialization):
             max_size_mb=max_size_mb
         )
         
-        if not XML_AVAILABLE:
-            raise ImportError(
-                "XML serialization requires 'dicttoxml' and 'xmltodict' packages. "
-                "Install with: pip install dicttoxml xmltodict"
-            )
+        # XML libraries are now required
     
     @property
     def format_name(self) -> str:
@@ -148,15 +142,9 @@ class XmlSerializer(aSerialization):
         config = super().get_config()
         config.update({
             "libraries": ["dicttoxml", "xmltodict"],
-            "xml_available": XML_AVAILABLE
+            "xml_available": True
         })
         return config
-
-
-# Error classes for consistency
-class XmlError(Exception):
-    """Base exception for XML serialization errors."""
-    pass
 
 
 # Module-level convenience functions for consistent API
