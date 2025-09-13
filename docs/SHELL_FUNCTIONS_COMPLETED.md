@@ -257,7 +257,7 @@ The following placeholders remain but are **non-critical** and marked as such:
 
 ### **New CLI Exports**:
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # Arguments
     ArgumentParser, Argument, Command, ArgumentType,
     

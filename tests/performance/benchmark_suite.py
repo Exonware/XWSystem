@@ -24,7 +24,7 @@ import os
 # Add src to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # Async I/O
     async_safe_write_text, async_safe_read_text,
     # Caching

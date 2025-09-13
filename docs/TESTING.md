@@ -121,7 +121,7 @@ The test suite provides comprehensive coverage for:
 ### For Core Tests
 1. Add test file to `tests/core/`
 2. Use `@pytest.mark.xsystem_core` marker
-3. Import from `exonware.xsystem`
+3. Import from `exonware.xwsystem`
 
 ### For Unit Tests
 1. Add test file to appropriate subdirectory in `tests/unit/`
@@ -371,7 +371,7 @@ The `tests/verify_installation.py` script provides comprehensive verification:
 python tests/verify_installation.py
 
 # Expected output:
-# 🔍 Testing exonware.xsystem serialization formats...
+# 🔍 Testing exonware.xwsystem serialization formats...
 # ✅ JSON
 # ✅ Apache Avro
 # ✅ Protocol Buffers
@@ -381,7 +381,7 @@ python tests/verify_installation.py
 # ✅ Cap'n Proto
 # ✅ FlatBuffers
 # 
-# 🎉 SUCCESS! exonware.xsystem is ready to use!
+# 🎉 SUCCESS! exonware.xwsystem is ready to use!
 # You have access to enterprise-grade serialization with 24 formats!
 ```
 

@@ -1,4 +1,4 @@
-# 🚀 **xSystem: The All-in-One Python Library You've Been Waiting For**
+# 🚀 **XWSystem: The All-in-One Python Library You've Been Waiting For**
 
 **Stop importing 20+ libraries. Import ONE.**
 
@@ -7,11 +7,30 @@
 **Company:** eXonware.com  
 **Author:** Eng. Muhammad AlShehri  
 **Email:** connect@exonware.com  
-**Version:** 0.0.1  
+**Version:** 0.0.1.2  
+**Updated:** September 12, 2025
 
-## 🎯 **Why xSystem?**
+## 🎯 **Why XWSystem?**
 
-**xSystem is the enterprise-grade Python framework that replaces 50+ dependencies with AI-powered performance optimization, military-grade security, 24 serialization formats, automatic memory leak prevention, circuit breakers, and production-ready monitoring - everything you need for bulletproof Python applications in one zero-config install.**
+**XWSystem is the enterprise-grade Python framework that replaces 50+ dependencies with AI-powered performance optimization, military-grade security, 24 serialization formats, automatic memory leak prevention, circuit breakers, and production-ready monitoring - everything you need for bulletproof Python applications in one zero-config install.**
+
+## 📦 **Dual Installation Options**
+
+Choose your preferred installation method:
+
+### **Option 1: Enterprise Package (Recommended for Teams)**
+```bash
+pip install exonware-xwsystem
+```
+**PyPI:** [https://pypi.org/project/exonware-xwsystem/](https://pypi.org/project/exonware-xwsystem/)
+
+### **Option 2: Simple Package (Quick & Easy)**
+```bash
+pip install xwsystem
+```
+**PyPI:** [https://pypi.org/project/xwsystem/](https://pypi.org/project/xwsystem/)
+
+**Both packages are identical** - same functionality, same imports, same everything!
 
 ### **🔥 The Problem We Solve**
 ```python
@@ -24,9 +43,9 @@ import pathlib, os, tempfile
 # ... and 15 more imports
 
 # Just do this:
-from exonware.xsystem import *
+from exonware.xwsystem import *
 # Or more simple:
-from xsystem import *
+from xwsystem import *
 ```
 
 ## ⚡ **24 Serialization Formats in One Import**
@@ -75,7 +94,7 @@ with AtomicFileWriter("critical.json") as writer:
 
 ```python
 # ADAPTIVE PERFORMANCE ENGINE - This is mind-blowing!
-from exonware.xsystem import PerformanceModeManager, PerformanceMode
+from exonware.xwsystem import PerformanceModeManager, PerformanceMode
 
 # AI-powered performance optimization
 manager = PerformanceModeManager(PerformanceMode.DUAL_ADAPTIVE)
@@ -146,7 +165,7 @@ class ConfigManager:
         self.config = load_config()
 ```
 
-## 🏆 **Why xSystem is a Game Changer**
+## 🏆 **Why XWSystem is a Game Changer**
 
 ✅ **One dependency replaces 50+** - psutil, cryptography, requests, PyYAML, msgpack, cbor2, fastavro, protobuf, pyarrow, etc.  
 ✅ **AI-powered performance optimization** - Adaptive learning engines built-in  
@@ -173,7 +192,7 @@ class ConfigManager:
 
 ### **One Simple Install**
 ```bash
-pip install exonware-xsystem
+pip install exonware-xwsystem
 ```
 
 *That's it! Everything included - no extras needed.*
@@ -284,7 +303,7 @@ pip install exonware-xsystem
 
 ### **30-Second Demo**
 ```python
-from exonware.xsystem import JsonSerializer, YamlSerializer, SecureHash
+from exonware.xwsystem import JsonSerializer, YamlSerializer, SecureHash
 
 # Serialize data
 data = {"project": "awesome", "version": "1.0"}
@@ -301,7 +320,7 @@ password_hash = SecureHash.sha256("user_password")
 
 #### Core Utilities
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     ThreadSafeFactory, 
     PathValidator, 
     AtomicFileWriter, 
@@ -323,7 +342,7 @@ with AtomicFileWriter("important.json") as writer:
 
 #### **Serialization (30 Formats) - The Crown Jewel**
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # Text formats (8 formats)
     JsonSerializer, YamlSerializer, TomlSerializer, XmlSerializer,
     CsvSerializer, ConfigParserSerializer, FormDataSerializer, MultipartSerializer,
@@ -398,7 +417,7 @@ parquet_data = pqs.dumps(data)    # Columnar format for analytics
 
 ```bash
 # Install in development mode
-pip install -e ./xsystem
+pip install -e ./xwsystem
 
 # Run tests
 pytest
@@ -472,7 +491,7 @@ isort src/ tests/
 
 ## 📈 **Join Developers Who Simplified Their Stack**
 
-*"Replaced 47 dependencies with xSystem. The adaptive performance engine automatically optimizes our ML pipelines."*  
+*"Replaced 47 dependencies with XWSystem. The adaptive performance engine automatically optimizes our ML pipelines."*  
 — **Senior ML Engineer**
 
 *"The memory leak detection saved our production servers. It automatically prevents and cleans up leaks - incredible!"*  
@@ -484,31 +503,39 @@ isort src/ tests/
 *"The AI-powered performance optimization learns from our usage patterns. It's like having a performance engineer built into the code."*  
 — **Principal Architect**
 
-*"24 serialization formats including enterprise schema formats, advanced security, performance monitoring - xSystem is what every Python project needs."*  
+*"24 serialization formats including enterprise schema formats, advanced security, performance monitoring - XWSystem is what every Python project needs."*  
 — **CTO, Fortune 500**
 
 ## 🚀 **Ready to Simplify Your Python Stack?**
 
+### **Choose Your Installation:**
+
 ```bash
-pip install exonware-xsystem
+# Option 1: Enterprise package
+pip install exonware-xwsystem
+
+# Option 2: Simple package  
+pip install xwsystem
 ```
 
+*Both packages are identical - same functionality, same imports, same everything!*
+
 ### **Links**
-- **⭐ Star us on GitHub:** `https://github.com/exonware/xsystem`  
+- **⭐ Star us on GitHub:** `https://github.com/exonware/xwsystem`  
 - **📚 Documentation:** [Complete API Reference](docs/)  
 - **💡 Examples:** [Practical Usage Examples](examples/)  
 - **🐛 Issues:** Report bugs and request features on GitHub  
 - **💬 Questions?** connect@exonware.com
 
 ### **What's Next?**
-1. **Install xSystem** - Get started in 30 seconds
+1. **Install XWSystem** - Get started in 30 seconds
 2. **Replace your imports** - One import instead of 20+
 3. **Enjoy cleaner code** - Consistent APIs, better security
 4. **Ship faster** - Focus on business logic, not utilities
 
 ---
 
-**🏆 xSystem: Because life's too short for dependency hell.**
+**🏆 XWSystem: Because life's too short for dependency hell.**
 
 ---
 

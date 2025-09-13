@@ -3,7 +3,7 @@ requires = [ "hatchling",]
 build-backend = "hatchling.build"
 
 [project]
-name = "exonware-xsystem"
+name = "exonware-xwsystem"
 version = "0.0.1.2"
 description = "Enterprise-grade Python framework with AI-powered performance optimization, 24 serialization formats, military-grade security, automatic memory leak prevention, circuit breakers, and production monitoring - replaces 50+ dependencies"
 readme = "README.md"
@@ -54,6 +54,41 @@ dependencies = [
     # Enterprise cloud and authentication
     "boto3>=1.26.0",
     "PyJWT>=2.6.0",
+    
+    # CLI and terminal support
+    "colorama>=0.4.0",
+    
+    # Additional database support
+    "rocksdb>=0.7.0",
+    
+    # HTTP requests for enterprise integrations
+    "requests>=2.28.0",
+    
+    # TOML reading support (complement to tomli-w)
+    "tomli>=2.0.0",
+    
+    # Advanced YAML processing (optional fallback)
+    "ruamel.yaml>=0.17.0",
+    
+    # Additional database and storage formats
+    "neo4j>=4.4.0",
+    "pydgraph>=21.3.0",
+    "lmdb>=1.4.0",
+    "zarr>=2.15.0",
+    "h5py>=3.8.0",
+    "pytz>=2023.3",
+    
+    # Performance and optional enhancement libraries
+    "lxml>=4.9.0",
+    "xmlschema>=2.0.0",
+    "orjson>=3.8.0",
+    "ijson>=3.2.0",
+    "jsonpointer>=2.0.0",
+    "jsonpatch>=1.33.0",
+    "jsonschema>=4.17.0",
+    "xxhash>=3.2.0",
+    "msgspec>=0.11.0",
+    "rtoml>=0.7.0",
 ]
 [[project.authors]]
 name = "Eng. Muhammad AlShehri"
@@ -64,15 +99,24 @@ text = "MIT"
 
 [project.optional-dependencies]
 dev = [ "pytest>=7.0.0", "pytest-asyncio>=0.21.0", "pytest-cov>=4.0.0", "black>=23.0.0", "isort>=5.12.0", "mypy>=1.0.0",]
-serialization = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0",]
-yaml = [ "PyYAML>=6.0",]
-toml = [ "tomli-w>=1.0.0",]
-xml = [ "dicttoxml>=1.7.4", "xmltodict>=0.12.0",]
+serialization = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "orjson>=3.8.0", "ijson>=3.2.0", "jsonpointer>=2.0.0", "jsonpatch>=1.33.0", "jsonschema>=4.17.0", "xxhash>=3.2.0", "msgspec>=0.11.0", "rtoml>=0.7.0",]
+yaml = [ "PyYAML>=6.0", "ruamel.yaml>=0.17.0",]
+toml = [ "tomli-w>=1.0.0", "tomli>=2.0.0",]
+xml = [ "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "lxml>=4.9.0", "xmlschema>=2.0.0",]
 bson = [ "pymongo>=4.0.0",]
 msgpack = [ "msgpack>=1.0.0",]
 cbor = [ "cbor2>=5.0.0",]
-http = [ "httpx>=0.24.0",]
+http = [ "httpx>=0.24.0", "requests>=2.28.0",]
 crypto = [ "cryptography>=41.0.0",]
+# Database and storage formats
+database = [ "neo4j>=4.4.0", "pydgraph>=21.3.0", "lmdb>=1.4.0", "rocksdb>=0.7.0",]
+storage = [ "zarr>=2.15.0", "h5py>=3.8.0",]
+timezone = [ "pytz>=2023.3",]
+
+# Performance enhancement libraries
+performance = [ "orjson>=3.8.0", "ijson>=3.2.0", "lxml>=4.9.0", "rtoml>=0.7.0", "msgspec>=0.11.0", "xxhash>=3.2.0",]
+validation = [ "jsonpointer>=2.0.0", "jsonpatch>=1.33.0", "jsonschema>=4.17.0", "xmlschema>=2.0.0",]
+
 # Enterprise serialization formats (optional for maximum compatibility)
 enterprise-advanced = [ "thrift>=0.15.0", "pyorc>=0.6.0",]
 enterprise-capnproto = [ "pycapnp>=1.1.0",]  # Separate due to complex build requirements
@@ -80,14 +124,14 @@ enterprise = [ "fastavro>=1.4.0", "protobuf>=3.19.0", "pyarrow>=8.0.0", "pandas>
 # Enterprise observability and distributed tracing
 observability = [ "opentelemetry-api>=1.20.0", "opentelemetry-sdk>=1.20.0", "opentelemetry-exporter-jaeger>=1.17.0", "opentelemetry-exporter-zipkin>=1.12.0",]
 # Complete installation with all stable formats
-complete = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "flatbuffers>=2.0.0",]
+complete = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "tomli>=2.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "requests>=2.28.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "flatbuffers>=2.0.0", "ruamel.yaml>=0.17.0", "neo4j>=4.4.0", "pydgraph>=21.3.0", "lmdb>=1.4.0", "zarr>=2.15.0", "h5py>=3.8.0", "pytz>=2023.3", "lxml>=4.9.0", "xmlschema>=2.0.0", "orjson>=3.8.0", "ijson>=3.2.0", "jsonpointer>=2.0.0", "jsonpatch>=1.33.0", "jsonschema>=4.17.0", "xxhash>=3.2.0", "msgspec>=0.11.0", "rtoml>=0.7.0",]
 # Maximum completeness (includes complex build dependencies)
-all = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "thrift>=0.15.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "pyorc>=0.6.0", "pycapnp>=1.1.0", "flatbuffers>=2.0.0",]
+all = [ "PyYAML>=6.0", "tomli-w>=1.0.0", "tomli>=2.0.0", "dicttoxml>=1.7.4", "xmltodict>=0.12.0", "pymongo>=4.0.0", "msgpack>=1.0.0", "cbor2>=5.0.0", "httpx>=0.24.0", "requests>=2.28.0", "cryptography>=41.0.0", "fastavro>=1.4.0", "protobuf>=3.19.0", "thrift>=0.15.0", "pyarrow>=8.0.0", "pandas>=1.3.0", "pyorc>=0.6.0", "pycapnp>=1.1.0", "flatbuffers>=2.0.0", "colorama>=0.4.0", "rocksdb>=0.7.0", "ruamel.yaml>=0.17.0", "neo4j>=4.4.0", "pydgraph>=21.3.0", "lmdb>=1.4.0", "zarr>=2.15.0", "h5py>=3.8.0", "pytz>=2023.3", "lxml>=4.9.0", "xmlschema>=2.0.0", "orjson>=3.8.0", "ijson>=3.2.0", "jsonpointer>=2.0.0", "jsonpatch>=1.33.0", "jsonschema>=4.17.0", "xxhash>=3.2.0", "msgspec>=0.11.0", "rtoml>=0.7.0",]
 
 [project.urls]
 Homepage = "https://exonware.com"
-Repository = "https://github.com/exonware/xsystem"
-Documentation = "https://github.com/exonware/xsystem#readme"
+Repository = "https://github.com/exonware/xwsystem"
+Documentation = "https://github.com/exonware/xwsystem#readme"
 
 [tool.black]
 line-length = 88
@@ -120,11 +164,11 @@ python_files = [ "test_*.py",]
 python_classes = [ "Test*",]
 python_functions = [ "test_*",]
 addopts = "-v --tb=short"
-markers = [ "xsystem_core: Core functionality tests", "xsystem_unit: Unit tests for individual components", "xsystem_integration: Integration tests between components", "xsystem_config: Configuration and setup tests", "xsystem_performance: Performance and benchmarking tests", "xsystem_security: Security validation tests", "xsystem_threading: Threading and concurrency tests", "xsystem_io: I/O operations tests", "xsystem_structures: Data structure tests", "xsystem_patterns: Design pattern tests", "xsystem_monitoring: Monitoring and metrics tests",]
+markers = [ "xwsystem_core: Core functionality tests", "xwsystem_unit: Unit tests for individual components", "xwsystem_integration: Integration tests between components", "xwsystem_config: Configuration and setup tests", "xwsystem_performance: Performance and benchmarking tests", "xwsystem_security: Security validation tests", "xwsystem_threading: Threading and concurrency tests", "xwsystem_io: I/O operations tests", "xwsystem_structures: Data structure tests", "xwsystem_patterns: Design pattern tests", "xwsystem_monitoring: Monitoring and metrics tests",]
 
 [tool.hatch.build.targets.wheel]
 packages = [ "src/exonware",]
-py-modules = [ "src/xsystem",]
+py-modules = [ "src/xwsystem",]
 
 [tool.hatch.build.targets.sdist]
 include = [ "/src", "/tests", "/README.md", "/.github",]

@@ -24,7 +24,7 @@ All critical gaps identified in the competitive analysis have been successfully 
 
 ```python
 # ✅ Async I/O Operations
-from exonware.xsystem import (
+from exonware.xwsystem import (
     async_safe_write_text, async_safe_read_text,
     AsyncAtomicFileWriter, async_atomic_write
 )
@@ -37,7 +37,7 @@ async def async_io_example():
         await f.write("Atomic async write!")
 
 # ✅ Async HTTP Client with HTTP/2
-from exonware.xsystem import AdvancedHttpClient
+from exonware.xwsystem import AdvancedHttpClient
 
 async def async_http_example():
     async with AdvancedHttpClient() as client:
@@ -49,7 +49,7 @@ async def async_http_example():
                 process(chunk)
 
 # ✅ Async Concurrency Primitives
-from exonware.xsystem import (
+from exonware.xwsystem import (
     AsyncLock, AsyncSemaphore, AsyncEvent, AsyncQueue,
     AsyncCondition, AsyncResourcePool
 )
@@ -64,7 +64,7 @@ async def async_concurrency_example():
         await critical_operation()
 
 # ✅ Async Caching
-from exonware.xsystem import AsyncLRUCache, AsyncLFUCache
+from exonware.xwsystem import AsyncLRUCache, AsyncLFUCache
 
 async def async_cache_example():
     cache = AsyncLRUCache(capacity=1000)
@@ -84,7 +84,7 @@ async def async_cache_example():
 
 ```python
 # ✅ Declarative Validation with Type Hints
-from exonware.xsystem import xModel, Field, ValidationError
+from exonware.xwsystem import xModel, Field, ValidationError
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -146,7 +146,7 @@ dict_data = user.model_dump(exclude={"email"})
 
 ```python
 # ✅ HTTP/2 Support
-from exonware.xsystem import (
+from exonware.xwsystem import (
     AdvancedHttpClient, AdvancedHttpConfig, Http2Config,
     StreamingConfig, MockTransport
 )
@@ -216,7 +216,7 @@ client = AdvancedHttpClient(transport=transport)
 
 ```python
 # ✅ AEAD Ciphers (Direct Access)
-from exonware.xsystem import AES_GCM, ChaCha20Poly1305_Cipher
+from exonware.xwsystem import AES_GCM, ChaCha20Poly1305_Cipher
 
 # AES-GCM authenticated encryption
 key = AES_GCM.generate_key(256)
@@ -231,7 +231,7 @@ chacha_cipher = ChaCha20Poly1305_Cipher(chacha_key)
 chacha_encrypted = chacha_cipher.encrypt(nonce, b"secret", b"auth_data")
 
 # ✅ Key Exchange Algorithms
-from exonware.xsystem import X25519_KeyExchange
+from exonware.xwsystem import X25519_KeyExchange
 
 alice_kx = X25519_KeyExchange()
 bob_kx = X25519_KeyExchange()
@@ -242,7 +242,7 @@ bob_public = bob_kx.get_public_key()
 shared_secret = alice_kx.exchange(bob_public)
 
 # ✅ Digital Signatures  
-from exonware.xsystem import Ed25519_Signature
+from exonware.xwsystem import Ed25519_Signature
 
 signer = Ed25519_Signature()
 message = b"Important document"
@@ -252,7 +252,7 @@ public_key = signer.get_public_key()
 is_valid = Ed25519_Signature.verify(public_key, signature, message)
 
 # ✅ Key Derivation Functions
-from exonware.xsystem import HKDF_Expand, PBKDF2_Derive
+from exonware.xwsystem import HKDF_Expand, PBKDF2_Derive
 
 # HKDF for key derivation
 derived_key = HKDF_Expand.derive(
@@ -271,7 +271,7 @@ password_key = PBKDF2_Derive.derive(
 )
 
 # ✅ X.509 Certificate Handling
-from exonware.xsystem import X509Certificate
+from exonware.xwsystem import X509Certificate
 
 cert = X509Certificate.load_from_file("server.crt")
 subject = cert.get_subject()
@@ -280,7 +280,7 @@ is_valid = cert.is_valid_now()
 ca_verified = cert.verify_signature(ca_certificate)
 
 # ✅ Low-Level Hash Functions
-from exonware.xsystem import secure_hash
+from exonware.xwsystem import secure_hash
 
 sha256_hash = secure_hash(b"data", "SHA256")
 sha3_hash = secure_hash(b"data", "SHA3_256")
@@ -299,7 +299,7 @@ blake2b_hash = secure_hash(b"data", "BLAKE2B")
 
 ```python
 # ✅ System-Wide Process Introspection
-from exonware.xsystem import (
+from exonware.xwsystem import (
     list_processes, get_process, SystemMonitor,
     get_cpu_usage, get_memory_usage, get_hardware_info
 )
@@ -363,7 +363,7 @@ for disk in disks:
 
 ```python
 # LRU, LFU, TTL caches with async support
-from exonware.xsystem import LRUCache, LFUCache, TTLCache, AsyncLRUCache
+from exonware.xwsystem import LRUCache, LFUCache, TTLCache, AsyncLRUCache
 
 lru = LRUCache(capacity=1000, ttl=300)
 lfu = LFUCache(capacity=500)
@@ -378,7 +378,7 @@ await async_lru.put("key", "value")
 
 ```python
 # Colored output, progress bars, tables
-from exonware.xsystem import (
+from exonware.xwsystem import (
     colorize, Colors, Style, ProgressBar, Table, TableFormatter
 )
 
@@ -393,7 +393,7 @@ table.add_row("Alice")
 
 ```python
 # Human-friendly time operations
-from exonware.xsystem import (
+from exonware.xwsystem import (
     humanize_timedelta, time_ago, parse_human_duration
 )
 
@@ -432,7 +432,7 @@ duration = parse_human_duration("2h 30m")  # timedelta(hours=2, minutes=30)
 
 ```python
 # ✅ All features tested and working
-from exonware.xsystem import *
+from exonware.xwsystem import *
 
 # Caching works
 cache = LRUCache(10)

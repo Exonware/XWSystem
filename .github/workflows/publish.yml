@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Dual PyPI Publish - exonware-xwsystem & xwsystem
 
 on:
   push:
@@ -23,11 +23,47 @@ jobs:
         python -m pip install --upgrade pip
         pip install build twine
     
-    - name: Build package
-      run: python -m build
+    - name: Build exonware-xwsystem package
+      run: |
+        echo "🔨 Building exonware-xwsystem package..."
+        python -m build --config-setting=build-dir=dist/exonware-xwsystem
+        
+    - name: Build xwsystem package
+      run: |
+        echo "🔨 Building xwsystem package..."
+        python -m build --config-setting=build-dir=dist/xwsystem -C pyproject.xwsystem.toml
     
-    - name: Publish to PyPI
+    - name: List built packages
+      run: |
+        echo "📦 Built packages:"
+        find dist -name "*.whl" -o -name "*.tar.gz" | sort
+    
+    - name: Publish exonware-xwsystem to PyPI
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: twine upload dist/*
+      run: |
+        echo "🚀 Publishing exonware-xwsystem to PyPI..."
+        twine upload dist/exonware-xwsystem/*
+    
+    - name: Publish xwsystem to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        echo "🚀 Publishing xwsystem to PyPI..."
+        twine upload dist/xwsystem/*
+        
+    - name: Success notification
+      run: |
+        echo "✅ Successfully published both packages:"
+        echo "   📦 exonware-xwsystem v${{ github.ref_name }}"
+        echo "   📦 xwsystem v${{ github.ref_name }}"
+        echo ""
+        echo "PyPI URLs:"
+        echo "   🌐 https://pypi.org/project/exonware-xwsystem/"
+        echo "   🌐 https://pypi.org/project/xwsystem/"
+        echo ""
+        echo "Install with:"
+        echo "   pip install exonware-xwsystem"
+        echo "   pip install xwsystem"

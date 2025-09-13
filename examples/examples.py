@@ -13,11 +13,11 @@ from pathlib import Path
 from typing import Any, Dict
 
 # Import xsystem utilities
-from ..src.exonware.xsystem.threading import ThreadSafeFactory
-from ..src.exonware.xsystem.security import PathValidator, PathSecurityError
-from ..src.exonware.xsystem.io import AtomicFileWriter
-from ..src.exonware.xsystem.structures import CircularReferenceDetector, CircularReferenceError
-from ..src.exonware.xsystem.patterns import GenericHandlerFactory
+from ..src.exonware.xwsystem.threading import ThreadSafeFactory
+from ..src.exonware.xwsystem.security import PathValidator, PathSecurityError
+from ..src.exonware.xwsystem.io import AtomicFileWriter
+from ..src.exonware.xwsystem.structures import CircularReferenceDetector, CircularReferenceError
+from ..src.exonware.xwsystem.patterns import GenericHandlerFactory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

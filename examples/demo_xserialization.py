@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Demo script for xSerialization functionality.
+Demo script for XWSerialization functionality.
 This demonstrates the self-transforming serializer concept.
 """
 
-print("🚀 xSerialization Demo")
+print("🚀 XWSerialization Demo")
 print("=" * 50)
 
 print("\n📝 Concept Overview:")
-print("xSerialization is a self-transforming intelligent serializer that:")
+print("XWSerialization is a self-transforming intelligent serializer that:")
 print("1. Starts as a smart proxy")
 print("2. Auto-detects format on first use") 
 print("3. Transforms into the appropriate specialized serializer")
@@ -17,7 +17,7 @@ print("4. All future calls use the specialized serializer directly")
 print("\n💡 Usage Examples:")
 print("""
 # Create intelligent serializer
-serializer = xSerialization()
+serializer = XWSerialization()
 
 # First call triggers detection and transformation
 result = serializer.dumps(data, file_path="data.json")  # Becomes JsonSerializer
@@ -53,7 +53,7 @@ print("• Format hints (explicit override)")
 print("• Data type inference (dict/list → JSON)")
 
 print("\n🔄 Self-Transformation Process:")
-print("1. xSerialization starts as proxy")
+print("1. XWSerialization starts as proxy")
 print("2. First method call triggers FormatDetector")
 print("3. Creates appropriate specialized serializer (JsonSerializer, etc.)")
 print("4. Delegates all future calls to specialized serializer")
@@ -92,7 +92,7 @@ print("• Comprehensive error handling")
 
 print("\n🔧 Implementation Status:")
 print("✅ Unified async architecture (iSerialization + aSerialization)")
-print("✅ Self-transforming xSerialization class")
+print("✅ Self-transforming XWSerialization class")
 print("✅ Intelligent FormatDetector with confidence scoring")
 print("✅ Static functions (dumps, loads, save_file, load_file)")
 print("✅ Security hardening (Pickle class filtering)")
@@ -100,11 +100,11 @@ print("✅ Streaming support framework")
 print("✅ Performance optimizations (__slots__, logging guards)")
 
 print("\n🎉 Result:")
-print("xSerialization provides the power of 24+ serialization formats")
+print("XWSerialization provides the power of 24+ serialization formats")
 print("with the simplicity of a single, intelligent interface that 'just works'!")
 
 print("\n" + "=" * 50)
-print("✅ xSerialization implementation is complete and ready!")
+print("✅ XWSerialization implementation is complete and ready!")
 
 # Note: Actual testing would require proper Python package imports
 # This demo shows the concept and architecture

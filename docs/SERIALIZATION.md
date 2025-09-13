@@ -24,7 +24,7 @@ xSystem provides **24 serialization formats** with consistent APIs - more than a
 
 ### **1. JSON - Universal Standard**
 ```python
-from exonware.xsystem import JsonSerializer
+from exonware.xwsystem import JsonSerializer
 
 js = JsonSerializer()
 data = {"name": "John", "age": 30, "active": True}
@@ -47,7 +47,7 @@ loaded_data = js.load_from_file("user.json")
 
 ### **2. YAML - Human-Readable Configs**
 ```python
-from exonware.xsystem import YamlSerializer
+from exonware.xwsystem import YamlSerializer
 
 ys = YamlSerializer()
 config = {
@@ -80,7 +80,7 @@ yaml_str = ys.dumps(config)
 
 ### **3. TOML - Python Package Configs**
 ```python
-from exonware.xsystem import TomlSerializer
+from exonware.xwsystem import TomlSerializer
 
 ts = TomlSerializer()
 config = {
@@ -106,7 +106,7 @@ toml_str = ts.dumps(config)
 
 ### **4. XML - Structured Documents**
 ```python
-from exonware.xsystem import XmlSerializer
+from exonware.xwsystem import XmlSerializer
 
 xs = XmlSerializer()
 data = {
@@ -139,7 +139,7 @@ xml_str = xs.dumps(data)
 
 ### **5. CSV - Tabular Data**
 ```python
-from exonware.xsystem import CsvSerializer
+from exonware.xwsystem import CsvSerializer
 
 cs = CsvSerializer()
 tabular_data = [
@@ -163,7 +163,7 @@ csv_str = cs.dumps(tabular_data)
 
 ### **6. ConfigParser - INI Files**
 ```python
-from exonware.xsystem import ConfigParserSerializer
+from exonware.xwsystem import ConfigParserSerializer
 
 cps = ConfigParserSerializer()
 ini_data = {
@@ -190,7 +190,7 @@ ini_str = cps.dumps(ini_data)
 
 ### **7. FormData - URL-Encoded Forms**
 ```python
-from exonware.xsystem import FormDataSerializer
+from exonware.xwsystem import FormDataSerializer
 
 fds = FormDataSerializer()
 form_data = {
@@ -211,7 +211,7 @@ form_str = fds.dumps(form_data)
 
 ### **8. Multipart - File Uploads**
 ```python
-from exonware.xsystem import MultipartSerializer
+from exonware.xwsystem import MultipartSerializer
 
 mps = MultipartSerializer()
 multipart_data = {
@@ -235,7 +235,7 @@ multipart_bytes = mps.dumps(multipart_data)
 
 ### **1. BSON - MongoDB Binary JSON**
 ```python
-from exonware.xsystem import BsonSerializer
+from exonware.xwsystem import BsonSerializer
 
 bs = BsonSerializer()
 data = {
@@ -256,7 +256,7 @@ loaded_data = bs.loads(bson_bytes)
 
 ### **2. MessagePack - Compact Binary**
 ```python
-from exonware.xsystem import MsgPackSerializer
+from exonware.xwsystem import MsgPackSerializer
 
 mss = MsgPackSerializer()
 data = {"users": list(range(1000)), "active": True}
@@ -278,7 +278,7 @@ print(f"Size reduction: {size_reduction:.1f}%")
 
 ### **3. CBOR - RFC 8949 Standard**
 ```python
-from exonware.xsystem import CborSerializer
+from exonware.xwsystem import CborSerializer
 
 cbrs = CborSerializer()
 data = {
@@ -299,7 +299,7 @@ parsed_data = cbrs.loads(cbor_bytes)
 
 ### **4. Pickle - Python Objects**
 ```python
-from exonware.xsystem import PickleSerializer
+from exonware.xwsystem import PickleSerializer
 
 ps = PickleSerializer()
 
@@ -329,7 +329,7 @@ restored_data = ps.loads(pickle_bytes)
 
 ### **5. Marshal - Python Internal**
 ```python
-from exonware.xsystem import MarshalSerializer
+from exonware.xwsystem import MarshalSerializer
 
 ms = MarshalSerializer()
 data = {
@@ -350,7 +350,7 @@ loaded_data = ms.loads(marshal_bytes)
 
 ### **6. SQLite3 - Embedded Database**
 ```python
-from exonware.xsystem import Sqlite3Serializer
+from exonware.xwsystem import Sqlite3Serializer
 
 s3s = Sqlite3Serializer()
 records = [
@@ -374,7 +374,7 @@ print(results)  # [{"id": 1, "name": "John", "age": 30}, {"id": 3, "name": "Bob"
 
 ### **7. DBM - Key-Value Database**
 ```python
-from exonware.xsystem import DbmSerializer
+from exonware.xwsystem import DbmSerializer
 
 ds = DbmSerializer()
 kv_data = {
@@ -398,7 +398,7 @@ all_data = ds.loads_from_dbm("data.dbm")
 
 ### **8. Shelve - Persistent Dictionary**
 ```python
-from exonware.xsystem import ShelveSerializer
+from exonware.xwsystem import ShelveSerializer
 
 ss = ShelveSerializer()
 shelf_data = {
@@ -421,7 +421,7 @@ session_data = ss.get_from_shelf("app_data.shelf", "session:abc123")
 
 ### **9. Plistlib - Apple Property Lists**
 ```python
-from exonware.xsystem import PlistlibSerializer
+from exonware.xwsystem import PlistlibSerializer
 
 pls = PlistlibSerializer()
 plist_data = {
@@ -449,7 +449,7 @@ plist_xml = pls.dumps(plist_data, format='xml')  # XML plist format
 
 ### **1. Apache Avro - Schema Evolution**
 ```python
-from exonware.xsystem import AvroSerializer
+from exonware.xwsystem import AvroSerializer
 
 avs = AvroSerializer()
 
@@ -492,7 +492,7 @@ print(user_data)  # {"id": 1, "name": "John", "email": "john@example.com", "phon
 
 ### **2. Protocol Buffers - Google's Format**
 ```python
-from exonware.xsystem import ProtobufSerializer
+from exonware.xwsystem import ProtobufSerializer
 
 pbs = ProtobufSerializer()
 
@@ -531,7 +531,7 @@ loaded_user = pbs.loads(protobuf_bytes, schema=proto_schema)
 
 ### **3. Apache Thrift - Cross-Language RPC**
 ```python
-from exonware.xsystem import ThriftSerializer
+from exonware.xwsystem import ThriftSerializer
 
 trs = ThriftSerializer()
 
@@ -563,7 +563,7 @@ loaded_data = trs.loads(thrift_bytes, schema=thrift_schema)
 
 ### **4. Apache Parquet - Columnar Analytics**
 ```python
-from exonware.xsystem import ParquetSerializer
+from exonware.xwsystem import ParquetSerializer
 
 pqs = ParquetSerializer()
 
@@ -595,7 +595,7 @@ loaded_data = pqs.loads(parquet_bytes)
 
 ### **5. Apache ORC - Optimized Row Columnar**
 ```python
-from exonware.xsystem import OrcSerializer
+from exonware.xwsystem import OrcSerializer
 
 ors = OrcSerializer()
 
@@ -624,7 +624,7 @@ loaded_data = ors.loads(orc_bytes)
 
 ### **6. Cap'n Proto - Infinite Speed (Optional)**
 ```python
-from exonware.xsystem import CapnProtoSerializer
+from exonware.xwsystem import CapnProtoSerializer
 
 try:
     cps = CapnProtoSerializer()
@@ -667,7 +667,7 @@ except ImportError:
 
 ### **7. FlatBuffers - Zero-Copy Access**
 ```python
-from exonware.xsystem import FlatBuffersSerializer
+from exonware.xwsystem import FlatBuffersSerializer
 
 fbs = FlatBuffersSerializer()
 
@@ -875,7 +875,7 @@ binary_msgpack = mss.dumps(data)
 
 ### **Error Handling**
 ```python
-from exonware.xsystem import SerializationError
+from exonware.xwsystem import SerializationError
 
 try:
     # Attempt serialization
@@ -969,7 +969,7 @@ import msgpack
 import pickle
 
 # After: One import for everything
-from exonware.xsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, PickleSerializer
+from exonware.xwsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, PickleSerializer
 
 # Same functionality, consistent API
 js = JsonSerializer()

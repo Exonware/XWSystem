@@ -37,7 +37,7 @@ def run_tests_with_pytest(test_path: str, marker: str = None, category: str = No
     try:
         import coverage
         pytest_args.extend([
-            "--cov=exonware.xsystem",
+            "--cov=exonware.xwsystem",
             "--cov-report=term-missing"
         ])
     except ImportError:
@@ -61,28 +61,28 @@ def run_core_tests():
     """Run all core tests."""
     print("🚀 Running CORE tests...")
     print("=" * 50)
-    return run_tests_with_pytest("core", "xsystem_core")
+    return run_tests_with_pytest("core", "xwsystem_core")
 
 
 def run_unit_tests():
     """Run all unit tests."""
     print("🚀 Running UNIT tests...")
     print("=" * 50)
-    return run_tests_with_pytest("unit", "xsystem_unit")
+    return run_tests_with_pytest("unit", "xwsystem_unit")
 
 
 def run_integration_tests():
     """Run all integration tests."""
     print("🚀 Running INTEGRATION tests...")
     print("=" * 50)
-    return run_tests_with_pytest("integration", "xsystem_integration")
+    return run_tests_with_pytest("integration", "xwsystem_integration")
 
 
 def run_performance_tests():
     """Run all performance tests."""
     print("🚀 Running PERFORMANCE tests...")
     print("=" * 50)
-    return run_tests_with_pytest("performance", "xsystem_performance")
+    return run_tests_with_pytest("performance", "xwsystem_performance")
 
 
 def run_specific_unit_category(category: str):
@@ -108,7 +108,7 @@ def run_specific_unit_category(category: str):
         "--tb=short",
         "-x",
         "--strict-markers",
-        "-m", f"xsystem_{category}",
+        "-m", f"xwsystem_{category}",
     ]
     
     cmd = [sys.executable, "-m", "pytest"] + pytest_args
@@ -212,7 +212,7 @@ Examples:
   python runner.py                    # Run all tests
   python runner.py core              # Run core tests only
   python runner.py pytest unit       # Run unit tests with pytest
-  python runner.py pytest -m xsystem_security  # Run security tests
+  python runner.py pytest -m xwsystem_security  # Run security tests
   python runner.py unit-category security_tests  # Run security unit tests
 
 Available Unit Categories:
@@ -226,12 +226,12 @@ Available Unit Categories:
   - threading_tests
 
 Markers:
-  -m xsystem_core         Core functionality tests
-  -m xsystem_unit         Unit tests
-  -m xsystem_integration  Integration tests
-  -m xsystem_security     Security tests
-  -m xsystem_serialization Serialization tests
-  -m xsystem_performance  Performance tests
+  -m xwsystem_core         Core functionality tests
+  -m xwsystem_unit         Unit tests
+  -m xwsystem_integration  Integration tests
+  -m xwsystem_security     Security tests
+  -m xwsystem_serialization Serialization tests
+  -m xwsystem_performance  Performance tests
 """)
 
 

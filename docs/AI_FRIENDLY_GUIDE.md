@@ -33,10 +33,10 @@ xSystem eliminates the need for 50+ Python dependencies by providing a unified, 
 
 ```python
 # Single import for everything
-from exonware.xsystem import *
+from exonware.xwsystem import *
 
 # Or specific imports
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # Serialization
     JsonSerializer, YamlSerializer, BsonSerializer,
     
@@ -74,7 +74,7 @@ from exonware.xsystem import (
 
 ```python
 # Same API for any format
-from exonware.xsystem import JsonSerializer, YamlSerializer, BsonSerializer
+from exonware.xwsystem import JsonSerializer, YamlSerializer, BsonSerializer
 
 data = {"users": [{"name": "Alice", "age": 30}], "count": 1}
 
@@ -97,7 +97,7 @@ parsed = bson_ser.loads(bson_bytes)
 ### **Enterprise Schema Formats**
 
 ```python
-from exonware.xsystem import AvroSerializer, ProtobufSerializer, ParquetSerializer
+from exonware.xwsystem import AvroSerializer, ProtobufSerializer, ParquetSerializer
 
 # Apache Avro with schema evolution
 avro = AvroSerializer()
@@ -120,7 +120,7 @@ parquet_data = parquet.dumps(data)
 
 ```python
 import asyncio
-from exonware.xsystem import (
+from exonware.xwsystem import (
     safe_write_text, async_safe_write_text,
     LRUCache, AsyncLRUCache,
     HttpClient, AdvancedHttpClient
@@ -155,7 +155,7 @@ asyncio.run(async_example())
 ### **Pattern: Declarative Models with Automatic Type Conversion**
 
 ```python
-from exonware.xsystem import xModel, Field, ValidationError
+from exonware.xwsystem import xModel, Field, ValidationError
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
@@ -216,7 +216,7 @@ dict_data = user.model_dump(exclude={"email"})
 ### **Pattern: Modern HTTP with Full Feature Set**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     AdvancedHttpClient, AdvancedHttpConfig, Http2Config, 
     StreamingConfig, MockTransport, MockResponse
 )
@@ -272,7 +272,7 @@ def test_api_client():
 ### **Pattern: Multiple Cache Types with Consistent APIs**
 
 ```python
-from exonware.xsystem import LRUCache, LFUCache, TTLCache, AsyncLRUCache
+from exonware.xwsystem import LRUCache, LFUCache, TTLCache, AsyncLRUCache
 
 # LRU Cache (Least Recently Used)
 lru = LRUCache(capacity=1000, ttl=300)  # Optional TTL
@@ -314,7 +314,7 @@ del lru["key"]
 ### **Pattern: Cross-Platform Terminal Utilities**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     colorize, Colors, Style, print_colored,
     ProgressBar, Table, TableFormatter
 )
@@ -359,7 +359,7 @@ else:
 ### **Pattern: High-Level + Low-Level Crypto Access**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # High-level (easy to use)
     SymmetricEncryption, AsymmetricEncryption, SecureHash,
     
@@ -413,7 +413,7 @@ print(f"Is valid now: {cert.is_valid_now()}")
 ### **Pattern: Cross-Platform System Information**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     get_cpu_usage, get_memory_usage, get_hardware_info,
     list_processes, get_process, SystemMonitor
 )
@@ -456,7 +456,7 @@ if monitor.is_available():
 ### **Pattern: Natural Language Time Operations**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     humanize_timedelta, time_ago, time_until, 
     parse_human_duration, duration_to_human
 )
@@ -493,7 +493,7 @@ def smart_format(dt):
         return dt.strftime("%b %d, %Y")  # "Jan 15, 2023"
 
 # Timezone-aware operations
-from exonware.xsystem import convert_timezone, get_local_timezone
+from exonware.xwsystem import convert_timezone, get_local_timezone
 
 utc_time = datetime.utcnow()
 local_time = convert_timezone(utc_time, get_local_timezone())
@@ -506,7 +506,7 @@ local_time = convert_timezone(utc_time, get_local_timezone())
 ### **Pattern: Modern Async Concurrency**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     AsyncLock, AsyncSemaphore, AsyncEvent, AsyncQueue,
     AsyncCondition, AsyncResourcePool
 )
@@ -560,19 +560,19 @@ async def concurrency_examples():
 
 ```python
 # ✅ Recommended: Import what you need
-from exonware.xsystem import LRUCache, xModel, Field, colorize
+from exonware.xwsystem import LRUCache, xModel, Field, colorize
 
 # ✅ Also good: Star import for comprehensive usage
-from exonware.xsystem import *
+from exonware.xwsystem import *
 
 # ❌ Avoid: Deep imports (may change)
-# from exonware.xsystem.caching.lru_cache import LRUCache
+# from exonware.xwsystem.caching.lru_cache import LRUCache
 ```
 
 ### **2. Error Handling Patterns**
 
 ```python
-from exonware.xsystem import ValidationError, FileOperationError, HttpError
+from exonware.xwsystem import ValidationError, FileOperationError, HttpError
 
 # Validation errors
 try:
@@ -647,7 +647,7 @@ class OldUser(BaseModel):
     age: int = PydanticField(ge=0)
 
 # New xSystem code (drop-in replacement)
-from exonware.xsystem import xModel, Field
+from exonware.xwsystem import xModel, Field
 
 class NewUser(xModel):
     name: str
@@ -668,7 +668,7 @@ async with httpx.AsyncClient() as client:
     response = await client.get("https://api.example.com")
 
 # New xSystem (enhanced features)
-from exonware.xsystem import AdvancedHttpClient
+from exonware.xwsystem import AdvancedHttpClient
 
 async with AdvancedHttpClient() as client:
     response = await client.get("https://api.example.com")
@@ -686,7 +686,7 @@ def expensive_function(arg):
     return complex_computation(arg)
 
 # New xSystem (more features)
-from exonware.xsystem import LRUCache
+from exonware.xwsystem import LRUCache
 
 cache = LRUCache(capacity=128, ttl=300)  # With TTL!
 

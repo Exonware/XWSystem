@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 # Import xsystem utilities
-from exonware.xsystem import (
+from exonware.xwsystem import (
     ThreadSafeFactory,
     PathValidator,
     AtomicFileWriter,

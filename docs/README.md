@@ -183,7 +183,7 @@ xSystem uses **established, well-tested libraries** for all serialization:
 ### **📝 Text Formats (8 formats)**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     JsonSerializer, YamlSerializer, TomlSerializer, XmlSerializer,
     CsvSerializer, ConfigParserSerializer, FormDataSerializer, MultipartSerializer
 )
@@ -226,7 +226,7 @@ multipart_data = mps.dumps({"file": open("data.txt", "rb"), "metadata": "info"})
 ### **💾 Binary Formats (9 formats)**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     BsonSerializer, MsgPackSerializer, CborSerializer,
     PickleSerializer, MarshalSerializer, Sqlite3Serializer,
     DbmSerializer, ShelveSerializer, PlistlibSerializer
@@ -274,7 +274,7 @@ plist_bytes = pls.dumps(data)  # Apple plist format
 ### **🆕 🏢 Schema-Based Enterprise Formats (7 formats)**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     AvroSerializer, ProtobufSerializer, ThriftSerializer,
     ParquetSerializer, OrcSerializer, CapnProtoSerializer, FlatBuffersSerializer
 )
@@ -385,7 +385,7 @@ except SerializationError as e:
 
 ```python
 import time
-from exonware.xsystem import JsonSerializer, MsgPackSerializer, CborSerializer
+from exonware.xwsystem import JsonSerializer, MsgPackSerializer, CborSerializer
 
 data = {"users": list(range(1000)), "metadata": {"version": "1.0", "active": True}}
 
@@ -418,7 +418,7 @@ Enterprise-grade security utilities for production applications.
 ### **🛡️ Path Security**
 
 ```python
-from exonware.xsystem import PathValidator, PathSecurityError
+from exonware.xwsystem import PathValidator, PathSecurityError
 
 # Create validator with security policies
 validator = PathValidator(
@@ -443,7 +443,7 @@ validated_path = validator.resolve_path(safe_path)           # Get absolute path
 ### **🔐 Cryptography**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     SymmetricEncryption, AsymmetricEncryption, SecureHash,
     SecureRandom, generate_api_key, hash_password, verify_password
 )
@@ -474,7 +474,7 @@ content_hash = SecureHash.sha256("content to hash")
 ### **🚨 Input Validation**
 
 ```python
-from exonware.xsystem import DataValidator, ValidationError
+from exonware.xwsystem import DataValidator, ValidationError
 
 validator = DataValidator()
 
@@ -505,7 +505,7 @@ Thread-safe utilities for concurrent applications.
 ### **🏭 Thread-Safe Factory**
 
 ```python
-from exonware.xsystem import ThreadSafeFactory
+from exonware.xwsystem import ThreadSafeFactory
 
 # Create thread-safe handler factory
 factory = ThreadSafeFactory()
@@ -535,7 +535,7 @@ threads = [
 ### **🔒 Enhanced Locks**
 
 ```python
-from exonware.xsystem import EnhancedRLock
+from exonware.xwsystem import EnhancedRLock
 
 # Create lock with timeout and statistics
 lock = EnhancedRLock(timeout=5.0, name="DataProcessingLock")
@@ -557,7 +557,7 @@ print(f"Average hold time: {stats['average_hold_time']:.4f}s")
 ### **⚙️ Method Generation**
 
 ```python
-from exonware.xsystem import MethodGenerator
+from exonware.xwsystem import MethodGenerator
 
 # Dynamically generate methods on classes
 def export_template(self, format_name: str, **kwargs):
@@ -588,7 +588,7 @@ Atomic and safe file operations for data integrity.
 ### **⚛️ Atomic File Operations**
 
 ```python
-from exonware.xsystem import AtomicFileWriter, safe_write_text, safe_read_text
+from exonware.xwsystem import AtomicFileWriter, safe_write_text, safe_read_text
 
 # Method 1: Context manager class
 with AtomicFileWriter(
@@ -617,7 +617,7 @@ except FileOperationError as e:
 ### **📁 Path Management**
 
 ```python
-from exonware.xsystem import PathManager
+from exonware.xwsystem import PathManager
 
 # Advanced path operations
 pm = PathManager(base_path="/app/data")
@@ -645,7 +645,7 @@ Modern HTTP client with smart retries and configuration.
 ### **🚀 HTTP Operations**
 
 ```python
-from exonware.xsystem import HttpClient, RetryConfig
+from exonware.xwsystem import HttpClient, RetryConfig
 
 # Create client with retry configuration
 retry_config = RetryConfig(
@@ -714,7 +714,7 @@ Advanced data structure utilities for complex data handling.
 ### **🔍 Circular Reference Detection**
 
 ```python
-from exonware.xsystem import CircularReferenceDetector, CircularReferenceError
+from exonware.xwsystem import CircularReferenceDetector, CircularReferenceError
 
 detector = CircularReferenceDetector(max_depth=100)
 
@@ -740,7 +740,7 @@ safe_data = detector.resolve_circular_refs(data, placeholder="<CIRCULAR>")
 ### **🌳 Tree Walking**
 
 ```python
-from exonware.xsystem import TreeWalker
+from exonware.xwsystem import TreeWalker
 
 walker = TreeWalker()
 
@@ -779,7 +779,7 @@ Reusable design patterns for better code organization.
 ### **🏭 Generic Handler Factory**
 
 ```python
-from exonware.xsystem import GenericHandlerFactory
+from exonware.xwsystem import GenericHandlerFactory
 
 # Create enhanced factory with all xsystem features
 factory = GenericHandlerFactory(
@@ -811,7 +811,7 @@ handler = factory.get_handler("json")
 ### **🎯 Context Managers**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     ContextualLogger, ThreadSafeSingleton, 
     combine_contexts, enhanced_error_context
 )
@@ -846,7 +846,7 @@ assert db1 is db2
 ### **🏊 Object Pool**
 
 ```python
-from exonware.xsystem import ObjectPool
+from exonware.xwsystem import ObjectPool
 
 # Create pool for expensive objects
 class DatabaseConnection:
@@ -877,7 +877,7 @@ Built-in performance monitoring and optimization.
 ### **⚡ Performance Tracking**
 
 ```python
-from exonware.xsystem import PerformanceMonitor, MemoryMonitor
+from exonware.xwsystem import PerformanceMonitor, MemoryMonitor
 
 # Monitor performance
 monitor = PerformanceMonitor()
@@ -906,7 +906,7 @@ print(f"Peak memory usage: {memory_stats['peak_mb']:.2f} MB")
 ### **🎯 Performance Validation**
 
 ```python
-from exonware.xsystem import PerformanceValidator
+from exonware.xwsystem import PerformanceValidator
 
 validator = PerformanceValidator(
     max_execution_time=1.0,    # 1 second max
@@ -931,7 +931,7 @@ Environment detection and runtime introspection.
 ### **🌍 Environment Management**
 
 ```python
-from exonware.xsystem import EnvironmentManager
+from exonware.xwsystem import EnvironmentManager
 
 env = EnvironmentManager()
 
@@ -954,7 +954,7 @@ max_workers = env.get_env_int("MAX_WORKERS", default=4, min_val=1, max_val=16)
 ### **🔍 Reflection Utilities**
 
 ```python
-from exonware.xsystem import ReflectionUtils
+from exonware.xwsystem import ReflectionUtils
 
 reflection = ReflectionUtils()
 
@@ -981,7 +981,7 @@ Dynamic plugin discovery and management.
 ### **🚀 Plugin Management**
 
 ```python
-from exonware.xsystem import PluginManager, PluginBase
+from exonware.xwsystem import PluginManager, PluginBase
 
 # Create plugin manager
 plugin_manager = PluginManager(
@@ -1041,7 +1041,7 @@ Flexible configuration system for all xsystem components.
 ### **🎛️ Performance Configuration**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     PerformanceConfig, configure_performance, 
     get_performance_config
 )
@@ -1061,7 +1061,7 @@ print(f"Current mode: {config.mode}")
 print(f"Memory limit: {config.max_memory_mb} MB")
 
 # Per-component configuration
-from exonware.xsystem import SerializationLimits, NetworkLimits
+from exonware.xwsystem import SerializationLimits, NetworkLimits
 
 serialization_limits = SerializationLimits(
     max_object_depth=50,
@@ -1079,7 +1079,7 @@ network_limits = NetworkLimits(
 ### **📝 Logging Configuration**
 
 ```python
-from exonware.xsystem import setup_logging, get_logger
+from exonware.xwsystem import setup_logging, get_logger
 
 # Setup logging
 setup_logging(
@@ -1110,7 +1110,7 @@ Comprehensive error handling and recovery mechanisms.
 ### **🚨 Exception Hierarchy**
 
 ```python
-from exonware.xsystem import (
+from exonware.xwsystem import (
     SerializationError, PathSecurityError, FileOperationError,
     CircularReferenceError, CryptoError, ValidationError,
     HttpError, PerformanceError
@@ -1135,7 +1135,7 @@ except ValidationError as e:
 ### **🔄 Error Recovery**
 
 ```python
-from exonware.xsystem import ErrorRecovery, CircuitBreaker
+from exonware.xwsystem import ErrorRecovery, CircuitBreaker
 
 # Circuit breaker for external services
 circuit_breaker = CircuitBreaker(

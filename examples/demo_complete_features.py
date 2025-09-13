@@ -18,7 +18,7 @@ print("\n1. ✅ ASYNC FOUNDATION")
 print("-" * 30)
 
 async def test_async_features():
-    from src.exonware.xsystem import (
+    from src.exonware.xwsystem import (
         async_safe_write_text, async_safe_read_text,
         AsyncLRUCache, AsyncLock
     )
@@ -48,7 +48,7 @@ print(async_result)
 print("\n2. ✅ PYDANTIC-STYLE VALIDATION")
 print("-" * 30)
 
-from src.exonware.xsystem import xModel, Field
+from src.exonware.xwsystem import xModel, Field
 from typing import Optional
 from enum import Enum
 
@@ -80,7 +80,7 @@ print(f"✓ JSON Schema: {len(DemoUser.model_json_schema())} properties")
 print("\n3. ✅ ADVANCED HTTP CLIENT") 
 print("-" * 30)
 
-from src.exonware.xsystem import AdvancedHttpClient, MockTransport
+from src.exonware.xwsystem import AdvancedHttpClient, MockTransport
 
 # Mock testing capability
 mock_responses = {
@@ -108,7 +108,7 @@ print(http_result)
 print("\n4. ✅ CACHING FRAMEWORK")
 print("-" * 30)
 
-from src.exonware.xsystem import LRUCache, LFUCache
+from src.exonware.xwsystem import LRUCache, LFUCache
 
 # LRU Cache
 lru = LRUCache(capacity=3, name="demo-lru")
@@ -132,7 +132,7 @@ print(f"✓ Cache Stats: {stats['hits']} hits, {stats['hit_rate']:.1%} hit rate"
 print("\n5. ✅ CLI UTILITIES")
 print("-" * 30)
 
-from src.exonware.xsystem import colorize, Colors, Style
+from src.exonware.xwsystem import colorize, Colors, Style
 
 colored_success = colorize("✓ CLI Colors Working!", Colors.GREEN, Style.BOLD)
 colored_info = colorize("ℹ Information", Colors.BLUE)
@@ -147,7 +147,7 @@ print("✓ Cross-platform color support detected" if len(colored_success) > 20 e
 print("\n6. ✅ SECURITY HAZMAT LAYER")
 print("-" * 30)
 
-from src.exonware.xsystem import (
+from src.exonware.xwsystem import (
     AES_GCM, X25519_KeyExchange, Ed25519_Signature,
     secure_hash, secure_random
 )
@@ -185,7 +185,7 @@ print(f"✓ Secure Hash: {len(hash_result)} bytes")
 print("\n7. ✅ SYSTEM MONITORING")
 print("-" * 30)
 
-from src.exonware.xsystem import (
+from src.exonware.xwsystem import (
     get_cpu_usage, get_memory_usage, get_hardware_info,
     list_processes, is_monitoring_available
 )
@@ -210,7 +210,7 @@ else:
 print("\n8. ✅ DATETIME UTILITIES")
 print("-" * 30)
 
-from src.exonware.xsystem import (
+from src.exonware.xwsystem import (
     humanize_timedelta, time_ago, parse_human_duration
 )
 

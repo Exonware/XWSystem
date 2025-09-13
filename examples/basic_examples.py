@@ -13,7 +13,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from exonware.xsystem import (
+from exonware.xwsystem import (
     ThreadSafeFactory,
     PathValidator,
     AtomicFileWriter,

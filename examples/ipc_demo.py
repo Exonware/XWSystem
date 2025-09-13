@@ -20,7 +20,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from exonware.xsystem import ProcessManager
+from exonware.xwsystem import ProcessManager
 
 def demo_process_management():
     """Demonstrate process management capabilities."""
@@ -63,7 +63,7 @@ demo_process_management()
 print("\n2. ✅ SHARED MEMORY")
 print("-" * 30)
 
-from exonware.xsystem import SharedMemoryManager, SharedData
+from exonware.xwsystem import SharedMemoryManager, SharedData
 
 def demo_shared_memory():
     """Demonstrate shared memory functionality."""
@@ -120,7 +120,7 @@ demo_shared_memory()
 print("\n3. ✅ MESSAGE QUEUES")
 print("-" * 30)
 
-from exonware.xsystem import MessageQueue, AsyncMessageQueue
+from exonware.xwsystem import MessageQueue, AsyncMessageQueue
 
 def demo_message_queues():
     """Demonstrate message queue functionality."""
@@ -189,7 +189,7 @@ asyncio.run(demo_async_message_queues())
 print("\n4. ✅ PROCESS POOLS")
 print("-" * 30)
 
-from exonware.xsystem import ProcessPool, AsyncProcessPool
+from exonware.xwsystem import ProcessPool, AsyncProcessPool
 
 def cpu_intensive_task(n):
     """Simulate CPU-intensive work."""
@@ -274,7 +274,7 @@ asyncio.run(demo_async_process_pools())
 print("\n5. ✅ PIPES")
 print("-" * 30)
 
-from exonware.xsystem import Pipe, AsyncPipe
+from exonware.xwsystem import Pipe, AsyncPipe
 
 def demo_pipes():
     """Demonstrate pipe functionality."""

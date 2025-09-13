@@ -4,7 +4,7 @@
 **Author:** Eng. Muhammad AlShehri  
 **Email:** connect@exonware.com  
 **Version:** 0.0.1  
-**Generation Date:** January 2, 2025
+**Generation Date:** 07-Sep-2025
 
 ## 🤖 AI-Friendly Document
 
@@ -42,14 +42,14 @@
 
 ### Core Principles
 - **Never remove features** - Always preserve existing functionality; never take out features that are already implemented
-- **Never reinvent the wheel** - Reuse code from exonware libraries (especially xsystem) or external Python libs (if unique size is <1.5MB) to leverage proven solutions and reduce maintenance burden
+- **Never reinvent the wheel** - Reuse code from exonware libraries (especially xwsystem) or external Python libs (if unique size is <1.5MB) to leverage proven solutions and reduce maintenance burden
 - **Think and design thoroughly** - Spend more time thinking and designing features rather than writing extensive code to prevent architectural debt and ensure long-term maintainability
 - **Simple, concise solutions** - Value simple, concise solutions when implementing features to reduce complexity and improve developer productivity
 - **Production-grade quality** - Build long-term, clean, extensible, maintainable code to ensure enterprise readiness and reduce technical debt
 - **Challenge ideas** - Prefer challenging rather than just agreeing to ensure robust solutions and avoid groupthink
 - **Fix root causes** - Never remove features; always resolve root causes instead of using workarounds to maintain system integrity and prevent technical debt accumulation
 - **Never permanently delete files** - Move to '_delete' folder if removal needed to maintain audit trail and enable recovery if needed
-- **Include full file path at the top commented** - Always add the full file path as a comment at the top of every file for better traceability: #exonware/xsystem/... etc
+- **Include full file path at the top commented** - Always add the full file path as a comment at the top of every file for better traceability: #exonware/xwsystem/... etc
 
 ---
 
@@ -112,21 +112,22 @@ library-name/
 
 ### Module Organization
 Each module must have:
-- **contracts.py** - All module enums and interfaces
+- **contracts.py** - All module enums and interfaces (MANDATORY: Never use "protocols.py" - always use "contracts.py")
 - **errors.py** - All module-specific errors (file, not folder)
 - **base.py** - All abstract classes and base implementations
 
 ### Naming Conventions
 - **File naming**: snake_case (e.g., `data_handler.py`, `schema_validator.py`)
 - **Class naming**: CapWord (e.g., `DataHandler`, `SchemaValidator`)
-- **Library naming**: lowercase (e.g., `xsystem`, `xnode`, `xdata`, `xschema`, `xaction`, `xentity`)
+- **Library naming**: lowercase (e.g., `xwsystem`, `xnode`, `xdata`, `xschema`, `xaction`, `xentity`)
+- **Interface files**: **MANDATORY: Always use `contracts.py` - NEVER use `protocols.py`** (e.g., `contracts.py` for all enums and interfaces)
 - **Interfaces**: `IClass` (e.g., `INode`, `IEdge`, `IDataHandler`)
 - **Abstract classes**: `AClass` (e.g., `ANode`, `AEdge`, `ABaseHandler`) - **MANDATORY: All abstract classes in base.py files MUST start with 'A' and extend interface class: AClass(IClass)**
 - **Extensible classes**: `XClass` (e.g., `XNode`, `XEdge`, `XDataHandler`) - Rich design patterns supporting strategy-based, handler-based, engine-based features
 - **Handler classes**: Uppercase acronyms ending with `DataHandler` or `SchemaHandler` (e.g., `JSONDataHandler`, `CAPSBaseHandler`, `CAPSDataHandler`)
 
 ### Library vs Class Naming Rules
-- **Library references**: Always use lowercase (e.g., `xsystem`, `xnode`, `xdata`)
+- **Library references**: Always use lowercase (e.g., `xwsystem`, `xnode`, `xdata`)
 - **Class references**: Always use CapWord with X prefix (e.g., `XNode`, `XData`, `XSchema`)
 - **Import statements**: Use library names (lowercase) for imports
 - **Class instantiation**: Use class names (CapWord) for creating objects
@@ -134,7 +135,7 @@ Each module must have:
 ### Design Patterns
 
 #### **Structural Patterns**
-- **Facade pattern** - Mandatory outside xsystem library for all future libs (xnode, xdata, xschema, xaction, xentity). **Note: xsystem is an exception** - it does not require a facade pattern as it serves as the foundation library
+- **Facade pattern** - Mandatory outside xwsystem library for all future libs (xnode, xdata, xschema, xaction, xentity). **Note: xwsystem is an exception** - it does not require a facade pattern as it serves as the foundation library
 - **Adapter pattern** - For integrating incompatible interfaces and legacy systems
 - **Decorator pattern** - For adding functionality to objects without altering their structure
 - **Composite pattern** - For treating individual objects and compositions uniformly
@@ -241,7 +242,7 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 
 #### **Version 0.x: Complete Ecosystem Development**
 - **Why Version 0 stays 0**: First number remains 0 until production ready
-- **Complete ecosystem requirement**: All libraries (xsystem, xnode, xdata, xschema, xaction, xentity) must be fully developed
+- **Complete ecosystem requirement**: All libraries (xwsystem, xnode, xdata, xschema, xaction, xentity) must be fully developed
 - **Backend and frontend completion**: All backend systems and frontend applications must be implemented
 - **Real-world validation**: At least 3 full-fledged production applications must be completed
 - **Design pattern perfection**: Extensive usage refines software patterns and architecture
@@ -295,12 +296,12 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 
 ### Library Strategy
 - **Why minimize imports** - Reduces dependency hell, simplifies deployment, and improves security by reducing attack surface
-- **One library import rationale** - Instead of importing 10+ libraries, projects import ONE: xsystem to achieve dependency consolidation and simplified maintenance
+- **One library import rationale** - Instead of importing 10+ libraries, projects import ONE: xwsystem to achieve dependency consolidation and simplified maintenance
 - **Why production-grade libraries** - Use production-grade libraries instead of custom implementations to leverage battle-tested solutions and reduce development time
 - **External library criteria** (Why these criteria matter):
   - Check if production-grade library exists - Ensures reliability and community support
   - Use the most established, well-maintained library - Reduces risk of abandonment and security vulnerabilities
-  - Wrap it with xsystem security/validation - Adds enterprise-grade security and validation layers
+  - Wrap it with xwsystem security/validation - Adds enterprise-grade security and validation layers
   - Never rewrite what already exists - Avoids reinventing proven solutions and focuses on value-added features
   - Keep implementations short and delegate to experts - Maintains code simplicity while leveraging specialized expertise
 
@@ -315,10 +316,10 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 ## eXonware Ecosystem Architecture
 
 ### Core Library Dependencies
-- **xsystem** (foundation, core-lib & facade-lib) - Core serialization, security, threading, HTTP client
+- **xwsystem** (foundation, core-lib & facade-lib) - Core serialization, security, threading, HTTP client
 - **xnode** (core-lib & facade-lib) - Node structures, edge types, xQuery support, lazy initialization
-- **xdata** (core-lib & facade-lib) - Uses xnode, 50+ formats, anything-to-anything conversion
-- **xschema** (core-lib & facade-lib) - Mix of xdata + OpenAPI, schema validation, format conversion
+- **xwdata** (core-lib & facade-lib) - Uses xnode, 50+ formats, anything-to-anything conversion
+- **xwschema** (core-lib & facade-lib) - Mix of xdata + OpenAPI, schema validation, format conversion
 - **xaction** (core-lib & facade-lib) - Function decoration, security, async, scheduling, automation
 - **xentity** (core-lib & facade-lib) - Combines xschema + xaction + xdata in unified object
 
@@ -363,7 +364,7 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 - **Requirements**: Lazy initialization, async-first, format-agnostic design
 
 ### Standalone Libraries (core-lib)
-- **xsystem** (foundation library)
+- **xwsystem** (foundation library)
 - Core functionality without facade requirement
 - Can be used independently by other libraries
 - **Requirements**: Production-grade quality, comprehensive testing
@@ -474,7 +475,7 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 - **Direct IDE edits** - Make changes directly in IDE via file edits rather than inline snippets
 - **Complete implementations** - Include all necessary imports and fix problems
 - **Avoid repetition** - Don't repeat information already in function signatures (parameter types, optional annotations)
-- **Follow naming conventions** - Use lowercase for libraries (xsystem, xnode) and CapWord for classes (XNode, XData)
+- **Follow naming conventions** - Use lowercase for libraries (xwsystem, xnode) and CapWord for classes (XNode, XData)
 - **Apply design patterns** - Implement facade, strategy, handler, and engine patterns as specified
 - **Enforce separation of concerns** - Organize code with contracts.p, errors.py, base.py structure
 
@@ -510,13 +511,18 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 ### AI Date Accuracy Standards
 - **Why date accuracy matters** - Accurate dates ensure proper versioning, documentation currency, and legal compliance
 - **Always use current dates** - Never use placeholder or outdated dates in any production work
+- **Standardized date formats** - Use consistent date formatting across all eXonware projects:
+  - **Documentation format**: `DD-MMM-YYYY` (e.g., "07-Sep-2025")
+  - **File names format**: `YYYYMMDD` (e.g., "20250907")
+  - **Numbers format**: `###,###.00` (e.g., "1,234.56")
+  - **Currency format**: `###,###.00 CUR` (e.g., "1,234.56 USD") - Use 3-letter UN currency codes
 - **Cross-platform date commands** - Use appropriate date commands for different operating systems:
-  - **Windows PowerShell**: `Get-Date -Format "MMMM dd, yyyy"` (e.g., "January 02, 2025")
+  - **Windows PowerShell**: `Get-Date -Format "dd-MMM-yyyy"` (e.g., "07-Sep-2025")
   - **Windows CMD**: `echo %date%` or `wmic os get localdatetime`
-  - **Linux/macOS**: `date "+%B %d, %Y"` (e.g., "January 02, 2025")
-  - **Python**: `datetime.now().strftime("%B %d, %Y")`
-  - **JavaScript/Node.js**: `new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })`
-- **Documentation headers** - Always include accurate generation dates in file headers and documentation
+  - **Linux/macOS**: `date "+%d-%b-%Y"` (e.g., "07-Sep-2025")
+  - **Python**: `datetime.now().strftime("%d-%b-%Y")`
+  - **JavaScript/Node.js**: `new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }).replace(' ', '-')`
+- **Documentation headers** - Always include accurate generation dates in file headers and documentation using DD-MMM-YYYY format
 - **Version information** - Ensure version dates match actual development timeline
 - **Legal compliance** - Accurate dates are crucial for licensing, copyright, and legal documentation
 
@@ -617,7 +623,7 @@ PRIORITIES FOCUS:
 
 **Feature Implementation:**
 ```
-Implement a new serialization format handler for the xsystem library:
+Implement a new serialization format handler for the xwsystem library:
 
 CORE REQUIREMENTS:
 - Follow naming conventions: JSONDataHandler class
@@ -804,7 +810,7 @@ Migrate existing code to follow DEV_GUIDELINES.md standards:
 ```
 Plan version progression for the eXonware ecosystem:
 - Follow versioning philosophy (0.x until complete ecosystem)
-- Ensure all libraries (xsystem, xnode, xdata, xschema, xaction, xentity) are complete
+- Ensure all libraries (xwsystem, xnode, xdata, xschema, xaction, xentity) are complete
 - Validate 3+ full applications requirement
 - Plan transition to Version 1.x (production ready)
 - Maintain exact version preservation rules
@@ -927,7 +933,7 @@ Integrate xnode with xdata following DEV_GUIDELINES.md:
 **Ecosystem Development:**
 ```
 Develop complete eXonware ecosystem following DEV_GUIDELINES.md:
-- Complete all libraries (xsystem, xnode, xdata, xschema, xaction, xentity)
+- Complete all libraries (xwsystem, xnode, xdata, xschema, xaction, xentity)
 - Implement backend systems using ecosystem
 - Create frontend applications
 - Develop 3+ full-fledged production applications
@@ -977,7 +983,7 @@ PRIORITIES FOCUS:
 Implement xdata library with Production-Grade Data Framework following DEV_GUIDELINES.md:
 
 CORE REQUIREMENTS:
-- Support 50+ data formats (exceeding xsystem's 24)
+- Support 50+ data formats (exceeding xwsystem's 24)
 - Implement anything-to-anything conversion
 - COW Semantics for optimal memory usage and performance
 - Object Pooling with pre-allocated node pools for hot path operations
@@ -1166,7 +1172,7 @@ PRIORITIES FOCUS:
 - **Abstraction layer** - Hides implementation complexity while exposing essential functionality
 - **Maintainability** - Changes to internal implementation don't affect client code
 - **Consistency** - Ensures uniform API across all eXonware libraries (xnode, xdata, xschema, xaction, xentity)
-- **Exception: xsystem** - xsystem is the foundation library and does not require a facade pattern as it serves as the base for other libraries
+- **Exception: xwsystem** - xwsystem is the foundation library and does not require a facade pattern as it serves as the base for other libraries
 
 ### xnode Library (core-lib & facade-lib)
 - **Why format-agnostic**: Ensures node operations work regardless of underlying data format
@@ -1186,7 +1192,7 @@ PRIORITIES FOCUS:
 
 ### xdata Library (core-lib & facade-lib)
 - **Why format-agnostic**: Enables seamless switching between data formats without changing client code
-- **50+ formats**: Exceed xsystem's 24 formats, extensible to custom formats
+- **50+ formats**: Exceed xwsystem's 24 formats, extensible to custom formats
 - **Anything-to-anything conversion**: Universal format conversion capabilities
 - **COW Semantics**: Copy-on-write for optimal memory usage and performance
 - **Object Pooling**: Pre-allocated node pools for hot path operations and memory efficiency
@@ -1327,6 +1333,7 @@ PRIORITIES FOCUS:
 ❌ Don't put examples.py in src/ directory  
 ❌ Don't mix Python versions  
 ❌ Don't skip root cause analysis  
+❌ **NEVER use "protocols.py" - always use "contracts.py" for interface files**  
 
 ---
 

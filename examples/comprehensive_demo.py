@@ -31,7 +31,7 @@ print("Demonstrating ALL audit gaps resolved and competitive features implemente
 print("=" * 70)
 
 # Import all major components
-from exonware.xsystem import (
+from exonware.xwsystem import (
     # Async Foundation
     async_safe_write_text, async_safe_read_text, AsyncLock,
     # Pydantic-Style Validation  
