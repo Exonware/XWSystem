@@ -26,13 +26,11 @@ jobs:
     - name: Build exonware-xwsystem package
       run: |
         echo "Building exonware-xwsystem package..."
-        cd xwsystem
         python -m build
         
     - name: Build xwsystem package
       run: |
         echo "Building xwsystem package..."
-        cd xwsystem
         cp pyproject.toml pyproject.backup.toml
         cp pyproject.xwsystem.toml pyproject.toml
         python -m build
@@ -41,7 +39,6 @@ jobs:
     - name: List built packages
       run: |
         echo "Built packages:"
-        cd xwsystem
         find dist -name "*.whl" -o -name "*.tar.gz" | sort
     
     - name: Publish exonware-xwsystem to PyPI
@@ -50,7 +47,6 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         echo "Publishing exonware-xwsystem to PyPI..."
-        cd xwsystem
         ls -la dist/
         twine upload dist/exonware_xwsystem-*.whl dist/exonware_xwsystem-*.tar.gz
     
@@ -60,7 +56,6 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         echo "Publishing xwsystem to PyPI..."
-        cd xwsystem
         twine upload dist/xwsystem-*.whl dist/xwsystem-*.tar.gz
         
     - name: Success notification
