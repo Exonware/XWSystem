@@ -6,7 +6,9 @@ build-backend = "hatchling.build"
 
 [project]
 name = "xwsystem"
-version = "0.0.1.2"
+dynamic = [
+    "version",
+]
 description = "Enterprise-grade Python framework with AI-powered performance optimization, 24 serialization formats, military-grade security, automatic memory leak prevention, circuit breakers, and production monitoring - replaces 50+ dependencies"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -293,7 +295,7 @@ Documentation = "https://github.com/exonware/xwsystem#readme"
 [tool.black]
 line-length = 88
 target-version = [
-    "py313",
+    "py38",
 ]
 
 [tool.isort]
@@ -301,7 +303,7 @@ profile = "black"
 line_length = 88
 
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.8"
 strict = true
 warn_return_any = true
 warn_unused_configs = true
@@ -344,6 +346,9 @@ markers = [
     "xwsystem_patterns: Design pattern tests",
     "xwsystem_monitoring: Monitoring and metrics tests",
 ]
+
+[tool.hatch.version]
+path = "src/exonware/xwsystem/version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = [

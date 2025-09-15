@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.347.345.343.341.340.339.338.337.336.3
 Generation Date: September 05, 2025
 
 Top-level xwsystem import alias for convenience.
@@ -34,6 +34,6 @@ The wildcard import here is intentional and follows Python best practices for al
 # Temporarily importing just XWSerialization for testing
 from exonware.xwsystem import *
 
-# Preserve the version
-__version__ = "0.0.1"
+# Import version from centralized location
+from exonware.xwsystem.version import __version__
 

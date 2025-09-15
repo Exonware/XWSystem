@@ -6,7 +6,7 @@ This file demonstrates the most common xSystem usage patterns.
 Perfect for new users to get started quickly.
 """
 
-from xsystem import (
+from exonware.xwsystem import (
     # Convenience functions - easiest way to get started
     quick_serialize, quick_deserialize, quick_hash, quick_encrypt, quick_decrypt,
     
@@ -33,7 +33,7 @@ def demo_convenience_functions():
     print("=" * 50)
     
     # Quick serialization - auto-detects format
-    data = {"name": "xSystem", "version": "0.0.1", "features": ["fast", "secure"]}
+    data = {"name": "xSystem", "version": "0.0.1.3", "features": ["fast", "secure"]}
     
     # JSON
     json_str = quick_serialize(data, "json")
@@ -159,7 +159,7 @@ def demo_http_client():
     client = HttpClient(
         timeout=10.0,
         retry_config=retry_config,
-        default_headers={"User-Agent": "xSystem/0.0.1"}
+        default_headers={"User-Agent": f"xSystem/0.0.1.3"}
     )
     
     try:

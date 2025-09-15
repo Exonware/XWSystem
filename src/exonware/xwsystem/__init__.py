@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.347.345.343.341.340.339.338.337.3
 Generation Date: September 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -347,7 +347,8 @@ from .core.contracts import IStringable
 # - security/contracts.py for security protocols
 # - validation/contracts.py for validation protocols
 
-__version__ = "0.0.1"
+# Import version from centralized location
+from .version import __version__
 
 # =============================================================================
 # CONVENIENCE FUNCTIONS - Quick access to common operations

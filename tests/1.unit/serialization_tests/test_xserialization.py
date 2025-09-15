@@ -33,7 +33,8 @@ def test_basic_detection():
     serializer = XWSerialization()
     
     # Test data
-    test_data = {"name": "xSystem", "version": "0.0.1", "formats": 24}
+    from exonware.xwsystem.version import __version__
+    test_data = {"name": "xSystem", "version": __version__, "formats": 24}
     
     # Serialize - should detect JSON from data structure
     result = serializer.dumps(test_data)
@@ -104,7 +105,7 @@ def test_content_detection():
     try:
         yaml_content = """
 name: xSystem
-version: 0.0.1
+version: 0.0.1.3
 features:
   - serialization
   - async support

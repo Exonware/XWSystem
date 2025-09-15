@@ -98,7 +98,8 @@ def demo_shared_memory():
         seg3 = manager.create_segment("logs", 2048)
         
         # Store different types of data
-        seg1.set({"app": "xSystem", "version": "0.0.1"})
+        from exonware.xwsystem.version import __version__
+        seg1.set({"app": "xSystem", "version": __version__})
         seg2.set({"cached_results": ["result1", "result2", "result3"]})
         seg3.set({"log_entries": [f"Entry {i}" for i in range(10)]})
         

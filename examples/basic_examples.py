@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.3
 Generation Date: August 31, 2025
 
 Basic usage examples extracted from the original examples.py file.
@@ -60,7 +60,8 @@ def example_atomic_file_writer():
     
     with tempfile.TemporaryDirectory() as temp_dir:
         test_file = Path(temp_dir) / "test.json"
-        test_data = {"message": "Hello from xSystem!", "version": "0.0.1"}
+        from exonware.xwsystem.version import __version__
+        test_data = {"message": "Hello from xSystem!", "version": __version__}
         
         # Write data atomically
         with AtomicFileWriter(str(test_file)) as f:

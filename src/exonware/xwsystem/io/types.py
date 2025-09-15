@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.347.345.343.341.340.339.338.337.3
 Generation Date: 07-Sep-2025
 
 IO types and enums for XWSystem.

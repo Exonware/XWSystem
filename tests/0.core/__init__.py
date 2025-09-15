@@ -17,4 +17,4 @@ Each core feature is tested individually with real data and comprehensive
 roundtrip testing to ensure production readiness.
 """
 
-__version__ = "0.0.1"
+from exonware.xwsystem.version import __version__

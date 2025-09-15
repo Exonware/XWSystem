@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.347.345.343.341.340.339.338.337.3
 Generation Date: September 05, 2025
 
 Distributed Tracing Integration for Enterprise Observability
@@ -23,6 +23,7 @@ from typing import Any, AsyncContextManager, ContextManager, Dict, Optional, Uni
 from .base import ATracingProvider
 from .errors import TracingError
 from .types import SpanKind
+from ..version import __version__
 
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
@@ -52,7 +53,7 @@ class TraceContext:
     session_id: Optional[str] = None
     request_id: Optional[str] = None
     service_name: str = "xwsystem"
-    service_version: str = "0.0.1"
+    service_version: str = __version__
 
 
 

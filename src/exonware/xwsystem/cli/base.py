@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1
+Version: 0.0.1.347.345.343.341.340.339.338.337.3
 Generation Date: September 04, 2025
 
 CLI module base classes - abstract classes for command-line interface functionality.
@@ -12,6 +12,7 @@ CLI module base classes - abstract classes for command-line interface functional
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union
 from .contracts import ColorType, ProgressStyle, TableStyle, PromptType, ICLI
+from ..version import __version__
 
 
 class AConsoleBase(ABC):
@@ -197,15 +198,15 @@ class AColorBase(ABC):
 class BaseCLI(ICLI):
     """Base CLI implementation."""
     
-    def __init__(self, name: str = "xwsystem", version: str = "0.0.1.2"):
+    def __init__(self, name: str = "xwsystem", version: str = None):
         """Initialize the CLI.
         
         Args:
             name: CLI name
-            version: CLI version
+            version: CLI version (defaults to package version)
         """
         self._name = name
-        self._version = version
+        self._version = version or __version__
         self._commands: Dict[str, Any] = {}
         self._options: Dict[str, Any] = {}
     
@@ -257,10 +258,10 @@ class BaseCLI(ICLI):
 class BaseCLI(ICLI):
     """Base CLI implementation for backward compatibility."""
     
-    def __init__(self, name: str = "xwsystem", version: str = "0.0.1.2"):
+    def __init__(self, name: str = "xwsystem", version: str = None):
         """Initialize base CLI."""
         self._name = name
-        self._version = version
+        self._version = version or __version__
         self._commands: Dict[str, Any] = {}
         self._options: Dict[str, Any] = {}
     
