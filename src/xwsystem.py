@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.347.345.343.341.340.339.338.337.336.3
+Version: 0.0.1.349.347.345.343.341.340.339.338.337.336.3
 Generation Date: September 05, 2025
 
 Top-level xwsystem import alias for convenience.
