@@ -51,6 +51,7 @@ jobs:
       run: |
         echo "Publishing exonware-xwsystem to PyPI..."
         cd xwsystem
+        ls -la dist/
         twine upload dist/exonware_xwsystem-*.whl dist/exonware_xwsystem-*.tar.gz
     
     - name: Publish xwsystem to PyPI
