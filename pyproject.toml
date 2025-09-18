@@ -67,7 +67,7 @@ full = [
     
     # Key-value stores (3 formats)
     "rocksdb>=0.7.0; platform_system != 'Windows'", 
-    "plyvel>=1.5.0", 
+    "plyvel>=1.5.0; platform_system != 'Windows'", 
     "lmdb>=1.4.0", 
     "zarr>=2.15.0", 
     
@@ -94,7 +94,7 @@ msgpack = [ "msgpack>=1.0.0",]
 cbor = [ "cbor2>=5.0.0",]
 http = [ "httpx>=0.24.0", "requests>=2.28.0",]
 crypto = [ "cryptography>=41.0.0",]
-database = [ "neo4j>=4.4.0", "pydgraph>=21.3.0", "lmdb>=1.4.0", "rocksdb>=0.7.0; platform_system != 'Windows'",]
+database = [ "neo4j>=4.4.0", "pydgraph>=21.3.0", "lmdb>=1.4.0", "rocksdb>=0.7.0; platform_system != 'Windows'", "plyvel>=1.5.0; platform_system != 'Windows'",]
 storage = [ "zarr>=2.15.0", "h5py>=3.8.0",]
 timezone = [ "pytz>=2023.3",]
 performance = [ "orjson>=3.8.0", "ijson>=3.2.0", "lxml>=4.9.0", "rtoml>=0.7.0", "msgspec>=0.11.0", "xxhash>=3.2.0",]

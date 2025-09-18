@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.359
+Version: 0.0.1.360
 Generation Date: September 05, 2025
 
 Top-level xwsystem import alias for convenience.
