@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.357
+Version: 0.0.1.358
 Generation Date: January 02, 2025
 
 HDF5 serializer for hierarchical tree with partial fast access.
