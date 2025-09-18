@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.356
+Version: 0.0.1.357
 Generation Date: September 04, 2025
 
 XSystem Serialization Package
@@ -139,8 +139,8 @@ from .auto_serializer import (
 )
 
 # XWSerialization - Self-transforming intelligent serializer
-from .xw_serialization import (
-    XWSerialization, create_auto_serializer,
+from .xw_serializer import (
+    XWSerializer, create_xw_serializer,
     dumps, loads, save_file, load_file
 )
 
@@ -199,7 +199,7 @@ __all__ = [
     "auto_save_file", "auto_load_file",
     
     # XWSerialization - Self-transforming intelligent serializer
-    "XWSerialization", "create_auto_serializer",
+    "XWSerializer", "create_xw_serializer",
     "dumps", "loads", "save_file", "load_file",
     
     # Flyweight optimization

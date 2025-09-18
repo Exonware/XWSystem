@@ -2,7 +2,7 @@
 # Company: eXonware.com
 # Author: Eng. Muhammad AlShehri
 # Email: connect@exonware.com
-# Version: 0.0.1.356
+# Version: 0.0.1.357
 # Generation Date: 06-Sep-2025
 #
 # This file contains all dependencies needed for xSystem's 30 serialization formats
@@ -157,6 +157,7 @@ httpx>=0.24.0                    # Modern HTTP client for async operations
 # =============================================================================
 # =============================================================================
 # =============================================================================
+# =============================================================================
 # MISSING DEPENDENCIES FOUND IN CODEBASE
 # =============================================================================
 
@@ -186,7 +187,8 @@ opentelemetry-exporter-zipkin>=1.12.0
 boto3>=1.26.0
 PyJWT>=2.6.0
 colorama>=0.4.0
-rocksdb>=0.7.0
+rocksdb>=0.7.0; platform_system != 'Windows
+plyvel>=1.5.0
 requests>=2.28.0
 tomli>=2.0.0
 ruamel.yaml>=0.17.0
