@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.360
+Version: 0.0.1.361
 Generation Date: September 04, 2025
 
 Lazy loading utilities for optimal performance.
@@ -210,3 +210,185 @@ def get_loading_stats() -> Dict[str, Any]:
 def preload_frequently_used(threshold: int = 5) -> None:
     """Preload frequently used modules from the global registry."""
     _global_registry.preload_frequently_used(threshold)
+
+
+# Lazy Mode Facade - Main interface for lazy loading operations
+class LazyModeFacade:
+    """
+    Main facade for lazy mode operations in xwsystem.
+    Provides a unified interface for lazy loading functionality.
+    """
+    
+    __slots__ = ('_enabled', '_strategy', '_config', '_performance_monitor')
+    
+    def __init__(self):
+        """Initialize lazy mode facade."""
+        self._enabled = False
+        self._strategy = None
+        self._config = {}
+        self._performance_monitor = None
+    
+    def enable(self, strategy: str = "on_demand", **kwargs) -> None:
+        """
+        Enable lazy mode with specified strategy.
+        
+        Args:
+            strategy: Lazy loading strategy ('on_demand', 'cached', 'preload', 'background')
+            **kwargs: Additional configuration options
+        """
+        self._enabled = True
+        self._strategy = strategy
+        self._config.update(kwargs)
+        
+        logger.info(f"Lazy mode enabled with strategy: {strategy}")
+        
+        # Initialize performance monitoring if enabled
+        if self._config.get('enable_monitoring', True):
+            self._performance_monitor = LazyPerformanceMonitor()
+    
+    def disable(self) -> None:
+        """Disable lazy mode and cleanup resources."""
+        self._enabled = False
+        self._strategy = None
+        
+        # Clear cache if requested
+        if self._config.get('clear_cache_on_disable', True):
+            _global_registry.clear_cache()
+        
+        logger.info("Lazy mode disabled")
+    
+    def is_enabled(self) -> bool:
+        """Check if lazy mode is currently enabled."""
+        return self._enabled
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get lazy mode performance statistics."""
+        stats = _global_registry.get_stats()
+        stats.update({
+            'enabled': self._enabled,
+            'strategy': self._strategy,
+            'config': self._config.copy()
+        })
+        
+        if self._performance_monitor:
+            stats['performance'] = self._performance_monitor.get_stats()
+        
+        return stats
+    
+    def configure(self, **kwargs) -> None:
+        """
+        Configure lazy mode settings.
+        
+        Args:
+            **kwargs: Configuration options
+        """
+        self._config.update(kwargs)
+        logger.debug(f"Lazy mode configuration updated: {kwargs}")
+    
+    def preload(self, modules: list[str]) -> None:
+        """
+        Preload specified modules.
+        
+        Args:
+            modules: List of module names to preload
+        """
+        for module_name in modules:
+            try:
+                loader = _global_registry.get_module(module_name)
+                # Force loading
+                _ = loader._get_module()
+                logger.info(f"Preloaded module: {module_name}")
+            except KeyError:
+                logger.warning(f"Module not registered: {module_name}")
+            except Exception as e:
+                logger.error(f"Failed to preload {module_name}: {e}")
+    
+    def optimize(self) -> None:
+        """Run optimization based on current usage patterns."""
+        if not self._enabled:
+            return
+        
+        # Preload frequently used modules
+        threshold = self._config.get('preload_threshold', 5)
+        _global_registry.preload_frequently_used(threshold)
+        
+        logger.info("Lazy mode optimization completed")
+
+
+class LazyPerformanceMonitor:
+    """
+    Performance monitor for lazy loading operations.
+    """
+    
+    __slots__ = ('_load_times', '_access_counts', '_memory_usage')
+    
+    def __init__(self):
+        """Initialize performance monitor."""
+        self._load_times = {}
+        self._access_counts = {}
+        self._memory_usage = {}
+    
+    def record_load_time(self, module: str, load_time: float) -> None:
+        """Record module load time."""
+        self._load_times[module] = load_time
+    
+    def record_access(self, module: str) -> None:
+        """Record module access."""
+        self._access_counts[module] = self._access_counts.get(module, 0) + 1
+    
+    def get_stats(self) -> Dict[str, Any]:
+        """Get performance statistics."""
+        return {
+            'load_times': self._load_times.copy(),
+            'access_counts': self._access_counts.copy(),
+            'memory_usage': self._memory_usage.copy()
+        }
+
+
+# Global lazy mode facade instance
+_lazy_facade = LazyModeFacade()
+
+# Public API functions
+def enable_lazy_mode(strategy: str = "on_demand", **kwargs) -> None:
+    """
+    Enable lazy mode with specified strategy.
+    
+    Args:
+        strategy: Lazy loading strategy to use
+        **kwargs: Additional configuration options
+    """
+    _lazy_facade.enable(strategy, **kwargs)
+
+def disable_lazy_mode() -> None:
+    """Disable lazy mode and cleanup resources."""
+    _lazy_facade.disable()
+
+def is_lazy_mode_enabled() -> bool:
+    """Check if lazy mode is currently enabled."""
+    return _lazy_facade.is_enabled()
+
+def get_lazy_mode_stats() -> Dict[str, Any]:
+    """Get lazy mode performance statistics."""
+    return _lazy_facade.get_stats()
+
+def configure_lazy_mode(**kwargs) -> None:
+    """
+    Configure lazy mode settings.
+    
+    Args:
+        **kwargs: Configuration options
+    """
+    _lazy_facade.configure(**kwargs)
+
+def preload_modules(modules: list[str]) -> None:
+    """
+    Preload specified modules.
+    
+    Args:
+        modules: List of module names to preload
+    """
+    _lazy_facade.preload(modules)
+
+def optimize_lazy_mode() -> None:
+    """Run optimization based on current usage patterns."""
+    _lazy_facade.optimize()

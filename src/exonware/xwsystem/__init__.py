@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.360
+Version: 0.0.1.361
 Generation Date: September 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -56,6 +56,47 @@ from typing import TYPE_CHECKING
 # Performance optimization: lazy import expensive modules
 if TYPE_CHECKING:
     from typing import Any
+
+# Lazy mode utilities
+from .utils.lazy_loader import (
+    LazyLoader,
+    LazyModuleRegistry,
+    LazyModeFacade,
+    LazyPerformanceMonitor,
+    register_lazy_module,
+    get_lazy_module,
+    get_loading_stats,
+    preload_frequently_used,
+    enable_lazy_mode,
+    disable_lazy_mode,
+    is_lazy_mode_enabled,
+    get_lazy_mode_stats,
+    configure_lazy_mode,
+    preload_modules,
+    optimize_lazy_mode
+)
+
+# Lazy install utilities
+from .utils.lazy_install import (
+    LazyInstaller,
+    DependencyMapper,
+    enable_lazy_install,
+    disable_lazy_install,
+    is_lazy_install_enabled,
+    install_missing_package,
+    install_and_import,
+    get_lazy_install_stats,
+    lazy_import_with_install
+)
+
+# Lazy discovery utilities
+from .utils.lazy_discovery import (
+    LazyDiscovery,
+    DependencyInfo,
+    discover_dependencies,
+    get_lazy_discovery,
+    export_dependency_mappings
+)
 
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging
@@ -846,6 +887,41 @@ __all__ = [
     "AsyncProcessPool",
     "Pipe",
     "AsyncPipe",
+    
+    # Lazy Mode - Performance optimization
+    "LazyLoader",
+    "LazyModuleRegistry", 
+    "LazyModeFacade",
+    "LazyPerformanceMonitor",
+    "register_lazy_module",
+    "get_lazy_module",
+    "get_loading_stats",
+    "preload_frequently_used",
+    "enable_lazy_mode",
+    "disable_lazy_mode",
+    "is_lazy_mode_enabled",
+    "get_lazy_mode_stats",
+    "configure_lazy_mode",
+    "preload_modules",
+    "optimize_lazy_mode",
+    
+    # Lazy Install - Auto-install missing packages
+    "LazyInstaller",
+    "DependencyMapper",
+    "enable_lazy_install",
+    "disable_lazy_install",
+    "is_lazy_install_enabled",
+    "install_missing_package",
+    "install_and_import",
+    "get_lazy_install_stats",
+    "lazy_import_with_install",
+    
+    # Lazy Discovery - Package-agnostic dependency discovery
+    "LazyDiscovery",
+    "DependencyInfo",
+    "discover_dependencies",
+    "get_lazy_discovery",
+    "export_dependency_mappings",
     
     # Convenience Functions - Quick access patterns
     "quick_serialize",
