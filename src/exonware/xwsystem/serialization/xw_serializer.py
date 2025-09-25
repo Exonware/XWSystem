@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.361
+Version: 0.0.1.362
 Generation Date: September 04, 2025
 
 XWSerializer - Unified intelligent serializer with I/O integration and auto-serialization.
@@ -754,38 +754,45 @@ def create_xw_serializer(confidence_threshold: float = 0.7, **config) -> XWSeria
     return XWSerializer(confidence_threshold, **config)
 
 
-# Global instance for convenience
-_global_xw_serializer = XWSerializer()
+# Global instance for convenience - will be created on first use
+_global_xw_serializer = None
+
+def _get_global_serializer() -> XWSerializer:
+    """Get or create global serializer instance."""
+    global _global_xw_serializer
+    if _global_xw_serializer is None:
+        _global_xw_serializer = XWSerializer()
+    return _global_xw_serializer
 
 # Static functions - clean API without prefixes
 def auto_serialize(data: Any, file_path: Union[str, Path], format_hint: Optional[str] = None) -> bool:
     """Auto-serialize data to file with format detection."""
-    return _global_xw_serializer.auto_serialize(data, file_path, format_hint)
+    return _get_global_serializer().auto_serialize(data, file_path, format_hint)
 
 def auto_deserialize(file_path: Union[str, Path], format_hint: Optional[str] = None) -> Any:
     """Auto-deserialize data from file with format detection."""
-    return _global_xw_serializer.auto_deserialize(file_path, format_hint)
+    return _get_global_serializer().auto_deserialize(file_path, format_hint)
 
 def atomic_save(data: Any, file_path: Union[str, Path], backup: bool = True) -> OperationResult:
     """Atomically save data with backup."""
-    return _global_xw_serializer.atomic_save(data, file_path, backup)
+    return _get_global_serializer().atomic_save(data, file_path, backup)
 
 def atomic_load(file_path: Union[str, Path]) -> Any:
     """Atomically load data."""
-    return _global_xw_serializer.atomic_load(file_path)
+    return _get_global_serializer().atomic_load(file_path)
 
 def dumps(data: Any, file_path: Optional[Union[str, Path]] = None, format_hint: Optional[str] = None) -> Union[str, bytes]:
     """Smart serialization function that auto-detects format."""
-    return _global_xw_serializer.dumps(data, file_path, format_hint)
+    return _get_global_serializer().dumps(data, file_path, format_hint)
 
 def loads(data: Union[str, bytes], format_hint: Optional[str] = None) -> Any:
     """Smart deserialization function that auto-detects format."""
-    return _global_xw_serializer.loads(data, format_hint)
+    return _get_global_serializer().loads(data, format_hint)
 
 def save_file(data: Any, file_path: Union[str, Path], format_hint: Optional[str] = None) -> None:
     """Smart file saving that auto-detects format from extension."""
-    return _global_xw_serializer.save_file(data, file_path, format_hint)
+    return _get_global_serializer().save_file(data, file_path, format_hint)
 
 def load_file(file_path: Union[str, Path], format_hint: Optional[str] = None) -> Any:
     """Smart file loading that auto-detects format from extension and content."""
-    return _global_xw_serializer.load_file(file_path, format_hint)
+    return _get_global_serializer().load_file(file_path, format_hint)

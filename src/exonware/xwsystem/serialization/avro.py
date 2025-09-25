@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.361
+Version: 0.0.1.362
 Generation Date: September 04, 2025
 
 Enhanced Apache Avro serialization with security, validation and performance optimizations.
@@ -14,7 +14,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import fastavro
+# Lazy import with auto-installation (only works with pip install xwsystem[lazy])
+from ..utils.lazy_install import xwimport
+
+# Try to import fastavro, install if missing and lazy mode is enabled
+fastavro = xwimport("fastavro")
 
 from .base import ASerialization
 from .errors import AvroError
@@ -58,6 +62,8 @@ class AvroSerializer(ASerialization):
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
         """
+        # fastavro is automatically installed by xwimport if needed
+        
         super().__init__(
             validate_input=validate_input,
             max_depth=max_depth,

@@ -51,434 +51,335 @@ class PerformanceStats:
         return {
             "operations_count": self.operations_count,
             "total_processing_time": self.total_processing_time,
-            "memory_usage_samples": self.memory_usage_samples.copy(),
-            "operation_history": self.operation_history.copy(),
+            "memory_usage_samples": self.memory_usage_samples,
+            "operation_history": self.operation_history,
             "error_count": self.error_count,
             "cache_hits": self.cache_hits,
             "cache_misses": self.cache_misses,
         }
+
+    def from_native(self, data: Dict[str, Any]) -> None:
+        """Load statistics from dictionary format."""
+        self.operations_count = data.get("operations_count", 0)
+        self.total_processing_time = data.get("total_processing_time", 0.0)
+        self.memory_usage_samples = data.get("memory_usage_samples", [])
+        self.operation_history = data.get("operation_history", [])
+        self.error_count = data.get("error_count", 0)
+        self.cache_hits = data.get("cache_hits", 0)
+        self.cache_misses = data.get("cache_misses", 0)
 
     def add_operation(
         self,
         operation_name: str,
         duration: float,
         success: bool = True,
-        error_info: Optional[Dict[str, Any]] = None,
+        memory_usage: Optional[Dict[str, Any]] = None,
+        **context_data: Any,
     ) -> None:
-        """
-        Record a completed operation.
-
-        Args:
-            operation_name: Name of the operation
-            duration: Time taken in seconds
-            success: Whether the operation succeeded
-            error_info: Optional error information if operation failed
-        """
+        """Add operation data to statistics."""
         self.operations_count += 1
         self.total_processing_time += duration
+
+        operation_data = {
+            "operation": operation_name,
+            "duration": duration,
+            "success": success,
+            "timestamp": time.time(),
+            **context_data,
+        }
+
+        self.operation_history.append(operation_data)
 
         if not success:
             self.error_count += 1
 
-        # Record in operation history
-        operation_record = {
-            "operation": operation_name,
-            "duration": duration,
-            "timestamp": time.perf_counter(),
-            "success": success,
-        }
+        if memory_usage:
+            self.memory_usage_samples.append(memory_usage)
 
-        if error_info:
-            operation_record.update(error_info)
-
-        self.operation_history.append(operation_record)
-
-        # Keep history manageable (last 100 operations)
+        # Keep only last 100 operations for memory efficiency
         if len(self.operation_history) > 100:
             self.operation_history = self.operation_history[-100:]
 
-    def add_memory_sample(
-        self, operation_name: str, memory_delta_mb: float, peak_memory_mb: float
-    ) -> None:
-        """
-        Record a memory usage sample.
+    def get_average_processing_time(self) -> float:
+        """Get average processing time per operation."""
+        if self.operations_count == 0:
+            return 0.0
+        return self.total_processing_time / self.operations_count
 
-        Args:
-            operation_name: Name of the operation being monitored
-            memory_delta_mb: Memory change in MB
-            peak_memory_mb: Peak memory usage in MB
-        """
-        self.memory_usage_samples.append(
-            {
-                "operation": operation_name,
-                "memory_delta_mb": memory_delta_mb,
-                "peak_memory_mb": peak_memory_mb,
-                "timestamp": time.perf_counter(),
-            }
-        )
+    def get_success_rate(self) -> float:
+        """Get success rate as percentage."""
+        if self.operations_count == 0:
+            return 100.0
+        successful_operations = self.operations_count - self.error_count
+        return (successful_operations / self.operations_count) * 100.0
 
-        # Keep samples manageable
-        if len(self.memory_usage_samples) > 100:
-            self.memory_usage_samples = self.memory_usage_samples[-100:]
-
-    def record_cache_hit(self) -> None:
-        """Record a cache hit."""
-        self.cache_hits += 1
-
-    def record_cache_miss(self) -> None:
-        """Record a cache miss."""
-        self.cache_misses += 1
-
-
-# ======================
-# Performance Monitor
-# ======================
+    def get_cache_hit_rate(self) -> float:
+        """Get cache hit rate as percentage."""
+        total_cache_operations = self.cache_hits + self.cache_misses
+        if total_cache_operations == 0:
+            return 0.0
+        return (self.cache_hits / total_cache_operations) * 100.0
 
 
 class PerformanceMonitor:
     """
-    Comprehensive performance monitoring system.
+    Performance monitoring and metrics collection.
 
-    This class provides a unified interface for performance monitoring
-    with configurable features and detailed statistics collection.
+    This class provides context managers and methods for monitoring
+    performance of operations, collecting metrics, and analyzing results.
     """
 
-    def __init__(self, enabled: bool = True, enable_memory_monitoring: bool = True):
-        """
-        Initialize performance monitor.
-
-        Args:
-            enabled: Whether monitoring is enabled
-            enable_memory_monitoring: Whether to monitor memory usage
-        """
-        self.enabled = enabled
-        self.enable_memory_monitoring = enable_memory_monitoring
+    def __init__(self, name: str = "default") -> None:
+        """Initialize performance monitor."""
+        self.name = name
         self.stats = PerformanceStats()
-        self._psutil_available = False
+        self._enabled = True
 
-        # Try to import psutil for memory monitoring
-        if enable_memory_monitoring:
-            # psutil is a required dependency for performance monitoring
-            import psutil
-            self._psutil_available = True
-            self._process = psutil.Process()
+    def enable(self) -> None:
+        """Enable performance monitoring."""
+        self._enabled = True
+
+    def disable(self) -> None:
+        """Disable performance monitoring."""
+        self._enabled = False
 
     def is_enabled(self) -> bool:
         """Check if monitoring is enabled."""
-        return self.enabled
-
-    def enable(self) -> None:
-        """Enable monitoring."""
-        self.enabled = True
-
-    def disable(self) -> None:
-        """Disable monitoring."""
-        self.enabled = False
+        return self._enabled
 
     def reset_stats(self) -> None:
         """Reset all performance statistics."""
         self.stats.reset()
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> PerformanceStats:
+        """Get current performance statistics."""
+        return self.stats
+
+    def get_stats_dict(self) -> Dict[str, Any]:
+        """Get performance statistics as dictionary."""
+        return self.stats.to_native()
+
+    def monitor_operation(
+        self, operation_name: str, **context_data: Any
+    ) -> ContextManager[None]:
         """
-        Get current performance statistics with derived metrics.
-
-        Returns:
-            Dictionary containing performance metrics
-        """
-        if not self.enabled:
-            return {}
-
-        stats_dict = self.stats.to_native()
-
-        # Calculate derived metrics
-        if stats_dict["operations_count"] > 0:
-            stats_dict["average_operation_time"] = (
-                stats_dict["total_processing_time"] / stats_dict["operations_count"]
-            )
-        else:
-            stats_dict["average_operation_time"] = 0.0
-
-        # Memory statistics
-        if stats_dict["memory_usage_samples"]:
-            memory_deltas = [
-                sample["memory_delta_mb"]
-                for sample in stats_dict["memory_usage_samples"]
-            ]
-            peak_memories = [
-                sample["peak_memory_mb"]
-                for sample in stats_dict["memory_usage_samples"]
-            ]
-
-            stats_dict["memory_stats"] = {
-                "average_memory_delta_mb": sum(memory_deltas) / len(memory_deltas),
-                "max_memory_delta_mb": max(memory_deltas),
-                "peak_memory_usage_mb": max(peak_memories),
-                "memory_samples_count": len(memory_deltas),
-            }
-
-        # Error rate
-        if stats_dict["operations_count"] > 0:
-            stats_dict["error_rate"] = (
-                stats_dict["error_count"] / stats_dict["operations_count"]
-            )
-        else:
-            stats_dict["error_rate"] = 0.0
-
-        # Cache efficiency
-        total_cache_ops = stats_dict["cache_hits"] + stats_dict["cache_misses"]
-        if total_cache_ops > 0:
-            stats_dict["cache_hit_rate"] = stats_dict["cache_hits"] / total_cache_ops
-        else:
-            stats_dict["cache_hit_rate"] = 0.0
-
-        return stats_dict
-
-    @contextmanager
-    def monitor_operation(self, operation_name: str):
-        """
-        Context manager for monitoring a single operation.
+        Create a context manager for monitoring an operation.
 
         Args:
             operation_name: Name of the operation being monitored
+            **context_data: Additional context data to store
 
-        Usage:
-            with monitor.monitor_operation("load_file"):
-                # Operation to monitor
-                result = load_file(path)
+        Returns:
+            Context manager that measures operation duration
         """
-        if not self.enabled:
-            yield
+        return performance_context(self, operation_name, **context_data)
+
+    def record_operation(
+        self,
+        operation_name: str,
+        duration: float,
+        success: bool = True,
+        memory_usage: Optional[Dict[str, Any]] = None,
+        **context_data: Any,
+    ) -> None:
+        """Record an operation manually."""
+        if not self._enabled:
             return
 
-        start_time = time.perf_counter()
-        start_memory = 0
+        self.stats.add_operation(
+            operation_name, duration, success, memory_usage, **context_data
+        )
 
-        # Memory monitoring setup
-        if self.enable_memory_monitoring and self._psutil_available:
-            try:
-                start_memory = self._process.memory_info().rss / 1024 / 1024  # MB
-            except Exception:
-                start_memory = 0
+    def record_cache_hit(self) -> None:
+        """Record a cache hit."""
+        if self._enabled:
+            self.stats.cache_hits += 1
 
-        success = True
-        error_info = None
+    def record_cache_miss(self) -> None:
+        """Record a cache miss."""
+        if self._enabled:
+            self.stats.cache_misses += 1
 
-        try:
-            yield
-        except Exception as e:
-            success = False
-            error_info = {"error_type": type(e).__name__, "error_message": str(e)}
-            raise
-        finally:
-            # Record operation completion
-            end_time = time.perf_counter()
-            duration = end_time - start_time
+    def get_summary(self) -> Dict[str, Any]:
+        """Get performance summary."""
+        return {
+            "monitor_name": self.name,
+            "operations_count": self.stats.operations_count,
+            "total_processing_time": self.stats.total_processing_time,
+            "average_processing_time": self.stats.get_average_processing_time(),
+            "success_rate": self.stats.get_success_rate(),
+            "error_count": self.stats.error_count,
+            "cache_hit_rate": self.stats.get_cache_hit_rate(),
+            "cache_hits": self.stats.cache_hits,
+            "cache_misses": self.stats.cache_misses,
+        }
 
-            # Record operation
-            self.stats.add_operation(operation_name, duration, success, error_info)
-
-            # Record memory usage if available
-            if (
-                self.enable_memory_monitoring
-                and self._psutil_available
-                and start_memory > 0
-            ):
-                try:
-                    end_memory = self._process.memory_info().rss / 1024 / 1024  # MB
-                    memory_delta = end_memory - start_memory
-                    self.stats.add_memory_sample(
-                        operation_name, memory_delta, end_memory
-                    )
-                except Exception:
-                    pass
-
-    def record_cache_operation(self, hit: bool) -> None:
-        """
-        Record a cache operation.
-
-        Args:
-            hit: True for cache hit, False for cache miss
-        """
-        if not self.enabled:
-            return
-
-        if hit:
-            self.stats.record_cache_hit()
-        else:
-            self.stats.record_cache_miss()
+    def __call__(self, operation_name: str, **context_data: Any) -> ContextManager[None]:
+        """Allow using monitor as a callable for context management."""
+        return self.monitor_operation(operation_name, **context_data)
 
 
-# ======================
-# Factory Functions
-# ======================
-
-
-def create_performance_monitor(
-    enabled: bool = True, enable_memory_monitoring: bool = True
-) -> PerformanceMonitor:
+def create_performance_monitor(name: str = "default") -> PerformanceMonitor:
     """
-    Factory function to create a performance monitor.
+    Create a new performance monitor instance.
 
     Args:
-        enabled: Whether monitoring should be enabled
-        enable_memory_monitoring: Whether to enable memory monitoring
+        name: Name for the monitor instance
 
     Returns:
-        Configured PerformanceMonitor instance
+        New PerformanceMonitor instance
     """
-    return PerformanceMonitor(
-        enabled=enabled, enable_memory_monitoring=enable_memory_monitoring
-    )
-
-
-# ======================
-# Context Managers
-# ======================
+    return PerformanceMonitor(name)
 
 
 @contextmanager
-def performance_context(monitor: PerformanceMonitor, operation_name: str):
+def performance_context(monitor: PerformanceMonitor, operation_name: str, **context_data: Any):
     """
     Context manager for performance monitoring.
 
     Args:
-        monitor: PerformanceMonitor instance
+        monitor: Performance monitor instance
         operation_name: Name of the operation being monitored
+        **context_data: Additional context data to store
 
-    Usage:
-        with performance_context(monitor, "operation_name"):
-            # Code to monitor
-            do_something()
+    Yields:
+        None
     """
-    with monitor.monitor_operation(operation_name):
+    if not monitor.is_enabled():
         yield
+        return
 
+    start_time = time.time()
+    success = True
+    error = None
 
-@contextmanager
-def enhanced_error_context(operation: str, **context_data: Any):
-    """
-    Context manager for enhanced error handling with context information.
-
-    Args:
-        operation: Name of the operation being performed
-        **context_data: Additional context data to include in errors
-
-    Usage:
-        with enhanced_error_context("file_parsing", file_path=path):
-            # Operation that might fail
-            result = parse_content(content)
-    """
     try:
         yield
     except Exception as e:
-        # Enhance the exception with context information
-        context_info = f"Operation: {operation}"
-        if context_data:
-            context_parts = [f"{k}={v}" for k, v in context_data.items()]
-            context_info += f" | Context: {', '.join(context_parts)}"
-
-        # Add context to the exception message if possible
-        if hasattr(e, "args") and e.args:
-            enhanced_message = f"{e.args[0]} | {context_info}"
-            e.args = (enhanced_message,) + e.args[1:]
-
-        logger.error(f"Enhanced error context - {context_info}: {e}")
+        success = False
+        error = e
         raise
+    finally:
+        duration = time.time() - start_time
+        monitor.record_operation(
+            operation_name,
+            duration,
+            success=success,
+            error=str(error) if error else None,
+            **context_data,
+        )
 
 
-# ======================
-# Analysis Functions
-# ======================
+def enhanced_error_context(operation: str, **context_data: Any) -> ContextManager[None]:
+    """
+    Enhanced error context with performance monitoring.
+
+    Args:
+        operation: Name of the operation
+        **context_data: Additional context data
+
+    Returns:
+        Context manager that provides error handling and performance monitoring
+    """
+    start_time = time.time()
+
+    class ErrorContext:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            duration = time.time() - start_time
+            if exc_type is not None:
+                logger.error(
+                    f"Operation '{operation}' failed after {duration:.3f}s: {exc_val}",
+                    extra={"operation": operation, "duration": duration, **context_data},
+                )
+            else:
+                logger.debug(
+                    f"Operation '{operation}' completed in {duration:.3f}s",
+                    extra={"operation": operation, "duration": duration, **context_data},
+                )
+
+    return ErrorContext()
 
 
 def calculate_performance_summary(stats: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Calculate a performance summary from statistics.
+    Calculate performance summary from statistics.
 
     Args:
         stats: Performance statistics dictionary
 
     Returns:
-        Dictionary containing performance summary
+        Calculated performance summary
     """
-    if not stats:
-        return {"status": "No performance data available"}
+    operations_count = stats.get("operations_count", 0)
+    total_time = stats.get("total_processing_time", 0.0)
+    error_count = stats.get("error_count", 0)
 
     summary = {
-        "status": "active" if stats.get("operations_count", 0) > 0 else "inactive",
-        "total_operations": stats.get("operations_count", 0),
-        "total_time_seconds": stats.get("total_processing_time", 0.0),
-        "average_operation_time": stats.get("average_operation_time", 0.0),
-        "error_rate_percentage": stats.get("error_rate", 0.0) * 100,
-        "cache_hit_rate_percentage": stats.get("cache_hit_rate", 0.0) * 100,
+        "operations_count": operations_count,
+        "total_processing_time": total_time,
+        "average_processing_time": total_time / operations_count if operations_count > 0 else 0.0,
+        "success_rate": ((operations_count - error_count) / operations_count * 100) if operations_count > 0 else 100.0,
+        "error_count": error_count,
     }
 
-    # Memory summary if available
-    memory_stats = stats.get("memory_stats")
-    if memory_stats:
-        summary["memory_summary"] = {
-            "peak_usage_mb": memory_stats.get("peak_memory_usage_mb", 0.0),
-            "average_delta_mb": memory_stats.get("average_memory_delta_mb", 0.0),
-            "max_delta_mb": memory_stats.get("max_memory_delta_mb", 0.0),
-        }
+    # Add cache statistics if available
+    cache_hits = stats.get("cache_hits", 0)
+    cache_misses = stats.get("cache_misses", 0)
+    total_cache_ops = cache_hits + cache_misses
+
+    if total_cache_ops > 0:
+        summary.update({
+            "cache_hit_rate": (cache_hits / total_cache_ops) * 100,
+            "cache_hits": cache_hits,
+            "cache_misses": cache_misses,
+        })
 
     return summary
 
 
 def format_performance_report(
-    stats: Dict[str, Any], title: str = "Performance Report"
+    stats: Dict[str, Any], include_history: bool = False
 ) -> str:
     """
-    Format performance statistics into a human-readable report.
+    Format performance statistics as a readable report.
 
     Args:
         stats: Performance statistics dictionary
-        title: Title for the report
+        include_history: Whether to include operation history
 
     Returns:
         Formatted performance report string
     """
-    if not stats:
-        return f"{title}\n{'=' * len(title)}\nNo performance data available."
-
     summary = calculate_performance_summary(stats)
 
     report_lines = [
-        title,
-        "=" * len(title),
-        "",
-        f"Status: {summary['status']}",
-        f"Total Operations: {summary['total_operations']}",
-        f"Total Processing Time: {summary['total_time_seconds']:.3f}s",
-        f"Average Operation Time: {summary['average_operation_time']:.3f}s",
-        f"Error Rate: {summary['error_rate_percentage']:.1f}%",
-        f"Cache Hit Rate: {summary['cache_hit_rate_percentage']:.1f}%",
+        "Performance Report",
+        "=" * 50,
+        f"Operations: {summary['operations_count']}",
+        f"Total Time: {summary['total_processing_time']:.3f}s",
+        f"Average Time: {summary['average_processing_time']:.3f}s",
+        f"Success Rate: {summary['success_rate']:.1f}%",
+        f"Errors: {summary['error_count']}",
     ]
 
-    # Add memory information if available
-    if "memory_summary" in summary:
-        memory = summary["memory_summary"]
-        report_lines.extend(
-            [
-                "",
-                "Memory Usage:",
-                f"  Peak Usage: {memory['peak_usage_mb']:.1f}MB",
-                f"  Average Delta: {memory['average_delta_mb']:.1f}MB",
-                f"  Max Delta: {memory['max_delta_mb']:.1f}MB",
-            ]
-        )
+    if "cache_hit_rate" in summary:
+        report_lines.extend([
+            f"Cache Hit Rate: {summary['cache_hit_rate']:.1f}%",
+            f"Cache Hits: {summary['cache_hits']}",
+            f"Cache Misses: {summary['cache_misses']}",
+        ])
 
-    # Add recent operations if available
-    operation_history = stats.get("operation_history", [])
-    if operation_history:
-        report_lines.extend(
-            [
-                "",
-                f"Recent Operations (last {min(5, len(operation_history))}):",
-            ]
-        )
+    if include_history and "operation_history" in stats:
+        report_lines.extend([
+            "",
+            "Recent Operations:",
+            "-" * 30,
+        ])
 
+        operation_history = stats["operation_history"]
         for op in operation_history[-5:]:
             status = "✓" if op.get("success", True) else "✗"
             report_lines.append(
@@ -486,3 +387,7 @@ def format_performance_report(
             )
 
     return "\n".join(report_lines)
+
+
+# Global performance monitor instance
+performance_monitor = PerformanceMonitor("global")

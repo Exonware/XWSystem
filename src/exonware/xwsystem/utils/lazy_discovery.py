@@ -1,15 +1,22 @@
 """
+#exonware/xwsystem/src/exonware/xwsystem/utils/lazy_discovery.py
+
+Company: eXonware.com
+Author: Eng. Muhammad AlShehri
+Email: connect@exonware.com
+Version: 0.0.1.362
+Generation Date: 27-Jan-2025
+
 Lazy Discovery System for xwsystem
 
 This module provides package-agnostic discovery of dependencies from project
 configuration files. It automatically discovers what packages are needed
 from pyproject.toml, requirements.txt, and other config files.
 
-Author: Eng. Muhammad AlShehri
-Company: eXonware.com
-Email: connect@exonware.com
-Version: 0.0.1.361
-Generated: 2025-01-27
+The system is designed to be completely package-agnostic and reusable across
+all exonware libraries (xwnode, xwdata, xwentity, etc.) by automatically
+discovering dependencies from project configuration files rather than using
+hardcoded package mappings.
 """
 
 import os
@@ -19,6 +26,10 @@ import toml
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
+
+from ..config.logging_setup import get_logger
+
+logger = get_logger("xsystem.utils.lazy_discovery")
 
 @dataclass
 class DependencyInfo:
@@ -144,7 +155,7 @@ class LazyDiscovery:
             self._discovery_sources.append('pyproject.toml')
             
         except Exception as e:
-            print(f"Warning: Could not parse pyproject.toml: {e}")
+            logger.warning(f"Could not parse pyproject.toml: {e}")
     
     def _discover_from_requirements_txt(self) -> None:
         """Discover dependencies from requirements.txt."""
@@ -162,7 +173,7 @@ class LazyDiscovery:
             self._discovery_sources.append('requirements.txt')
             
         except Exception as e:
-            print(f"Warning: Could not parse requirements.txt: {e}")
+            logger.warning(f"Could not parse requirements.txt: {e}")
     
     def _discover_from_setup_py(self) -> None:
         """Discover dependencies from setup.py."""
@@ -190,7 +201,7 @@ class LazyDiscovery:
             self._discovery_sources.append('setup.py')
             
         except Exception as e:
-            print(f"Warning: Could not parse setup.py: {e}")
+            logger.warning(f"Could not parse setup.py: {e}")
     
     def _discover_from_custom_config(self) -> None:
         """Discover dependencies from custom configuration files."""
@@ -220,7 +231,7 @@ class LazyDiscovery:
                     self._discovery_sources.append(config_file)
                     
                 except Exception as e:
-                    print(f"Warning: Could not parse {config_file}: {e}")
+                    logger.warning(f"Could not parse {config_file}: {e}")
     
     def _parse_dependency_string(self, dep_str: str, source: str) -> None:
         """Parse a dependency string and extract dependency information."""
@@ -281,6 +292,87 @@ class LazyDiscovery:
             source='custom',
             category=category
         )
+    
+    def get_package_import_mapping(self) -> Dict[str, List[str]]:
+        """
+        Get mapping of package names to their possible import names.
+        
+        Returns:
+            Dict mapping package_name -> [package_name, import_name1, import_name2, ...]
+            
+        Example:
+            {
+                "fastavro": ["fastavro", "fastavro"],
+                "opencv-python": ["opencv-python", "cv2"],
+                "Pillow": ["Pillow", "PIL"],
+                "PyYAML": ["PyYAML", "yaml"]
+            }
+        """
+        # First, discover all dependencies
+        self.discover_all_dependencies()
+        
+        # Create reverse mapping: package_name -> [import_names]
+        package_to_imports = {}
+        
+        for import_name, dep_info in self.discovered_dependencies.items():
+            package_name = dep_info.package_name
+            
+            if package_name not in package_to_imports:
+                package_to_imports[package_name] = [package_name]  # Always include package name itself
+            
+            # Add import name if different from package name
+            if import_name != package_name:
+                if import_name not in package_to_imports[package_name]:
+                    package_to_imports[package_name].append(import_name)
+        
+        return package_to_imports
+    
+    def get_import_package_mapping(self) -> Dict[str, str]:
+        """
+        Get mapping of import names to package names (reverse of above).
+        
+        Returns:
+            Dict mapping import_name -> package_name
+            
+        Example:
+            {
+                "fastavro": "fastavro",
+                "cv2": "opencv-python", 
+                "PIL": "Pillow",
+                "yaml": "PyYAML"
+            }
+        """
+        # First, discover all dependencies
+        self.discover_all_dependencies()
+        
+        # Create simple mapping: import_name -> package_name
+        return {import_name: dep_info.package_name for import_name, dep_info in self.discovered_dependencies.items()}
+    
+    def get_package_for_import(self, import_name: str) -> Optional[str]:
+        """
+        Get the package name for a given import name.
+        
+        Args:
+            import_name: The import name (e.g., 'cv2', 'PIL')
+            
+        Returns:
+            Package name (e.g., 'opencv-python', 'Pillow') or None if not found
+        """
+        mapping = self.get_import_package_mapping()
+        return mapping.get(import_name)
+    
+    def get_imports_for_package(self, package_name: str) -> List[str]:
+        """
+        Get all possible import names for a given package.
+        
+        Args:
+            package_name: The package name (e.g., 'opencv-python')
+            
+        Returns:
+            List of import names (e.g., ['opencv-python', 'cv2'])
+        """
+        mapping = self.get_package_import_mapping()
+        return mapping.get(package_name, [package_name])
     
     def export_to_json(self, file_path: str) -> None:
         """Export discovered dependencies to JSON file."""

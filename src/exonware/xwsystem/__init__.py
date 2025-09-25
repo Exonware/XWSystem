@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.361
+Version: 0.0.1.362
 Generation Date: September 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -86,8 +86,22 @@ from .utils.lazy_install import (
     install_missing_package,
     install_and_import,
     get_lazy_install_stats,
-    lazy_import_with_install
+    lazy_import_with_install,
+    xwimport
 )
+
+# Auto-enable lazy install if lazy extra is installed
+import os
+try:
+    import pkg_resources
+    _lazy_enabled = 'lazy' in pkg_resources.get_distribution('exonware-xwsystem').extras
+    if _lazy_enabled:
+        enable_lazy_install()
+except:
+    # Fallback: check environment variable
+    _lazy_enabled = os.environ.get('XWSYSTEM_LAZY_INSTALL', 'false').lower() == 'true'
+    if _lazy_enabled:
+        enable_lazy_install()
 
 # Lazy discovery utilities
 from .utils.lazy_discovery import (
@@ -141,7 +155,7 @@ from .serialization import (
     FeatherSerializer, FeatherError,
     GraphDbSerializer, GraphDbError,
     # Intelligent auto-detection
-    XWSerialization, dumps, loads, save_file, load_file,
+    XWSerializer, dumps, loads, save_file, load_file,
     # Flyweight optimization
     get_serializer, get_flyweight_stats, clear_serializer_cache, 
     get_cache_info, create_serializer, SerializerPool,
@@ -305,8 +319,7 @@ from .config import (
     PATH_SEPARATOR_FORWARD, PATH_SEPARATOR_BACKWARD,
     CIRCULAR_REFERENCE_PLACEHOLDER, MAX_DEPTH_EXCEEDED_PLACEHOLDER,
     LOGGING_ENABLED, LOGGING_LEVEL, setup_logging, get_logger,
-    PerformanceMode, PerformanceProfile, PerformanceProfiles,
-    PerformanceModeManager, PerformanceConfig, PerformanceLimits,
+    PerformanceConfig, PerformanceLimits,
     SerializationLimits, NetworkLimits, SecurityLimits
 )
 from .config.performance import (
@@ -450,8 +463,8 @@ def quick_deserialize(data, format="auto", **kwargs):
         {'hello': 'world'}
     """
     if format == "auto":
-        from .serialization import XWSerialization
-        return XWSerialization().loads(data, **kwargs)
+        from .serialization import XWSerializer
+        return XWSerializer().loads(data, **kwargs)
     else:
         from .serialization import create_serializer
         serializer = create_serializer(format)
@@ -614,7 +627,7 @@ __all__ = [
     "FeatherSerializer", "FeatherError",
     "GraphDbSerializer", "GraphDbError",
     # Intelligent auto-detection
-    "XWSerialization", "dumps", "loads", "save_file", "load_file",
+    "XWSerializer", "dumps", "loads", "save_file", "load_file",
     # Flyweight optimization
     "get_serializer", "get_flyweight_stats", "clear_serializer_cache", 
     "get_cache_info", "create_serializer", "SerializerPool",
@@ -729,11 +742,9 @@ __all__ = [
     "PATH_SEPARATOR_BACKWARD",
     "CIRCULAR_REFERENCE_PLACEHOLDER",
     "MAX_DEPTH_EXCEEDED_PLACEHOLDER",
-    # Performance Modes
-    "PerformanceMode",
-    "PerformanceProfile",
-    "PerformanceProfiles",
-    "PerformanceModeManager",
+    # Performance Configuration
+    "PerformanceConfig",
+    "PerformanceLimits",
     # Validation
     "DataValidator",
     "check_data_depth",
@@ -915,6 +926,7 @@ __all__ = [
     "install_and_import",
     "get_lazy_install_stats",
     "lazy_import_with_install",
+    "xwimport",
     
     # Lazy Discovery - Package-agnostic dependency discovery
     "LazyDiscovery",
