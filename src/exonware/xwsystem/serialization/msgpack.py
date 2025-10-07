@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 MessagePack Serializer Implementation
@@ -19,8 +19,8 @@ from pathlib import Path
 from .contracts import ISerialization
 from .base import ASerialization
 
+# Import msgpack - lazy installation system will handle it if missing
 import msgpack
-_MSGPACK_AVAILABLE = True
 
 
 class MsgPackSerializer(ASerialization):
@@ -60,12 +60,7 @@ class MsgPackSerializer(ASerialization):
             max_depth: Maximum nesting depth for security
             max_size_mb: Maximum data size in MB
         """
-        if not _MSGPACK_AVAILABLE:
-            raise ImportError(
-                "MessagePack serialization requires the 'msgpack' package. "
-                "Install it with: pip install msgpack"
-            )
-        
+        # Lazy installation system will handle msgpack if missing
         super().__init__(
             validate_input=validate_input,
             validate_paths=validate_paths,
@@ -193,8 +188,7 @@ class MsgPackSerializer(ASerialization):
         Returns:
             Packed bytes
         """
-        if not _MSGPACK_AVAILABLE:
-            raise ImportError("MessagePack streaming requires the 'msgpack' package")
+        # Lazy install handles msgpack
         
         buffer = io.BytesIO()
         
@@ -223,8 +217,7 @@ class MsgPackSerializer(ASerialization):
         Yields:
             Unpacked objects
         """
-        if not _MSGPACK_AVAILABLE:
-            raise ImportError("MessagePack streaming requires the 'msgpack' package")
+        # Lazy install handles msgpack
         
         if self._use_compression:
             import zlib

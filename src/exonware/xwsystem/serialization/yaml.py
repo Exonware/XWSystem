@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced YAML serialization with security, validation and performance optimizations.
@@ -23,31 +23,12 @@ from ..config.logging_setup import get_logger
 
 logger = get_logger("xwsystem.serialization.yaml")
 
-# Try to import performance libraries
-try:
-    import yaml
-    from yaml import SafeLoader, SafeDumper
-    HAS_PYYAML = True
-except ImportError:
-    HAS_PYYAML = False
-
-try:
-    import ruamel.yaml
-    HAS_RUAMEL = True
-except ImportError:
-    HAS_RUAMEL = False
-
-try:
-    import msgspec
-    HAS_MSGSPEC = True
-except ImportError:
-    HAS_MSGSPEC = False
-
-try:
-    import xxhash
-    HAS_XXHASH = True
-except ImportError:
-    HAS_XXHASH = False
+# Import YAML libraries - lazy installation system will handle missing dependencies
+import yaml
+from yaml import SafeLoader, SafeDumper
+import ruamel.yaml
+import msgspec
+import xxhash
 
 
 class YamlError(SerializationError):
@@ -120,7 +101,7 @@ class YamlSerializer(ASerialization):
         self.width = width
         self.indent = indent
         self.canonical = canonical
-        self.use_ruamel = use_ruamel and HAS_RUAMEL
+        self.use_ruamel = use_ruamel  # Lazy install handles ruamel availability
         self.type_adapters: Dict[type, tuple[Callable, Callable]] = {}
         self.target_version = "1.0"
         
@@ -194,17 +175,12 @@ class YamlSerializer(ASerialization):
                 raise FormatDetectionError("Unsupported source type")
             
             # Try to parse as YAML
+            # Lazy install handles library availability
             if self.use_ruamel:
                 yaml_obj = ruamel.yaml.YAML()
                 yaml_obj.load(content)
-            elif HAS_PYYAML:
-                yaml.safe_load(content)
             else:
-                # Basic YAML detection
-                if ':' in content and ('-' in content or content.strip().startswith('---')):
-                    return SerializationFormat.YAML
-                else:
-                    raise FormatDetectionError("Not a valid YAML format")
+                yaml.safe_load(content)
             
             return SerializationFormat.YAML
         except Exception as e:
@@ -229,7 +205,7 @@ class YamlSerializer(ASerialization):
                 string_stream = StringIO()
                 yaml_obj.dump(data, string_stream)
                 return string_stream.getvalue()
-            elif HAS_PYYAML:
+            else:
                 return yaml.dump(
                     data,
                     default_flow_style=self.default_flow_style,
@@ -238,8 +214,6 @@ class YamlSerializer(ASerialization):
                     indent=self.indent,
                     Dumper=SafeDumper
                 )
-            else:
-                raise YamlError("No YAML library available")
         except Exception as e:
             raise YamlError(f"YAML serialization failed: {e}", e)
 
@@ -257,13 +231,12 @@ class YamlSerializer(ASerialization):
     def loads_text(self, data: str) -> Any:
         """Deserialize from text string."""
         try:
+            # Lazy install handles library availability
             if self.use_ruamel:
                 yaml_obj = ruamel.yaml.YAML()
                 return yaml_obj.load(data)
-            elif HAS_PYYAML:
-                return yaml.safe_load(data)
             else:
-                raise YamlError("No YAML library available")
+                return yaml.safe_load(data)
         except Exception as e:
             raise YamlError(f"YAML deserialization failed: {e}", e)
 
@@ -498,10 +471,7 @@ class YamlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(canonical).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(canonical).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(canonical).hexdigest()
             else:
                 return hashlib.new(algorithm, canonical).hexdigest()
         except Exception as e:
@@ -521,10 +491,7 @@ class YamlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(serialized).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(serialized).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(serialized).hexdigest()
             else:
                 return hashlib.new(algorithm, serialized).hexdigest()
         except Exception as e:

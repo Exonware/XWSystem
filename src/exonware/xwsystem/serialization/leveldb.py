@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: January 02, 2025
 
 LevelDB/RocksDB serializer for key-value store operations.
@@ -14,21 +14,9 @@ import pickle
 from typing import Any, Dict, Iterator, Optional, Union
 from pathlib import Path
 
-# Optional imports - dependencies managed via pyproject.toml optional dependencies
-# Install with: pip install exonware-xsystem[enterprise-leveldb]
-try:
-    import rocksdb
-    ROCKSDB_AVAILABLE = True
-except ImportError:
-    rocksdb = None
-    ROCKSDB_AVAILABLE = False
-
-try:
-    import plyvel
-    PYLEVEL_AVAILABLE = True
-except ImportError:
-    plyvel = None
-    PYLEVEL_AVAILABLE = False
+# Import leveldb libraries - lazy installation system will handle missing dependencies
+import rocksdb
+import plyvel
 
 from .base import ASerialization
 from .errors import SerializationError
@@ -58,13 +46,7 @@ class LevelDbSerializer(ASerialization):
         Raises:
             LevelDbError: If neither rocksdb nor plyvel is available
         """
-        # Check if at least one backend is available
-        if not ROCKSDB_AVAILABLE and not PYLEVEL_AVAILABLE:
-            raise LevelDbError(
-                "LevelDB/RocksDB requires either pycapnp or plyvel.\n"
-                "Install with: pip install rocksdb plyvel\n"
-                "Note: This is optional - you have 22 other serialization formats available!"
-            )
+        # Lazy installation system will handle missing backends automatically
         
         super().__init__()
         self.backend = backend
@@ -81,12 +63,12 @@ class LevelDbSerializer(ASerialization):
         db_path.mkdir(parents=True, exist_ok=True)
         
         # Use RocksDB first (more features), fallback to LevelDB
-        if self.backend in ("auto", "rocksdb") and ROCKSDB_AVAILABLE:
+        if self.backend in ("auto", "rocksdb"):
             self._db = rocksdb.DB(str(db_path), rocksdb.Options(create_if_missing=True))
             self._db_type = "rocksdb"
             return self._db
         
-        if self.backend in ("auto", "leveldb") and PYLEVEL_AVAILABLE:
+        if self.backend in ("auto", "leveldb"):
             self._db = plyvel.DB(str(db_path), create_if_missing=True)
             self._db_type = "leveldb"
             return self._db

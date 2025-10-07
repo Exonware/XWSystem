@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 05, 2025
 
 Colored terminal output utilities with cross-platform support.
@@ -15,9 +15,9 @@ from .types import Colors, Style
 
 # Explicit import - colorama is a required dependency for CLI functionality
 # This ensures consistent cross-platform colored output
+# Import colorama - lazy installation system will handle it if missing
 import colorama
 colorama.init(autoreset=True)
-COLORAMA_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 
@@ -73,11 +73,8 @@ class ColoredOutput:
         if 'color' in term or term in ('xterm', 'xterm-256color', 'screen', 'tmux'):
             return True
         
-        # Windows support
-        if os.name == 'nt':
-            return COLORAMA_AVAILABLE
-        
-        # Default to True for Unix-like systems
+        # Lazy installation ensures colorama is always available
+        # Works on all platforms
         return True
     
     def supports_color(self) -> bool:

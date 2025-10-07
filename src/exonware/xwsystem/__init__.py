@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -76,40 +76,61 @@ from .utils.lazy_loader import (
     optimize_lazy_mode
 )
 
+# =============================================================================
+# LAZY INSTALLATION - Simple One-Line Configuration
+# =============================================================================
+# Auto-detects if user installed with [lazy] extra: pip install xwsystem[lazy]
+from .utils.lazy_discovery import config_package_lazy_install_enabled
+config_package_lazy_install_enabled("xwsystem")  # Auto-detect from installation
+
 # Lazy install utilities
 from .utils.lazy_install import (
     LazyInstaller,
+    LazyInstallerRegistry,
+    LazyInstallMode,
+    LazyInstallPolicy,
     DependencyMapper,
     enable_lazy_install,
     disable_lazy_install,
     is_lazy_install_enabled,
+    set_lazy_install_mode,
+    get_lazy_install_mode,
     install_missing_package,
     install_and_import,
     get_lazy_install_stats,
+    get_all_lazy_install_stats,
     lazy_import_with_install,
-    xwimport
+    xwimport,
+    # Security & Policy APIs
+    set_package_allow_list,
+    set_package_deny_list,
+    add_to_package_allow_list,
+    add_to_package_deny_list,
+    set_package_index_url,
+    set_package_extra_index_urls,
+    add_package_trusted_host,
+    set_package_lockfile,
+    generate_package_sbom,
+    check_externally_managed_environment
 )
-
-# Auto-enable lazy install if lazy extra is installed
-import os
-try:
-    import pkg_resources
-    _lazy_enabled = 'lazy' in pkg_resources.get_distribution('exonware-xwsystem').extras
-    if _lazy_enabled:
-        enable_lazy_install()
-except:
-    # Fallback: check environment variable
-    _lazy_enabled = os.environ.get('XWSYSTEM_LAZY_INSTALL', 'false').lower() == 'true'
-    if _lazy_enabled:
-        enable_lazy_install()
 
 # Lazy discovery utilities
 from .utils.lazy_discovery import (
     LazyDiscovery,
+    LazyInstallConfig,
     DependencyInfo,
     discover_dependencies,
     get_lazy_discovery,
-    export_dependency_mappings
+    export_dependency_mappings,
+    config_package_lazy_install_enabled
+)
+
+# Lazy import hook utilities (performance optimized)
+from .utils.lazy_import_hook import (
+    LazyMetaPathFinder,
+    install_import_hook,
+    uninstall_import_hook,
+    is_import_hook_installed
 )
 
 # Logging utilities
@@ -916,24 +937,49 @@ __all__ = [
     "preload_modules",
     "optimize_lazy_mode",
     
-    # Lazy Install - Auto-install missing packages
+    # Lazy Install - Auto-install missing packages (per-package isolation)
     "LazyInstaller",
+    "LazyInstallerRegistry",
+    "LazyInstallMode",
+    "LazyInstallPolicy",
     "DependencyMapper",
     "enable_lazy_install",
     "disable_lazy_install",
     "is_lazy_install_enabled",
+    "set_lazy_install_mode",
+    "get_lazy_install_mode",
     "install_missing_package",
     "install_and_import",
     "get_lazy_install_stats",
+    "get_all_lazy_install_stats",
     "lazy_import_with_install",
     "xwimport",
+    # Security & Policy APIs
+    "set_package_allow_list",
+    "set_package_deny_list",
+    "add_to_package_allow_list",
+    "add_to_package_deny_list",
+    "set_package_index_url",
+    "set_package_extra_index_urls",
+    "add_package_trusted_host",
+    "set_package_lockfile",
+    "generate_package_sbom",
+    "check_externally_managed_environment",
     
-    # Lazy Discovery - Package-agnostic dependency discovery
+    # Lazy Discovery - Package-agnostic dependency discovery with auto-detection
     "LazyDiscovery",
+    "LazyInstallConfig",
     "DependencyInfo",
     "discover_dependencies",
     "get_lazy_discovery",
     "export_dependency_mappings",
+    "config_package_lazy_install_enabled",
+    
+    # Lazy Import Hook - Performance optimized automatic import interception
+    "LazyMetaPathFinder",
+    "install_import_hook",
+    "uninstall_import_hook",
+    "is_import_hook_installed",
     
     # Convenience Functions - Quick access patterns
     "quick_serialize",

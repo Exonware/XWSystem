@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 IO module base classes - abstract classes for input/output functionality.
@@ -648,43 +648,36 @@ class AAsyncIO(IAsyncIO, ABC):
     @staticmethod
     async def aopen_file(path: Union[str, Path], mode: str = 'r', encoding: Optional[str] = None) -> Any:
         """Async open file."""
-        try:
-            import aiofiles
-            return await aiofiles.open(path, mode, encoding=encoding)
-        except ImportError:
-            raise ImportError("aiofiles is required for async I/O operations")
+        # Lazy installation system will handle aiofiles if missing
+        import aiofiles
+        return await aiofiles.open(path, mode, encoding=encoding)
     
     @staticmethod
     async def aread_text(path: Union[str, Path], encoding: str = 'utf-8') -> str:
         """Async read text file."""
-        try:
-            import aiofiles
-            async with aiofiles.open(path, 'r', encoding=encoding) as f:
-                return await f.read()
-        except ImportError:
-            raise ImportError("aiofiles is required for async I/O operations")
+        # Lazy installation system will handle aiofiles if missing
+        import aiofiles
+        async with aiofiles.open(path, 'r', encoding=encoding) as f:
+            return await f.read()
     
     @staticmethod
     async def aread_bytes(path: Union[str, Path]) -> bytes:
         """Async read binary file."""
-        try:
-            import aiofiles
-            async with aiofiles.open(path, 'rb') as f:
-                return await f.read()
-        except ImportError:
-            raise ImportError("aiofiles is required for async I/O operations")
+        # Lazy installation system will handle aiofiles if missing
+        import aiofiles
+        async with aiofiles.open(path, 'rb') as f:
+            return await f.read()
     
     @staticmethod
     async def awrite_text(path: Union[str, Path], content: str, encoding: str = 'utf-8') -> bool:
         """Async write text to file."""
         try:
+            # Lazy installation system will handle aiofiles if missing
             import aiofiles
             Path(path).parent.mkdir(parents=True, exist_ok=True)
             async with aiofiles.open(path, 'w', encoding=encoding) as f:
                 await f.write(content)
             return True
-        except ImportError:
-            raise ImportError("aiofiles is required for async I/O operations")
         except Exception:
             return False
     
@@ -692,13 +685,12 @@ class AAsyncIO(IAsyncIO, ABC):
     async def awrite_bytes(path: Union[str, Path], content: bytes) -> bool:
         """Async write bytes to file."""
         try:
+            # Lazy installation system will handle aiofiles if missing
             import aiofiles
             Path(path).parent.mkdir(parents=True, exist_ok=True)
             async with aiofiles.open(path, 'wb') as f:
                 await f.write(content)
             return True
-        except ImportError:
-            raise ImportError("aiofiles is required for async I/O operations")
         except Exception:
             return False
 

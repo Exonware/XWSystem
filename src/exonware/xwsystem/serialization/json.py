@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced JSON serialization with security, validation and performance optimizations.
@@ -25,36 +25,14 @@ from ..config.logging_setup import get_logger
 
 logger = get_logger("xwsystem.serialization.json")
 
-# Try to import performance libraries
-try:
-    import orjson
-    HAS_ORJSON = True
-except ImportError:
-    HAS_ORJSON = False
-
-try:
-    import ijson
-    HAS_IJSON = True
-except ImportError:
-    HAS_IJSON = False
-
-try:
-    import jsonpointer
-    HAS_JSONPOINTER = True
-except ImportError:
-    HAS_JSONPOINTER = False
-
-try:
-    import jsonpatch
-    HAS_JSONPATCH = True
-except ImportError:
-    HAS_JSONPATCH = False
-
-try:
-    import jsonschema
-    HAS_JSONSCHEMA = True
-except ImportError:
-    HAS_JSONSCHEMA = False
+# Import JSON libraries - lazy installation system will handle missing dependencies
+import orjson
+import ijson
+import jsonpointer
+import jsonpatch
+import jsonschema
+import msgspec
+import xxhash
 
 
 class JsonSerializer(ASerialization):
@@ -117,7 +95,7 @@ class JsonSerializer(ASerialization):
         self.sort_keys = sort_keys or canonical
         self.ensure_ascii = ensure_ascii
         self.canonical = canonical
-        self.use_orjson = use_orjson and HAS_ORJSON
+        self.use_orjson = use_orjson  # Lazy install handles orjson availability
         self.type_adapters: Dict[type, tuple[Callable, Callable]] = {}
         self.target_version = "1.0"
         
@@ -157,11 +135,9 @@ class JsonSerializer(ASerialization):
         """Get set of capabilities supported by this format."""
         caps = {SerializationCapability.STREAMING}
         
-        if HAS_JSONPOINTER:
-            caps.add(SerializationCapability.PARTIAL_ACCESS)
-        
-        if HAS_JSONSCHEMA:
-            caps.add(SerializationCapability.TYPED_DECODE)
+        # Lazy install handles dependencies automatically
+        caps.add(SerializationCapability.PARTIAL_ACCESS)
+        caps.add(SerializationCapability.TYPED_DECODE)
         
         if self.canonical or self.sort_keys:
             caps.add(SerializationCapability.CANONICAL)
@@ -315,19 +291,8 @@ class JsonSerializer(ASerialization):
             else:
                 json_pointer = path
             
-            # Use JSON Pointer if available, otherwise fall back to manual navigation
-            if HAS_JSONPOINTER:
-                return jsonpointer.resolve_pointer(obj, json_pointer)
-            else:
-                # Fallback: manual navigation using dot notation
-                keys = path.split('.')
-                current = obj
-                for key in keys:
-                    if isinstance(current, dict) and key in current:
-                        current = current[key]
-                    else:
-                        return None
-                return current
+            # Use JSON Pointer - lazy install handles jsonpointer availability
+            return jsonpointer.resolve_pointer(obj, json_pointer)
         except Exception as e:
             raise SerializationError(f"Failed to get value at path '{path}': {e}")
 
@@ -346,18 +311,8 @@ class JsonSerializer(ASerialization):
             else:
                 json_pointer = path
             
-            # Use JSON Pointer if available, otherwise fall back to manual navigation
-            if HAS_JSONPOINTER:
-                jsonpointer.set_pointer(obj, json_pointer, value)
-            else:
-                # Fallback: manual navigation using dot notation
-                keys = path.split('.')
-                current = obj
-                for key in keys[:-1]:
-                    if key not in current:
-                        current[key] = {}
-                    current = current[key]
-                current[keys[-1]] = value
+            # Use JSON Pointer - lazy install handles jsonpointer availability
+            jsonpointer.set_pointer(obj, json_pointer, value)
             
             # Serialize back
             result = json.dumps(obj, sort_keys=self.sort_keys, ensure_ascii=self.ensure_ascii)
@@ -374,26 +329,9 @@ class JsonSerializer(ASerialization):
             # Parse JSON
             obj = json.loads(data)
             
-            # Use ijson for streaming path access if available
-            if HAS_IJSON:
-                for item in ijson.items(StringIO(data), path):
-                    yield item
-            else:
-                # Fallback: manual navigation
-                if path == '*':
-                    # Return all values
-                    def _iter_dict(d):
-                        for v in d.values():
-                            if isinstance(v, dict):
-                                yield from _iter_dict(v)
-                            else:
-                                yield v
-                    yield from _iter_dict(obj)
-                else:
-                    # Single path
-                    value = self.get_at(data, path)
-                    if value is not None:
-                        yield value
+            # Use ijson for streaming path access - lazy install handles ijson availability
+            for item in ijson.items(StringIO(data), path):
+                yield item
         except Exception as e:
             raise SerializationError(f"Failed to iterate path '{path}': {e}")
 
@@ -410,67 +348,26 @@ class JsonSerializer(ASerialization):
             # Parse JSON
             obj = json.loads(data)
             
-            if HAS_JSONPATCH:
-                # Convert dot notation paths to JSON Pointer format for jsonpatch
-                if isinstance(patch, list):
-                    converted_patch = []
-                    for op in patch:
-                        converted_op = op.copy()
-                        if 'path' in converted_op and not converted_op['path'].startswith('/'):
-                            # Convert dot notation to JSON Pointer
-                            converted_op['path'] = '/' + converted_op['path'].replace('.', '/')
-                        converted_patch.append(converted_op)
-                    patch = converted_patch
-                
-                if rfc == "6902":
-                    # JSON Patch
-                    patched = jsonpatch.apply_patch(obj, patch)
-                elif rfc == "7386":
-                    # JSON Merge Patch
-                    patched = jsonpatch.merge_patch(obj, patch)
-                else:
-                    raise SerializationError(f"Unsupported RFC: {rfc}")
+            # Convert dot notation paths to JSON Pointer format for jsonpatch
+            # Lazy install handles jsonpatch availability
+            if isinstance(patch, list):
+                converted_patch = []
+                for op in patch:
+                    converted_op = op.copy()
+                    if 'path' in converted_op and not converted_op['path'].startswith('/'):
+                        # Convert dot notation to JSON Pointer
+                        converted_op['path'] = '/' + converted_op['path'].replace('.', '/')
+                    converted_patch.append(converted_op)
+                patch = converted_patch
+            
+            if rfc == "6902":
+                # JSON Patch
+                patched = jsonpatch.apply_patch(obj, patch)
+            elif rfc == "7386":
+                # JSON Merge Patch
+                patched = jsonpatch.merge_patch(obj, patch)
             else:
-                # Fallback: simple patch operations
-                if isinstance(patch, list):
-                    for op in patch:
-                        if op.get('op') == 'replace' and 'path' in op:
-                            path = op['path']
-                            value = op.get('value', '')
-                            # Convert dot notation to JSON Pointer
-                            if not path.startswith('/'):
-                                json_pointer = '/' + path.replace('.', '/')
-                            else:
-                                json_pointer = path
-                            # Apply patch directly to object
-                            keys = path.split('.')
-                            current = obj
-                            for key in keys[:-1]:
-                                if key not in current:
-                                    current[key] = {}
-                                current = current[key]
-                            current[keys[-1]] = value
-                        elif op.get('op') == 'add' and 'path' in op:
-                            path = op['path']
-                            value = op.get('value', '')
-                            # Apply patch directly to object
-                            keys = path.split('.')
-                            current = obj
-                            for key in keys[:-1]:
-                                if key not in current:
-                                    current[key] = {}
-                                current = current[key]
-                            current[keys[-1]] = value
-                        elif op.get('op') == 'remove' and 'path' in op:
-                            path = op['path']
-                            # Remove value at path
-                            keys = path.split('.')
-                            current = obj
-                            for key in keys[:-1]:
-                                current = current[key]
-                            if keys[-1] in current:
-                                del current[keys[-1]]
-                patched = obj
+                raise SerializationError(f"Unsupported RFC: {rfc}")
             
             # Serialize back
             result = json.dumps(patched, sort_keys=self.sort_keys, ensure_ascii=self.ensure_ascii)
@@ -491,18 +388,12 @@ class JsonSerializer(ASerialization):
             # Parse JSON
             obj = json.loads(data)
             
-            if HAS_JSONSCHEMA and dialect == "jsonschema":
+            # Lazy install handles jsonschema availability
+            if dialect == "jsonschema":
                 jsonschema.validate(obj, schema)
                 return True
             else:
-                # Fallback: simple schema validation
-                if isinstance(schema, dict):
-                    for key, expected_type in schema.items():
-                        if key not in obj:
-                            return False
-                        if not isinstance(obj[key], expected_type):
-                            return False
-                return True
+                raise SerializationError(f"Unsupported schema dialect: {dialect}")
         except Exception as e:
             raise ValidationError(f"Schema validation failed: {e}")
 
@@ -535,11 +426,7 @@ class JsonSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(canonical).hexdigest()
             elif algorithm == "xxh3":
-                try:
-                    import xxhash
-                    return xxhash.xxh3_64(canonical).hexdigest()
-                except ImportError:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(canonical).hexdigest()
             else:
                 return hashlib.new(algorithm, canonical).hexdigest()
         except Exception as e:
@@ -559,11 +446,7 @@ class JsonSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(serialized).hexdigest()
             elif algorithm == "xxh3":
-                try:
-                    import xxhash
-                    return xxhash.xxh3_64(serialized).hexdigest()
-                except ImportError:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(serialized).hexdigest()
             else:
                 return hashlib.new(algorithm, serialized).hexdigest()
         except Exception as e:

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 05, 2025
 
 Enhanced Cap'n Proto serialization with security, validation and performance optimizations.
@@ -13,8 +13,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Type
 
-# Explicit import - dependency managed via pyproject.toml optional dependencies
-# Install with: pip install exonware-xsystem[enterprise-capnproto]
+# Import capnp - lazy installation system will handle it if missing
 import capnp
 
 from .base import ASerialization
@@ -62,9 +61,6 @@ class CapnProtoSerializer(ASerialization):
         """
         Initialize Cap'n Proto serializer with schema and security options.
         
-        Raises:
-            CapnProtoError: If pycapnp is not available
-
         Args:
             schema_file: Path to .capnp schema file
             struct_name: Name of the struct to serialize (required if schema_file provided)
@@ -84,12 +80,7 @@ class CapnProtoSerializer(ASerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        if capnp is None:
-            raise CapnProtoError(
-                "Cap'n Proto requires pycapnp which needs C++ build tools.\n"
-                "Install with: pip install pycapnp\n"
-                "Note: This is optional - you have 23 other serialization formats available!"
-            )
+        # Lazy installation system will handle pycapnp if missing
             
         # Cap'n Proto-specific configuration
         self.schema_file = Path(schema_file) if schema_file else None

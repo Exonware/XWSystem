@@ -3,7 +3,7 @@
 **Company:** eXonware.com  
 **Author:** Eng. Muhammad AlShehri  
 **Email:** connect@exonware.com  
-**Version:** 0.0.1.363
+**Version:** 0.0.1.364
 **Generation Date:** 07-Sep-2025
 
 ## 🤖 AI-Friendly Document
@@ -97,10 +97,86 @@ library-name/
 ## Code Quality Standards
 
 ### Import Management
+
+#### **🚀 Revolutionary Auto-Install Import Hook (xwsystem [lazy])**
+
+**The New Standard**: With xwsystem's import hook system, dependency management is **completely automatic**:
+
+```python
+# Install with [lazy] extra
+pip install xwsystem[lazy]
+
+# Then just use normal Python imports!
+import fastavro  # Missing? Auto-installed! ✨
+import protobuf  # Missing? Auto-installed! ✨
+import pandas    # Missing? Auto-installed! ✨
+
+# NO try/except, NO HAS_* flags, NO defensive code!
+# The import hook handles everything automatically
+```
+
+**Key Benefits:**
+- ✅ **Zero Config**: One line in `__init__.py` enables the system
+- ✅ **Zero Overhead**: Successful imports run at full native speed
+- ✅ **Seamless**: Code continues automatically after installation
+- ✅ **Clean Code**: No defensive programming patterns needed
+- ✅ **Performance**: 20-100x faster with aggressive caching
+
+#### **Import Rules**
 - **Explicit imports only** - No wildcard or fallback imports
 - **Complete dependencies** - All formats and their dependencies must be included
-- **Missing library handling** - If a library is missing, import it and update project documentation and configuration files
-- **NO TRY/EXCEPT FOR IMPORTS** - **CRITICAL: Never use try/except blocks for imports. All dependencies must be explicit and required. This prevents hidden runtime errors and ensures all dependencies are properly declared.**
+- **NO TRY/EXCEPT FOR IMPORTS** - **CRITICAL: Never use try/except blocks for imports. With [lazy] extra, the import hook handles missing packages automatically. Without [lazy], all dependencies must be explicitly declared in requirements. This prevents hidden runtime errors and ensures clean, maintainable code.**
+- **NO HAS_* FLAGS** - Don't create `HAS_LIBRARY` flags to check if packages are available. The import hook makes this unnecessary.
+- **NO CONDITIONAL IMPORTS** - Import libraries directly. The hook handles missing packages automatically if [lazy] is installed.
+
+#### **3 Installation Modes (MANDATORY for ALL packages)**
+
+All eXonware packages (xwsystem, xwnode, xwdata, xwschema, xwaction, xwentity) and any package using lazy installation **MUST** support 3 installation modes:
+
+**pyproject.toml Structure:**
+```toml
+[project]
+dependencies = [
+    "exonware-xwsystem>=0.0.1",  # Core dependency
+]
+
+[project.optional-dependencies]
+lazy = [
+    "exonware-xwsystem[lazy]>=0.0.1",  # Lazy mode
+]
+
+full = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    # ... all optional dependencies
+]
+```
+
+**Installation Modes:**
+1. **LITE (default):** `pip install package` - Core dependencies only, minimal footprint
+2. **LAZY:** `pip install package[lazy]` - Auto-install on demand, recommended for development
+3. **FULL:** `pip install package[full]` - All dependencies pre-installed, recommended for production
+
+**__init__.py Configuration (MANDATORY):**
+```python
+# Around line 84 in __init__.py
+from exonware.xwsystem.utils.lazy_discovery import config_package_lazy_install_enabled
+config_package_lazy_install_enabled("package_name")  # Auto-detect from installation
+```
+
+**Import Pattern (MANDATORY):**
+```python
+# Standard imports - NO try/except!
+import pandas
+import numpy
+import scikit-learn
+
+# NOT this:
+# try:
+#     import pandas
+# except ImportError:
+#     pandas = None
+```
 
 ### Code Structure
 - **Separation of concerns** - Enforce clear separation of concerns with dedicated modules
@@ -294,6 +370,95 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 
 ## Import & Dependency Management
 
+### Lazy Installation Integration (MANDATORY for ALL eXonware Packages)
+
+All eXonware packages (xwsystem, xwnode, xwdata, xwschema, xwaction, xwentity) **MUST** support lazy installation with 3 installation modes.
+
+#### **Complete Integration Checklist**
+
+**1. pyproject.toml Configuration (MANDATORY):**
+```toml
+[project]
+name = "exonware-yourpackage"
+version = "0.0.1"
+dependencies = [
+    "exonware-xwsystem>=0.0.1",  # Core dependency for lazy system
+]
+
+[project.optional-dependencies]
+# LAZY MODE - Auto-install dependencies on demand (development)
+lazy = [
+    "exonware-xwsystem[lazy]>=0.0.1",
+]
+
+# FULL MODE - Pre-install all dependencies (production)
+full = [
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    # ALL optional dependencies here
+]
+```
+
+**2. __init__.py Setup (MANDATORY - Line ~84):**
+```python
+# yourpackage/__init__.py
+"""
+#exonware/yourpackage/src/exonware/yourpackage/__init__.py
+
+Company: eXonware.com
+Author: Eng. Muhammad AlShehri
+Email: connect@exonware.com
+Version: 0.0.1
+"""
+
+# LAZY INSTALLATION - Simple One-Line Configuration
+from exonware.xwsystem.utils.lazy_discovery import config_package_lazy_install_enabled
+config_package_lazy_install_enabled("yourpackage")  # Auto-detect [lazy] extra
+
+# IMPORTS - Standard Python Imports (NO try/except!)
+import pandas
+import numpy
+# ... all dependencies
+```
+
+**3. Module Imports (MANDATORY - NO Defensive Code):**
+```python
+# yourpackage/processor.py
+import pandas as pd
+import numpy as np
+
+# NOT this:
+# try:
+#     import pandas as pd
+# except ImportError:
+#     pd = None
+```
+
+**4. README.md Documentation (MANDATORY):**
+```markdown
+## Installation
+
+### Lite (Default) - Core Only
+pip install exonware-yourpackage
+
+### Lazy (Recommended for Development)
+pip install exonware-yourpackage[lazy]
+Auto-installs missing dependencies on demand
+
+### Full (Recommended for Production)
+pip install exonware-yourpackage[full]
+All dependencies pre-installed
+```
+
+**5. Testing (MANDATORY):**
+- Test lite mode: `pip install package`
+- Test lazy mode: `pip install package[lazy]`
+- Test full mode: `pip install package[full]`
+- Verify import hook activation
+- Verify auto-installation works
+
+---
+
 ### Library Strategy
 - **Why minimize imports** - Reduces dependency hell, simplifies deployment, and improves security by reducing attack surface
 - **One library import rationale** - Instead of importing 10+ libraries, projects import ONE: xwsystem to achieve dependency consolidation and simplified maintenance
@@ -486,6 +651,7 @@ The eXonware ecosystem follows a structured 5-phase development approach with st
 - **Testing** - Include test cases and validation using pytest and runners
 - **Version compliance** - Ensure all work aligns with versioning philosophy (0.x until complete ecosystem)
 - **Production-grade quality** - Build long-term, clean, extensible, maintainable code
+- **Lazy installation integration** - **MANDATORY: ALL new packages MUST include lazy installation support with 3 installation modes (lite/lazy/full)**
 
 ### AI Documentation Standards
 - **Follow documentation guidelines** - Place all docs in docs/ folder, use killer one-sentence overviews
@@ -582,6 +748,16 @@ CORE REQUIREMENTS:
 - Include comprehensive testing with pytest and runners
 - Follow version 0.x development phase requirements
 - Generate complete documentation in docs/ folder
+- **MANDATORY: Include lazy installation support with 3 modes (lite/lazy/full)**
+
+LAZY INSTALLATION (MANDATORY):
+- pyproject.toml MUST have: dependencies=["exonware-xwsystem>=0.0.1"]
+- pyproject.toml MUST have: lazy=["exonware-xwsystem[lazy]>=0.0.1"]
+- pyproject.toml MUST have: full=[...all optional dependencies...]
+- __init__.py MUST have (line ~84): config_package_lazy_install_enabled("xentity")
+- All imports MUST be standard (NO try/except ImportError)
+- NO HAS_* flags anywhere in the code
+- README MUST document all 3 installation modes
 
 MAIN CLASSES & INTERFACES:
 - IEntity (interface) - Core entity contract

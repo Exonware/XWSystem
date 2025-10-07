@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Advanced HTTP client with HTTP/2, streaming, pluggable transports, and modern features.
@@ -17,8 +17,8 @@ from urllib.parse import urljoin
 
 from .contracts import Transport
 
+# Import httpx - lazy installation system will handle it if missing
 import httpx
-HTTPX_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 from ..monitoring.error_recovery import retry_with_backoff
@@ -154,8 +154,7 @@ class AdvancedHttpClient:
             transport: Custom transport (for testing/mocking)
             default_headers: Default headers for all requests
         """
-        if not HTTPX_AVAILABLE:
-            raise HttpError("httpx is required for AdvancedHttpClient. Install with: pip install httpx[http2]")
+        # Lazy installation system will handle httpx if missing
             
         self.base_url = base_url
         self.config = config or AdvancedHttpConfig()

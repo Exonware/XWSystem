@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 System-wide monitoring and hardware introspection utilities.
@@ -15,8 +15,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Any, Tuple, Union
 from pathlib import Path
 
+# Import psutil - lazy installation system will handle it if missing
 import psutil
-PSUTIL_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 
@@ -135,15 +135,15 @@ class SystemMonitor:
     
     def __init__(self):
         """Initialize system monitor."""
-        if not PSUTIL_AVAILABLE:
-            logger.warning("psutil not available - system monitoring will be limited")
+        # Lazy installation system will handle psutil if missing
         
         self._boot_time = None
         logger.debug("System monitor initialized")
     
     def is_available(self) -> bool:
         """Check if full system monitoring is available."""
-        return PSUTIL_AVAILABLE
+        # Lazy installation system ensures psutil is always available
+        return True
     
     # =============================================================================
     # PROCESS MONITORING
@@ -159,8 +159,7 @@ class SystemMonitor:
         Returns:
             List of ProcessInfo objects
         """
-        if not PSUTIL_AVAILABLE:
-            raise RuntimeError("psutil is required for process monitoring")
+        # Lazy installation system will handle psutil if missing
         
         processes = []
         
@@ -204,8 +203,7 @@ class SystemMonitor:
         Returns:
             ProcessInfo object or None if process not found
         """
-        if not PSUTIL_AVAILABLE:
-            raise RuntimeError("psutil is required for process monitoring")
+        # Lazy installation system will handle psutil if missing
         
         try:
             proc = psutil.Process(pid)
@@ -321,62 +319,44 @@ class SystemMonitor:
             'processor': platform.processor(),
         }
         
-        if PSUTIL_AVAILABLE:
-            # Boot time
-            boot_time = psutil.boot_time()
-            
-            # CPU information
-            cpu_count_logical = psutil.cpu_count(logical=True)
-            cpu_count_physical = psutil.cpu_count(logical=False)
-            
-            try:
-                cpu_freq = psutil.cpu_freq()
-                cpu_freq_current = cpu_freq.current if cpu_freq else None
-                cpu_freq_min = cpu_freq.min if cpu_freq else None
-                cpu_freq_max = cpu_freq.max if cpu_freq else None
-            except (AttributeError, OSError):
-                cpu_freq_current = cpu_freq_min = cpu_freq_max = None
-            
-            # Memory information
-            memory = psutil.virtual_memory()
-            
-            # Swap information
-            swap = psutil.swap_memory()
-            
-            system_info.update({
-                'boot_time': boot_time,
-                'cpu_count_logical': cpu_count_logical,
-                'cpu_count_physical': cpu_count_physical or cpu_count_logical,
-                'cpu_freq_current': cpu_freq_current,
-                'cpu_freq_min': cpu_freq_min,
-                'cpu_freq_max': cpu_freq_max,
-                'memory_total': memory.total,
-                'memory_available': memory.available,
-                'memory_used': memory.used,
-                'memory_percent': memory.percent,
-                'swap_total': swap.total,
-                'swap_used': swap.used,
-                'swap_free': swap.free,
-                'swap_percent': swap.percent,
-            })
-        else:
-            # Limited information without psutil
-            system_info.update({
-                'boot_time': 0.0,
-                'cpu_count_logical': os.cpu_count() or 1,
-                'cpu_count_physical': os.cpu_count() or 1,
-                'cpu_freq_current': None,
-                'cpu_freq_min': None,
-                'cpu_freq_max': None,
-                'memory_total': 0,
-                'memory_available': 0,
-                'memory_used': 0,
-                'memory_percent': 0.0,
-                'swap_total': 0,
-                'swap_used': 0,
-                'swap_free': 0,
-                'swap_percent': 0.0,
-            })
+        # Lazy installation ensures psutil is available
+        # Boot time
+        boot_time = psutil.boot_time()
+        
+        # CPU information
+        cpu_count_logical = psutil.cpu_count(logical=True)
+        cpu_count_physical = psutil.cpu_count(logical=False)
+        
+        try:
+            cpu_freq = psutil.cpu_freq()
+            cpu_freq_current = cpu_freq.current if cpu_freq else None
+            cpu_freq_min = cpu_freq.min if cpu_freq else None
+            cpu_freq_max = cpu_freq.max if cpu_freq else None
+        except (AttributeError, OSError):
+            cpu_freq_current = cpu_freq_min = cpu_freq_max = None
+        
+        # Memory information
+        memory = psutil.virtual_memory()
+        
+        # Swap information
+        swap = psutil.swap_memory()
+        
+        system_info.update({
+            'boot_time': boot_time,
+            'cpu_count_logical': cpu_count_logical,
+            'cpu_count_physical': cpu_count_physical or cpu_count_logical,
+            'cpu_freq_current': cpu_freq_current,
+            'cpu_freq_min': cpu_freq_min,
+            'cpu_freq_max': cpu_freq_max,
+            'memory_total': memory.total,
+            'memory_available': memory.available,
+            'memory_used': memory.used,
+            'memory_percent': memory.percent,
+            'swap_total': swap.total,
+            'swap_used': swap.used,
+            'swap_free': swap.free,
+            'swap_percent': swap.percent,
+        })
         
         return SystemInfo(**system_info)
     
@@ -391,8 +371,7 @@ class SystemMonitor:
         Returns:
             CPU usage percentage (or list if per_cpu=True)
         """
-        if not PSUTIL_AVAILABLE:
-            return 0.0 if not per_cpu else [0.0]
+        # Lazy installation system will handle psutil if missing
         
         return psutil.cpu_percent(interval=interval, percpu=per_cpu)
     
@@ -403,8 +382,7 @@ class SystemMonitor:
         Returns:
             Dictionary with memory statistics
         """
-        if not PSUTIL_AVAILABLE:
-            return {'total': 0, 'available': 0, 'used': 0, 'percent': 0.0}
+        # Lazy installation system will handle psutil if missing
         
         memory = psutil.virtual_memory()
         return {
@@ -426,8 +404,7 @@ class SystemMonitor:
         Returns:
             List of DiskInfo objects
         """
-        if not PSUTIL_AVAILABLE:
-            return []
+        # Lazy installation system will handle psutil if missing
         
         disks = []
         
@@ -460,8 +437,7 @@ class SystemMonitor:
         Returns:
             List of NetworkInfo objects
         """
-        if not PSUTIL_AVAILABLE:
-            return []
+        # Lazy installation system will handle psutil if missing
         
         interfaces = []
         
@@ -505,8 +481,7 @@ class SystemMonitor:
         Returns:
             List of NetworkConnection objects
         """
-        if not PSUTIL_AVAILABLE:
-            return []
+        # Lazy installation system will handle psutil if missing
         
         connections = []
         
@@ -563,80 +538,80 @@ class SystemMonitor:
             'architecture': platform.architecture(),
         })
         
-        if PSUTIL_AVAILABLE:
-            # CPU information
-            hardware_info['cpu'] = {
-                'logical_cores': psutil.cpu_count(logical=True),
-                'physical_cores': psutil.cpu_count(logical=False),
-            }
-            
-            # Try to get CPU frequency
+        # Lazy installation ensures psutil is available
+        # CPU information
+        hardware_info['cpu'] = {
+            'logical_cores': psutil.cpu_count(logical=True),
+            'physical_cores': psutil.cpu_count(logical=False),
+        }
+        
+        # Try to get CPU frequency
+        try:
+            cpu_freq = psutil.cpu_freq()
+            if cpu_freq:
+                hardware_info['cpu'].update({
+                    'current_freq_mhz': cpu_freq.current,
+                    'min_freq_mhz': cpu_freq.min,
+                    'max_freq_mhz': cpu_freq.max,
+                })
+        except (AttributeError, OSError):
+            pass
+        
+        # Memory information
+        memory = psutil.virtual_memory()
+        hardware_info['memory'] = {
+            'total_bytes': memory.total,
+            'total_gb': round(memory.total / (1024**3), 2),
+        }
+        
+        # Disk information
+        disks = []
+        for partition in psutil.disk_partitions():
             try:
-                cpu_freq = psutil.cpu_freq()
-                if cpu_freq:
-                    hardware_info['cpu'].update({
-                        'current_freq_mhz': cpu_freq.current,
-                        'min_freq_mhz': cpu_freq.min,
-                        'max_freq_mhz': cpu_freq.max,
-                    })
-            except (AttributeError, OSError):
-                pass
-            
-            # Memory information
-            memory = psutil.virtual_memory()
-            hardware_info['memory'] = {
-                'total_bytes': memory.total,
-                'total_gb': round(memory.total / (1024**3), 2),
+                usage = psutil.disk_usage(partition.mountpoint)
+                disks.append({
+                    'device': partition.device,
+                    'mountpoint': partition.mountpoint,
+                    'fstype': partition.fstype,
+                    'total_bytes': usage.total,
+                    'total_gb': round(usage.total / (1024**3), 2),
+                })
+            except (PermissionError, OSError):
+                continue
+        
+        hardware_info['disks'] = disks
+        
+        # Network interfaces
+        interfaces = []
+        net_addrs = psutil.net_if_addrs()
+        net_stats = psutil.net_if_stats()
+        
+        for interface, addrs in net_addrs.items():
+            interface_info = {
+                'name': interface,
+                'addresses': [],
             }
             
-            # Disk information
-            disks = []
-            for partition in psutil.disk_partitions():
-                try:
-                    usage = psutil.disk_usage(partition.mountpoint)
-                    disks.append({
-                        'device': partition.device,
-                        'mountpoint': partition.mountpoint,
-                        'fstype': partition.fstype,
-                        'total_bytes': usage.total,
-                        'total_gb': round(usage.total / (1024**3), 2),
-                    })
-                except (PermissionError, OSError):
-                    continue
+            for addr in addrs:
+                interface_info['addresses'].append({
+                    'family': addr.family.name,
+                    'address': addr.address,
+                    'netmask': addr.netmask,
+                    'broadcast': addr.broadcast,
+                })
             
-            hardware_info['disks'] = disks
+            if interface in net_stats:
+                stats = net_stats[interface]
+                interface_info.update({
+                    'is_up': stats.isup,
+                    'duplex': stats.duplex.name if stats.duplex else 'unknown',
+                    'speed_mbps': stats.speed,
+                    'mtu': stats.mtu,
+                })
             
-            # Network interfaces
-            interfaces = []
-            net_addrs = psutil.net_if_addrs()
-            net_stats = psutil.net_if_stats()
-            
-            for interface, addrs in net_addrs.items():
-                interface_info = {
-                    'name': interface,
-                    'addresses': [],
-                }
-                
-                for addr in addrs:
-                    interface_info['addresses'].append({
-                        'family': addr.family.name,
-                        'address': addr.address,
-                        'netmask': addr.netmask,
-                        'broadcast': addr.broadcast,
-                    })
-                
-                if interface in net_stats:
-                    stats = net_stats[interface]
-                    interface_info.update({
-                        'is_up': stats.isup,
-                        'duplex': stats.duplex.name if stats.duplex else 'unknown',
-                        'speed_mbps': stats.speed,
-                        'mtu': stats.mtu,
-                    })
-                
-                interfaces.append(interface_info)
-            
-            hardware_info['network_interfaces'] = interfaces
+            interfaces.append(interface_info)
+        
+        hardware_info['network_interfaces'] = interfaces
         
         return hardware_info
     
@@ -647,10 +622,8 @@ class SystemMonitor:
         Returns:
             Boot time timestamp
         """
-        if PSUTIL_AVAILABLE:
-            return psutil.boot_time()
-        else:
-            return 0.0
+        # Lazy installation ensures psutil is available
+        return psutil.boot_time()
     
     def get_uptime(self) -> float:
         """
@@ -671,13 +644,12 @@ class SystemMonitor:
     
     def get_current_user(self) -> str:
         """Get current username."""
-        if PSUTIL_AVAILABLE:
-            try:
-                return psutil.Process().username()
-            except (psutil.AccessDenied, AttributeError):
-                pass
-        
-        return os.getenv('USER') or os.getenv('USERNAME') or 'unknown'
+        # Lazy installation ensures psutil is available
+        try:
+            return psutil.Process().username()
+        except (psutil.AccessDenied, AttributeError):
+            # Fallback to environment variables
+            return os.getenv('USER') or os.getenv('USERNAME') or 'unknown'
     
     def get_environment_variables(self) -> Dict[str, str]:
         """Get all environment variables."""
@@ -727,4 +699,5 @@ def get_hardware_info() -> Dict[str, Any]:
 
 def is_monitoring_available() -> bool:
     """Check if full system monitoring is available."""
-    return _system_monitor.is_available()
+    # Lazy installation system ensures psutil is always available
+    return True

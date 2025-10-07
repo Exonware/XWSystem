@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 05, 2025
 
 Flyweight Pattern Implementation for Serializers
@@ -343,14 +343,8 @@ def create_serializer(format_name: str, **config: Any) -> ISerialization:
         FormDataSerializer, MultipartSerializer
     )
     
-    # Enterprise formats (explicit imports - dependencies managed via pyproject.toml)
-    # These imports will fail if optional dependencies are not installed
-    # This is the correct approach per DEV_GUIDELINES.md - no try/except for imports
+    # Enterprise formats - lazy installation system handles missing dependencies
     optional_serializers = {}
-    
-    # Import enterprise serializers explicitly
-    # If these fail, it means the optional dependencies are not installed
-    # Users should install with: pip install exonware-xsystem[enterprise]
     from . import (
         AvroSerializer, ProtobufSerializer, ThriftSerializer,
         ParquetSerializer, OrcSerializer, CapnProtoSerializer, FlatBuffersSerializer
@@ -397,10 +391,8 @@ def create_serializer(format_name: str, **config: Any) -> ISerialization:
         missing_enterprise = [fmt for fmt in enterprise_formats if fmt not in available_formats and format_name.lower() == fmt]
         
         if missing_enterprise:
-            raise ValueError(
-                f"Format '{format_name}' requires optional dependencies. "
-                f"Install with: pip install exonware-xsystem[enterprise] or exonware-xsystem[all]"
-            )
+            # Lazy installation system will handle missing dependencies
+            raise ValueError(f"Unsupported format: '{format_name}'")
         else:
             raise ValueError(
                 f"Unsupported format: {format_name}. "

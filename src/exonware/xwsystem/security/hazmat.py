@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Hazardous Materials (Hazmat) Layer - Low-level cryptographic primitives.
@@ -35,7 +35,6 @@ from cryptography.hazmat.primitives.kdf.x963kdf import X963KDF
 from cryptography.hazmat.backends import default_backend
 from cryptography import x509
 from cryptography.x509.oid import NameOID, ExtensionOID
-CRYPTOGRAPHY_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 
@@ -49,8 +48,8 @@ class HazmatError(Exception):
 
 def _ensure_cryptography():
     """Ensure cryptography library is available."""
-    if not CRYPTOGRAPHY_AVAILABLE:
-        raise HazmatError("cryptography library is required. Install with: pip install cryptography")
+    # Lazy installation system will handle cryptography if missing
+    pass
 
 
 # =============================================================================
@@ -72,7 +71,6 @@ class AES_GCM:
         Args:
             key: 128, 192, or 256-bit key
         """
-        _ensure_cryptography()
         if len(key) not in (16, 24, 32):
             raise HazmatError("AES-GCM key must be 128, 192, or 256 bits")
         
@@ -157,7 +155,6 @@ class ChaCha20Poly1305_Cipher:
         Args:
             key: 256-bit key (32 bytes)
         """
-        _ensure_cryptography()
         if len(key) != 32:
             raise HazmatError("ChaCha20-Poly1305 key must be exactly 32 bytes")
         
@@ -715,4 +712,5 @@ def secure_random(length: int) -> bytes:
 
 def is_cryptography_available() -> bool:
     """Check if cryptography library is available."""
-    return CRYPTOGRAPHY_AVAILABLE
+    # Lazy installation system ensures cryptography is always available
+    return True

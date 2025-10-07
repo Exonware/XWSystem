@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 XSystem Serialization Package
@@ -107,24 +107,10 @@ from .orc import OrcSerializer, OrcError
 from .capnproto import CapnProtoSerializer, CapnProtoError
 from .flatbuffers import FlatBuffersSerializer, FlatBuffersError
 
-# Key-value stores (3 additional formats)
-try:
-    from .leveldb import LevelDbSerializer, LevelDbError
-except ImportError:
-    LevelDbSerializer = None
-    LevelDbError = None
-
-try:
-    from .lmdb import LmdbSerializer, LmdbError
-except ImportError:
-    LmdbSerializer = None
-    LmdbError = None
-
-try:
-    from .zarr import ZarrSerializer, ZarrError
-except ImportError:
-    ZarrSerializer = None
-    ZarrError = None
+# Key-value stores (3 additional formats) - lazy installation handles missing deps
+from .leveldb import LevelDbSerializer, LevelDbError
+from .lmdb import LmdbSerializer, LmdbError
+from .zarr import ZarrSerializer, ZarrError
 
 # Scientific & analytics (3 additional formats)
 from .hdf5 import Hdf5Serializer, Hdf5Error

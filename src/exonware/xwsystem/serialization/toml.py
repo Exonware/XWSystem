@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced TOML serialization with security, validation and performance optimizations.
@@ -22,37 +22,17 @@ from ..config.logging_setup import get_logger
 
 logger = get_logger("xwsystem.serialization.toml")
 
-# Try to import performance libraries
-try:
-    import rtoml
-    HAS_RTOML = True
-except ImportError:
-    HAS_RTOML = False
-
-try:
-    import tomli
-    HAS_TOMLI = True
-except ImportError:
-    HAS_TOMLI = False
-
-try:
-    import tomli_w
-    HAS_TOMLI_W = True
-except ImportError:
-    HAS_TOMLI_W = False
+# Import TOML libraries - lazy installation system will handle missing dependencies
+import rtoml
+import tomli
+import tomli_w
+import xxhash
 
 # Built-in tomllib (Python 3.11+)
-TOML_READ_AVAILABLE = sys.version_info >= (3, 11)
-if TOML_READ_AVAILABLE:
+if sys.version_info >= (3, 11):
     import tomllib
 else:
     tomllib = None
-
-try:
-    import xxhash
-    HAS_XXHASH = True
-except ImportError:
-    HAS_XXHASH = False
 
 
 class TomlError(SerializationError):
@@ -105,7 +85,7 @@ class TomlSerializer(ASerialization):
         self.pretty = pretty
         self.sort_keys = sort_keys or canonical
         self.canonical = canonical
-        self.use_rtoml = use_rtoml and HAS_RTOML
+        self.use_rtoml = use_rtoml  # Lazy install handles rtoml availability
         self.type_adapters: Dict[type, tuple[Callable, Callable]] = {}
         self.target_version = "1.0"
         
@@ -178,19 +158,13 @@ class TomlSerializer(ASerialization):
             else:
                 raise FormatDetectionError("Unsupported source type")
             
-            # Try to parse as TOML
+            # Try to parse as TOML - lazy install handles library availability
             if self.use_rtoml:
                 rtoml.loads(content)
-            elif TOML_READ_AVAILABLE:
+            elif sys.version_info >= (3, 11):
                 tomllib.loads(content.encode('utf-8'))
-            elif HAS_TOMLI:
-                tomli.loads(content)
             else:
-                # Basic TOML detection
-                if '=' in content and ('[' in content or content.strip().startswith('#')):
-                    return SerializationFormat.TOML
-                else:
-                    raise FormatDetectionError("Not a valid TOML format")
+                tomli.loads(content)
             
             return SerializationFormat.TOML
         except Exception as e:
@@ -206,12 +180,11 @@ class TomlSerializer(ASerialization):
             if self.validate_input and self._data_validator:
                 self._data_validator.validate_data_structure(data)
             
+            # Lazy install handles library availability
             if self.use_rtoml:
                 return rtoml.dumps(data, pretty=self.pretty)
-            elif HAS_TOMLI_W:
-                return tomli_w.dumps(data, pretty=self.pretty, sort_keys=self.sort_keys)
             else:
-                raise TomlError("No TOML writing library available")
+                return tomli_w.dumps(data, sort_keys=self.sort_keys)
         except Exception as e:
             raise TomlError(f"TOML serialization failed: {e}", e)
 
@@ -229,14 +202,13 @@ class TomlSerializer(ASerialization):
     def loads_text(self, data: str) -> Any:
         """Deserialize from text string."""
         try:
+            # Lazy install handles library availability
             if self.use_rtoml:
                 return rtoml.loads(data)
-            elif TOML_READ_AVAILABLE:
+            elif sys.version_info >= (3, 11):
                 return tomllib.loads(data.encode('utf-8'))
-            elif HAS_TOMLI:
-                return tomli.loads(data)
             else:
-                raise TomlError("No TOML reading library available")
+                return tomli.loads(data)
         except Exception as e:
             raise TomlError(f"TOML deserialization failed: {e}", e)
 
@@ -471,10 +443,7 @@ class TomlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(canonical).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(canonical).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(canonical).hexdigest()
             else:
                 return hashlib.new(algorithm, canonical).hexdigest()
         except Exception as e:
@@ -494,10 +463,7 @@ class TomlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(serialized).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(serialized).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(serialized).hexdigest()
             else:
                 return hashlib.new(algorithm, serialized).hexdigest()
         except Exception as e:

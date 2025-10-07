@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 XWSerializer - Unified intelligent serializer with I/O integration and auto-serialization.
@@ -141,7 +141,8 @@ class XWSerializer(ASerialization):
                               fromlist=[class_name])
             return getattr(module, class_name)
         except (ImportError, AttributeError) as e:
-            raise ImportError(f"Serializer for {format_name} not available: {e}")
+            # Lazy installation system will handle missing dependencies
+            raise ImportError(f"Serializer for {format_name} failed to load: {e}")
     
     def _transform_to_specialized(
         self, 

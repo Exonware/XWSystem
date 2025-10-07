@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Asynchronous I/O operations for non-blocking file handling.
@@ -17,9 +17,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, AsyncContextManager, BinaryIO, List, Optional, TextIO, Union
 
+# Import aiofiles - lazy installation system will handle it if missing
 import aiofiles
 import aiofiles.os
-AIOFILES_AVAILABLE = True
 
 from ..config.logging_setup import get_logger
 from .atomic_file import FileOperationError
@@ -87,8 +87,7 @@ class AsyncAtomicFileWriter:
         Returns:
             Async file handle for writing
         """
-        if not AIOFILES_AVAILABLE:
-            raise FileOperationError("aiofiles is required for async I/O operations. Install with: pip install aiofiles")
+        # Lazy installation system will handle aiofiles if missing
             
         if self._started:
             raise FileOperationError("Async atomic write operation already started")

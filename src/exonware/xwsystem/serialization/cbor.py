@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 CBOR (Concise Binary Object Representation) Serializer Implementation
@@ -19,8 +19,8 @@ from pathlib import Path
 from .contracts import ISerialization
 from .base import ASerialization
 
+# Import cbor2 - lazy installation system will handle it if missing
 import cbor2
-_CBOR_AVAILABLE = True
 
 
 class CborSerializer(ASerialization):
@@ -60,11 +60,7 @@ class CborSerializer(ASerialization):
             max_depth: Maximum nesting depth for security
             max_size_mb: Maximum data size in MB
         """
-        if not _CBOR_AVAILABLE:
-            raise ImportError(
-                "CBOR serialization requires the 'cbor2' package. "
-                "Install it with: pip install cbor2"
-            )
+        # Lazy installation system will handle cbor2 if missing
         
         super().__init__(
             validate_input=validate_input,
@@ -175,8 +171,7 @@ class CborSerializer(ASerialization):
         Returns:
             CBOR bytes
         """
-        if not _CBOR_AVAILABLE:
-            raise ImportError("CBOR streaming requires the 'cbor2' package")
+        # Lazy install handles cbor2
         
         buffer = io.BytesIO()
         
@@ -203,8 +198,7 @@ class CborSerializer(ASerialization):
         Yields:
             Decoded objects
         """
-        if not _CBOR_AVAILABLE:
-            raise ImportError("CBOR streaming requires the 'cbor2' package")
+        # Lazy install handles cbor2
         
         fp = io.BytesIO(data)
         decoder = cbor2.CBORDecoder(fp)

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced BSON serialization with security, validation and performance optimizations.
@@ -14,9 +14,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, List, Optional, Union
 
+# Import bson - lazy installation system will handle it if missing
 import bson
 from bson import ObjectId, Binary
-BSON_AVAILABLE = True
 
 from .base import ASerialization
 from .errors import SerializationError
@@ -65,8 +65,7 @@ class BsonSerializer(ASerialization):
             validate_paths: Whether to validate file paths for security
             base_path: Base path for path validation
         """
-        if not BSON_AVAILABLE:
-            raise BsonError("bson is required for BSON serialization. Install with: pip install pymongo")
+        # Lazy installation system will handle bson if missing
             
         # Initialize base class with XSystem integration
         super().__init__(

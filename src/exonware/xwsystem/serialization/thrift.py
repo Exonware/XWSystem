@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced Apache Thrift serialization with security, validation and performance optimizations.
@@ -20,9 +20,6 @@ from thrift.protocol.TBinaryProtocol import TProtocolFactory
 
 # Use TException as base class since TBase doesn't exist in this Thrift version
 TBase = TException
-
-# Check if thrift is available
-_thrift_available = True
 
 from .base import ASerialization
 from .errors import SerializationError
@@ -86,12 +83,6 @@ class ThriftSerializer(ASerialization):
             validate_paths=validate_paths,
             base_path=base_path,
         )
-        if not _thrift_available:
-            raise ThriftError(
-                "Thrift serialization requires the 'thrift' library.\n"
-                "Install with: pip install thrift\n"
-                "Note: This is optional - you have 23 other serialization formats available!"
-            )
             
         self.thrift_class = thrift_class
         self.protocol = protocol

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.363
+Version: 0.0.1.364
 Generation Date: September 04, 2025
 
 Enhanced XML serialization with security, validation and performance optimizations.
@@ -25,44 +25,15 @@ from ..config.logging_setup import get_logger
 
 logger = get_logger("xwsystem.serialization.xml")
 
-# Try to import performance libraries
-try:
-    from lxml import etree as lxml_etree
-    from lxml.etree import XPath
-    HAS_LXML = True
-except ImportError:
-    HAS_LXML = False
-
-try:
-    import defusedxml
-    import defusedxml.ElementTree as defused_ET
-    HAS_DEFUSEDXML = True
-except ImportError:
-    HAS_DEFUSEDXML = False
-
-try:
-    import xmltodict
-    HAS_XMLTODICT = True
-except ImportError:
-    HAS_XMLTODICT = False
-
-try:
-    import xmlschema
-    HAS_XMLSCHEMA = True
-except ImportError:
-    HAS_XMLSCHEMA = False
-
-try:
-    import dicttoxml
-    HAS_DICTTOXML = True
-except ImportError:
-    HAS_DICTTOXML = False
-
-try:
-    import xxhash
-    HAS_XXHASH = True
-except ImportError:
-    HAS_XXHASH = False
+# Import XML libraries - lazy installation system will handle missing dependencies
+from lxml import etree as lxml_etree
+from lxml.etree import XPath
+import defusedxml
+import defusedxml.ElementTree as defused_ET
+import xmltodict
+import xmlschema
+import dicttoxml
+import xxhash
 
 
 class XmlSerializer(ASerialization):
@@ -125,7 +96,7 @@ class XmlSerializer(ASerialization):
         self.encoding = encoding
         self.xml_declaration = xml_declaration
         self.canonical = canonical
-        self.use_lxml = use_lxml and HAS_LXML
+        self.use_lxml = use_lxml  # Lazy install handles lxml availability
         self.type_adapters: Dict[type, tuple[Callable, Callable]] = {}
         self.target_version = "1.0"
         
@@ -165,11 +136,9 @@ class XmlSerializer(ASerialization):
         """Get set of capabilities supported by this format."""
         caps = {SerializationCapability.STREAMING}
         
-        if HAS_LXML:
-            caps.add(SerializationCapability.PARTIAL_ACCESS)
-        
-        if HAS_XMLSCHEMA:
-            caps.add(SerializationCapability.TYPED_DECODE)
+        # Lazy install handles dependencies automatically
+        caps.add(SerializationCapability.PARTIAL_ACCESS)
+        caps.add(SerializationCapability.TYPED_DECODE)
         
         if self.canonical:
             caps.add(SerializationCapability.CANONICAL)
@@ -295,8 +264,7 @@ class XmlSerializer(ASerialization):
 
     def get_at(self, data: Union[str, bytes], path: str) -> Any:
         """Get value at specific path using XPath."""
-        if not HAS_LXML:
-            raise SerializationError("XPath support requires 'lxml' library")
+        # Lazy install handles lxml availability
         
         try:
             if isinstance(data, bytes):
@@ -320,8 +288,7 @@ class XmlSerializer(ASerialization):
 
     def set_at(self, data: Union[str, bytes], path: str, value: Any) -> Union[str, bytes]:
         """Set value at specific path using XPath."""
-        if not HAS_LXML:
-            raise SerializationError("XPath support requires 'lxml' library")
+        # Lazy install handles lxml availability
         
         try:
             if isinstance(data, bytes):
@@ -349,8 +316,7 @@ class XmlSerializer(ASerialization):
 
     def iter_path(self, data: Union[str, bytes], path: str) -> Iterator[Any]:
         """Iterate over values matching path expression."""
-        if not HAS_LXML:
-            raise SerializationError("Path iteration requires 'lxml' library")
+        # Lazy install handles lxml availability
         
         try:
             if isinstance(data, bytes):
@@ -414,7 +380,8 @@ class XmlSerializer(ASerialization):
             if isinstance(data, bytes):
                 data = data.decode(self.encoding)
             
-            if HAS_XMLSCHEMA and dialect == "xsd":
+            # Lazy install handles xmlschema availability
+            if dialect == "xsd":
                 # XSD validation
                 if isinstance(schema, str):
                     schema_obj = xmlschema.XMLSchema(schema)
@@ -477,10 +444,7 @@ class XmlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(canonical).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(canonical).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(canonical).hexdigest()
             else:
                 return hashlib.new(algorithm, canonical).hexdigest()
         except Exception as e:
@@ -500,10 +464,7 @@ class XmlSerializer(ASerialization):
             if algorithm == "sha256":
                 return hashlib.sha256(serialized).hexdigest()
             elif algorithm == "xxh3":
-                if HAS_XXHASH:
-                    return xxhash.xxh3_64(serialized).hexdigest()
-                else:
-                    raise SerializationError("xxh3 requires 'xxhash' library")
+                return xxhash.xxh3_64(serialized).hexdigest()
             else:
                 return hashlib.new(algorithm, serialized).hexdigest()
         except Exception as e:
