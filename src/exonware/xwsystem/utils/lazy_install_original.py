@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.365
+Version: 0.0.1.367
 Generation Date: 27-Jan-2025
 
 Lazy Installation System for xwsystem

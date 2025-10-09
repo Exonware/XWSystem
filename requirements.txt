@@ -2,7 +2,7 @@
 # Company: eXonware.com
 # Author: Eng. Muhammad AlShehri
 # Email: connect@exonware.com
-# Version: 0.0.1.365
+# Version: 0.0.1.367
 # Generation Date: 06-Sep-2025
 #
 # This file contains all dependencies needed for xSystem's 30 serialization formats
@@ -219,7 +219,7 @@ exonware-xentity>=0.0.1    # Entity management and relationship modeling library
 # Python Version Compatibility:
 # - Minimum: Python 3.8 (for maximum compatibility with enterprise formats)
 # - Recommended: Python 3.8+ for best compatibility
-# - Tested: Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13
+# - Tested: Python 3.8, 3.9, 3.10, 3.11, 3.12
 #
 # Platform Compatibility:
 # - Windows: Full support (all formats)
