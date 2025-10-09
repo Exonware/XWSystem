@@ -1,4 +1,4 @@
-name: PyPI Publish - exonware-xwsystem (supports both import paths)
+name: Dual PyPI Publish - exonware-xwsystem & xwsystem
 
 on:
   push:
@@ -28,6 +28,14 @@ jobs:
         echo "Building exonware-xwsystem package..."
         python -m build
         
+    - name: Build xwsystem wrapper package
+      run: |
+        echo "Building xwsystem wrapper package..."
+        cp pyproject.toml pyproject.backup.toml
+        cp pyproject.xwsystem.toml pyproject.toml
+        python -m build --wheel
+        mv pyproject.backup.toml pyproject.toml
+    
     - name: List built packages
       run: |
         echo "Built packages:"
@@ -38,22 +46,31 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
-        echo "Publishing exonware-xwsystem to PyPI (includes both import paths)..."
+        echo "Publishing exonware-xwsystem to PyPI..."
         ls -la dist/
         twine upload dist/exonware_xwsystem-*.whl dist/exonware_xwsystem-*.tar.gz
-        echo "✅ Both 'import xwsystem' and 'import exonware.xwsystem' now work!"
+    
+    - name: Publish xwsystem wrapper to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        echo "Publishing xwsystem wrapper to PyPI..."
+        twine upload dist/xwsystem-*.whl
         
     - name: Success notification
       run: |
-        echo "✅ Successfully published exonware-xwsystem v${{ github.ref_name }}"
+        echo "✅ Successfully published both packages:"
+        echo "   📦 exonware-xwsystem v${{ github.ref_name }} (full package)"
+        echo "   📦 xwsystem v${{ github.ref_name }} (wrapper)"
         echo ""
-        echo "PyPI URL:"
+        echo "PyPI URLs:"
         echo "   https://pypi.org/project/exonware-xwsystem/"
+        echo "   https://pypi.org/project/xwsystem/"
         echo ""
         echo "Install with either:"
-        echo "   pip install exonware-xwsystem"
-        echo "   pip install exonware-xwsystem[lazy]  # Minimal dependencies"
-        echo "   pip install exonware-xwsystem[full]  # All features"
+        echo "   pip install xwsystem[lazy]  # Recommended (wrapper)"
+        echo "   pip install exonware-xwsystem[lazy]  # Direct"
         echo ""
         echo "Both import paths work:"
         echo "   import xwsystem"

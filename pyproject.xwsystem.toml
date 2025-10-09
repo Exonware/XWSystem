@@ -133,4 +133,15 @@ markers = [
 [tool.hatch.version]
 path = "src/exonware/xwsystem/version.py"
 
-[tool.hatch.build]
+[tool.hatch.build.targets.wheel]
+only-include = [
+    "README.md",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/README.md",
+    "/.github",
+]
