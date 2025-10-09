@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.367
+Version: 0.0.1.368
 Generation Date: January 02, 2025
 
 Zarr serializer for chunked compressed arrays.
