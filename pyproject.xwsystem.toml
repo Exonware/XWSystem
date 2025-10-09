@@ -53,7 +53,7 @@ classifiers = [
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
-    "exonware-xwsystem==0.0.1.371",
+    "exonware-xwsystem==0.0.1.372",
 ]
 authors = [
     { name = "Eng. Muhammad AlShehri", email = "connect@exonware.com" },
@@ -64,10 +64,10 @@ text = "MIT"
 
 [project.optional-dependencies]
 lazy = [
-    "exonware-xwsystem[lazy]==0.0.1.371",
+    "exonware-xwsystem[lazy]==0.0.1.372",
 ]
 full = [
-    "exonware-xwsystem[full]==0.0.1.371",
+    "exonware-xwsystem[full]==0.0.1.372",
 ]
 
 [project.urls]
@@ -134,6 +134,7 @@ markers = [
 path = "src/exonware/xwsystem/version.py"
 
 [tool.hatch.build.targets.wheel]
+packages = []
 py-modules = [
     "src/xwsystem",
 ]
