@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.380
+Version: 0.0.1.381
 Generation Date: September 05, 2025
 
 Distributed Tracing Integration for Enterprise Observability
