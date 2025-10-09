@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.370
+Version: 0.0.1.371
 Generation Date: September 05, 2025
 
 Enhanced Cap'n Proto serialization with security, validation and performance optimizations.
