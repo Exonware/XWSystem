@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.374
+Version: 0.0.1.375
 Generation Date: October 07, 2025
 
 Lazy Import Hook System

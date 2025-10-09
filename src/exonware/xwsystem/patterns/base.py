@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.374
+Version: 0.0.1.375
 Generation Date: September 04, 2025
 
 Abstract base classes for XSystem patterns.

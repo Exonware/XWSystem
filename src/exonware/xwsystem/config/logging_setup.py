@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.374
+Version: 0.0.1.375
 Generation Date: September 05, 2025
 
 Logging configuration setup for XSystem.
