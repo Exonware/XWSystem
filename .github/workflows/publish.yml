@@ -33,7 +33,7 @@ jobs:
         echo "Building xwsystem package..."
         cp pyproject.toml pyproject.backup.toml
         cp pyproject.xwsystem.toml pyproject.toml
-        python -m build
+        python -m build --wheel
         mv pyproject.backup.toml pyproject.toml
     
     - name: List built packages
@@ -56,7 +56,7 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: |
         echo "Publishing xwsystem to PyPI..."
-        twine upload dist/xwsystem-*.whl dist/xwsystem-*.tar.gz
+        twine upload dist/xwsystem-*.whl
         
     - name: Success notification
       run: |
