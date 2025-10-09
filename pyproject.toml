@@ -134,7 +134,7 @@ path = "src/exonware/xwsystem/version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = [ "src/exonware",]
-# Note: py-modules removed - xwsystem.py only included in the xwsystem wrapper package
+py-modules = [ "src/xwsystem",]
 
 [tool.hatch.build.targets.sdist]
 include = [ "/src", "/tests", "/README.md", "/.github",]
