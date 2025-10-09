@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.368
+Version: 0.0.1.369
 Generation Date: January 02, 2025
 
 GraphDB serializer for Neo4j/Dgraph graph structure optimization.
