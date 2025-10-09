@@ -134,9 +134,8 @@ markers = [
 path = "src/exonware/xwsystem/version.py"
 
 [tool.hatch.build.targets.wheel]
-packages = []
-py-modules = [
-    "src/xwsystem",
+only-include = [
+    "src/xwsystem.py",
 ]
 
 [tool.hatch.build.targets.sdist]
