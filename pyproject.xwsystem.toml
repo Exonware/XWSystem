@@ -136,6 +136,7 @@ path = "src/exonware/xwsystem/version.py"
 [tool.hatch.build.targets.wheel]
 only-include = [
     "README.md",
+    "src/xwsystem_wrapper.py",
 ]
 
 [tool.hatch.build.targets.sdist]
