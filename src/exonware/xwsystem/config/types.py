@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.378
+Version: 0.0.1.379
 Generation Date: 07-Sep-2025
 
 Config types and enums for XWSystem.
