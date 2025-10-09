@@ -53,7 +53,7 @@ classifiers = [
     "Topic :: System :: Monitoring",
 ]
 dependencies = [
-    "exonware-xwsystem==0.0.1.373",
+    "exonware-xwsystem",
 ]
 authors = [
     { name = "Eng. Muhammad AlShehri", email = "connect@exonware.com" },
@@ -64,10 +64,10 @@ text = "MIT"
 
 [project.optional-dependencies]
 lazy = [
-    "exonware-xwsystem[lazy]==0.0.1.373",
+    "exonware-xwsystem[lazy]",
 ]
 full = [
-    "exonware-xwsystem[full]==0.0.1.373",
+    "exonware-xwsystem[full]",
 ]
 
 [project.urls]
