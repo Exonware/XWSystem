@@ -7,7 +7,7 @@ Production-grade CLI utilities for XSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.372
+Version: 0.0.1.373
 Generated: 2025-01-27
 """
 

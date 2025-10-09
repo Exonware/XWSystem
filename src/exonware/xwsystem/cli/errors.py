@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.372
+Version: 0.0.1.373
 Generation Date: September 04, 2025
 
 CLI module errors - exception classes for command-line interface functionality.
