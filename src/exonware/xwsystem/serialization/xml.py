@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.381
+Version: 0.0.1.382
 Generation Date: September 04, 2025
 
 Enhanced XML serialization with security, validation and performance optimizations.
