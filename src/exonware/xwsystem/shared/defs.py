@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-#exonware/xwsystem/shared/types.py
+#exonware/xwsystem/shared/defs.py
 """
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: 10-Sep-2025
 
 Shared types and enums for XWSystem modules.

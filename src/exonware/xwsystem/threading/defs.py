@@ -4,14 +4,14 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: 07-Sep-2025
 
 Threading types and enums for XWSystem.
 """
 
 from enum import Enum
-from ..shared.types import LockType
+from ..shared.defs import LockType
 
 
 # ============================================================================

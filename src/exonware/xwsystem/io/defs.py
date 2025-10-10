@@ -4,14 +4,14 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: 07-Sep-2025
 
 IO types and enums for XWSystem.
 """
 
 from enum import Enum
-from ..shared.types import PathType, LockType, OperationResult
+from ..shared.defs import PathType, LockType, OperationResult
 
 
 # ============================================================================
