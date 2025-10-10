@@ -19,8 +19,7 @@ from pathlib import Path
 # Add the src directory to the path
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from exonware.xwsystem.utils.lazy_discovery import get_lazy_discovery
-from exonware.xwsystem.utils.lazy_install import DependencyMapper
+from exonware.xwsystem.utils.lazy_package import get_lazy_discovery, DependencyMapper
 
 
 def main():

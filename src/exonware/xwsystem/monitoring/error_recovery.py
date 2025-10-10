@@ -10,7 +10,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Type, Union
-from .types import CircuitState
+from .defs import CircuitState
 
 from ..config.logging_setup import get_logger
 

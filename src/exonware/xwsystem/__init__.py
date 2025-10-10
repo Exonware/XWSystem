@@ -3,8 +3,8 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
-Generation Date: September 10, 2025
+Version: 0.0.1.383
+Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
 
@@ -57,12 +57,32 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Any
 
-# Lazy mode utilities
-from .utils.lazy_loader import (
+# =============================================================================
+# LAZY LOADING SYSTEM - Unified Package
+# =============================================================================
+# All lazy loading functionality consolidated into lazy_package following DEV_GUIDELINES.md
+# Implements per-package lazy loading with automatic installation of missing dependencies.
+
+from .utils.lazy_package import (
+    # Core classes
     LazyLoader,
     LazyModuleRegistry,
     LazyModeFacade,
     LazyPerformanceMonitor,
+    LazyInstaller,
+    LazyInstallerRegistry,
+    LazyInstallMode,
+    LazyInstallPolicy,
+    DependencyMapper,
+    LazyDiscovery,
+    LazyInstallConfig,
+    DeferredImportError,
+    LazyMetaPathFinder,
+    
+    # Dataclasses
+    DependencyInfo,
+    
+    # Lazy mode functions
     register_lazy_module,
     get_lazy_module,
     get_loading_stats,
@@ -73,23 +93,9 @@ from .utils.lazy_loader import (
     get_lazy_mode_stats,
     configure_lazy_mode,
     preload_modules,
-    optimize_lazy_mode
-)
-
-# =============================================================================
-# LAZY INSTALLATION - Simple One-Line Configuration
-# =============================================================================
-# Auto-detects if user installed with [lazy] extra: pip install xwsystem[lazy]
-from .utils.lazy_discovery import config_package_lazy_install_enabled
-config_package_lazy_install_enabled("xwsystem")  # Auto-detect from installation
-
-# Lazy install utilities
-from .utils.lazy_install import (
-    LazyInstaller,
-    LazyInstallerRegistry,
-    LazyInstallMode,
-    LazyInstallPolicy,
-    DependencyMapper,
+    optimize_lazy_mode,
+    
+    # Install functions
     enable_lazy_install,
     disable_lazy_install,
     is_lazy_install_enabled,
@@ -101,6 +107,18 @@ from .utils.lazy_install import (
     get_all_lazy_install_stats,
     lazy_import_with_install,
     xwimport,
+    
+    # Discovery functions
+    discover_dependencies,
+    get_lazy_discovery,
+    export_dependency_mappings,
+    config_package_lazy_install_enabled,
+    
+    # Hook functions
+    install_import_hook,
+    uninstall_import_hook,
+    is_import_hook_installed,
+    
     # Security & Policy APIs
     set_package_allow_list,
     set_package_deny_list,
@@ -111,27 +129,20 @@ from .utils.lazy_install import (
     add_package_trusted_host,
     set_package_lockfile,
     generate_package_sbom,
-    check_externally_managed_environment
+    check_externally_managed_environment,
 )
 
-# Lazy discovery utilities
-from .utils.lazy_discovery import (
-    LazyDiscovery,
-    LazyInstallConfig,
-    DependencyInfo,
-    discover_dependencies,
-    get_lazy_discovery,
-    export_dependency_mappings,
-    config_package_lazy_install_enabled
-)
+# =============================================================================
+# LAZY INSTALLATION - Simple One-Line Configuration
+# =============================================================================
+# Auto-detects if user installed with [lazy] extra: pip install xwsystem[lazy]
+config_package_lazy_install_enabled("xwsystem", install_hook=False)  # Configure lazy mode
 
-# Lazy import hook utilities (performance optimized)
-from .utils.lazy_import_hook import (
-    LazyMetaPathFinder,
-    install_import_hook,
-    uninstall_import_hook,
-    is_import_hook_installed
-)
+# =============================================================================
+# TWO-STAGE LAZY LOADING - Install import hook BEFORE importing serialization
+# =============================================================================
+# Install the hook NOW, before serialization imports, so it can intercept them
+install_import_hook("xwsystem")  # Install hook to intercept serialization module imports
 
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging
@@ -976,6 +987,7 @@ __all__ = [
     "config_package_lazy_install_enabled",
     
     # Lazy Import Hook - Performance optimized automatic import interception
+    "DeferredImportError",
     "LazyMetaPathFinder",
     "install_import_hook",
     "uninstall_import_hook",

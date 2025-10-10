@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Security module base classes - abstract classes for security functionality.

@@ -7,7 +7,7 @@ Production-grade table formatting for XWSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 05, 2025
 """
 
@@ -17,7 +17,7 @@ from dataclasses import dataclass
 # Import colors from our existing color module
 # Explicit import - colors module is part of the same package
 from .colors import colorize, Colors, Style
-from .types import Alignment, BorderStyle
+from .defs import Alignment, BorderStyle
 
 
 @dataclass

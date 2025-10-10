@@ -11,7 +11,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Union
-from .types import AdvancedPerformanceMode
+from .defs import AdvancedPerformanceMode
 
 import psutil
 

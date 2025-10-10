@@ -69,7 +69,7 @@ def demo_lazy_import_with_install():
     print("🚀 DEMO 2: Lazy Import with Install")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_install import lazy_import_with_install
+    from exonware.xwsystem.utils.lazy_package import lazy_import_with_install
     
     # Test with a common package that might not be installed
     test_modules = [
@@ -99,7 +99,7 @@ def demo_lazy_install_stats():
     print("🚀 DEMO 3: Lazy Install Statistics")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_install import get_lazy_install_stats
+    from exonware.xwsystem.utils.lazy_package import get_lazy_install_stats
     
     stats = get_lazy_install_stats()
     print(f"📊 Lazy Install Statistics:")
@@ -143,7 +143,7 @@ def demo_real_world_usage():
     
     # Simulate what happens in a serialization module
     print("📝 In xwsystem/serialization/msgpack.py:")
-    print("   from ..utils.lazy_install import lazy_import_with_install")
+    print("   from ..utils.lazy_package import lazy_import_with_install")
     print("   ")
     print("   msgpack, MSGPACK_AVAILABLE = lazy_import_with_install('msgpack')")
     print("   ")

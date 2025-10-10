@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Schema Registry Integration for Enterprise Serialization
@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass
 from .base import ASchemaRegistry
 from .errors import SchemaRegistryError, SchemaNotFoundError, SchemaValidationError
-from .types import CompatibilityLevel
+from .defs import CompatibilityLevel
 
 import requests
 import boto3

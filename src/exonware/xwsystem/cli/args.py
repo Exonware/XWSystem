@@ -7,7 +7,7 @@ Production-grade CLI argument parsing for XWSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generated: 2025-01-27
 """
 
@@ -16,7 +16,7 @@ import sys
 from typing import Any, Dict, List, Optional, Callable, Union
 from dataclasses import dataclass
 import logging
-from .types import ArgumentType
+from .defs import ArgumentType
 
 logger = logging.getLogger(__name__)
 

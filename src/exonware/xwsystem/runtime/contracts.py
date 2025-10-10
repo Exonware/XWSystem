@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Runtime module contracts - interfaces and enums for runtime environment functionality.
@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Union, Type, Callable
 import sys
 
 # Import enums from types module
-from .types import (
+from .defs import (
     EnvironmentType,
     PlatformType,
     PythonVersion,

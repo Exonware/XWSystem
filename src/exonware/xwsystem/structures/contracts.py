@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Structures module contracts - interfaces and enums for data structure functionality.
@@ -12,7 +12,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union, Iterator, Callable
 
 # Import enums from types module
-from .types import (
+from .defs import (
     StructureType,
     TraversalOrder,
     TraversalType,

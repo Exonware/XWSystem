@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Enhanced XML serialization with security, validation and performance optimizations.
@@ -26,7 +26,8 @@ from ..config.logging_setup import get_logger
 logger = get_logger("xwsystem.serialization.xml")
 
 # Import XML libraries - lazy installation system will handle missing dependencies
-from lxml import etree as lxml_etree
+# Import directly to avoid RelaxNG initialization chain that loads rnc2rng/rpython
+import lxml.etree as lxml_etree
 from lxml.etree import XPath
 import defusedxml
 import defusedxml.ElementTree as defused_ET

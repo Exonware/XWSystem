@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 05, 2025
 
 Colored terminal output utilities with cross-platform support.
@@ -11,7 +11,7 @@ Colored terminal output utilities with cross-platform support.
 import os
 import sys
 from typing import Optional, Union
-from .types import Colors, Style
+from .defs import Colors, Style
 
 # Explicit import - colorama is a required dependency for CLI functionality
 # This ensures consistent cross-platform colored output

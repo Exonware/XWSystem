@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 IPC module contracts - interfaces and enums for inter-process communication.
@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Union, AsyncGenerator, Callable
 from multiprocessing import Process
 
 # Import enums from types module
-from .types import (
+from .defs import (
     IPCType,
     MessageType,
     ProcessState,

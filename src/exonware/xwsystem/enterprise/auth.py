@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Advanced Authentication Providers for Enterprise Integration
@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urlencode, parse_qs
 from .base import AAuthProvider, ATokenInfo, AUserInfo
 from .errors import AuthenticationError, AuthorizationError, TokenExpiredError
-from .types import OAuth2GrantType
+from .defs import OAuth2GrantType
 
 import jwt
 import requests

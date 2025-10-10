@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Serialization interfaces for XWSystem.
@@ -17,7 +17,7 @@ from typing_extensions import runtime_checkable
 from dataclasses import dataclass
 
 # Import enums from types module
-from .types import (
+from .defs import (
     SerializationFormat,
     SerializationMode,
     SerializationType,

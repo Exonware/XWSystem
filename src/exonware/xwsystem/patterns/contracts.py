@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Pattern contracts and interfaces for XWSystem design patterns.
@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Type, TypeVar, Generic, Callable, Union
 
 # Import enums from types module
-from .types import (
+from .defs import (
     PatternType,
     HandlerType,
     ContextType,

@@ -14,7 +14,7 @@ def test_dynamic_mapping():
     print("Testing dynamic mapping system...")
     
     try:
-        from exonware.xwsystem.utils.lazy_discovery import get_lazy_discovery
+        from exonware.xwsystem.utils.lazy_package import get_lazy_discovery
         print("✓ Import successful")
         
         discovery = get_lazy_discovery()
@@ -38,7 +38,7 @@ def test_dynamic_mapping():
             print(f"  {import_name}: {package}")
         
         # Test DependencyMapper
-        from exonware.xwsystem.utils.lazy_install import DependencyMapper
+        from exonware.xwsystem.utils.lazy_package import DependencyMapper
         mapper = DependencyMapper()
         print("\n✓ DependencyMapper created")
         

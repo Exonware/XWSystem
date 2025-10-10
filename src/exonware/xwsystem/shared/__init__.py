@@ -4,13 +4,13 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: 10-Sep-2025
 
 Shared types and utilities for XWSystem modules.
 """
 
-from .types import (
+from .defs import (
     ValidationLevel,
     PerformanceLevel,
     AuthType,

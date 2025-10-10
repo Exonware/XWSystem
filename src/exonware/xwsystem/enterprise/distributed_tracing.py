@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 05, 2025
 
 Distributed Tracing Integration for Enterprise Observability
@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from typing import Any, AsyncContextManager, ContextManager, Dict, Optional, Union
 from .base import ATracingProvider
 from .errors import TracingError
-from .types import SpanKind
+from .defs import SpanKind
 from ..version import __version__
 
 from opentelemetry import trace

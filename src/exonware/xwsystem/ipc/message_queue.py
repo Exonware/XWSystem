@@ -18,7 +18,7 @@ from typing import Any, Optional, TypeVar, Generic, Callable
 from dataclasses import dataclass
 import time
 import logging
-from .types import MessageQueueType
+from .defs import MessageQueueType
 
 logger = logging.getLogger(__name__)
 

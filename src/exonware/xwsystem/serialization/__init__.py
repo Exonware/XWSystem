@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.382
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 XSystem Serialization Package
@@ -98,7 +98,7 @@ from .dbm import DbmSerializer, DbmError
 from .shelve import ShelveSerializer, ShelveError
 from .plistlib import PlistlibSerializer, PlistlibError
 
-# Schema-based formats (6 core + 1 optional = 7 enterprise formats)
+# Schema-based formats (7 enterprise formats)
 from .avro import AvroSerializer, AvroError
 from .protobuf import ProtobufSerializer, ProtobufError
 from .thrift import ThriftSerializer, ThriftError
@@ -107,7 +107,7 @@ from .orc import OrcSerializer, OrcError
 from .capnproto import CapnProtoSerializer, CapnProtoError
 from .flatbuffers import FlatBuffersSerializer, FlatBuffersError
 
-# Key-value stores (3 additional formats) - lazy installation handles missing deps
+# Key-value stores (3 additional formats)
 from .leveldb import LevelDbSerializer, LevelDbError
 from .lmdb import LmdbSerializer, LmdbError
 from .zarr import ZarrSerializer, ZarrError
