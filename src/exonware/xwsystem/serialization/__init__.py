@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.385
+Version: 0.0.1.386
 Generation Date: September 04, 2025
 
 XSystem Serialization Package
@@ -44,15 +44,14 @@ SCHEMA-BASED FORMATS (7):
 23. Cap'n Proto      - pycapnp library
 24. FlatBuffers      - flatbuffers library
 
-KEY-VALUE STORES (3):
-25. LevelDB/RocksDB  - plyvel/python-rocksdb libraries
-26. LMDB            - lmdb library
-27. Zarr            - zarr library
+KEY-VALUE STORES (2):
+25. LMDB            - lmdb library
+26. Zarr            - zarr library
 
 SCIENTIFIC & ANALYTICS (3):
-28. HDF5            - h5py library
-29. Feather/Arrow   - pyarrow library
-30. GraphDB         - neo4j/pydgraph libraries
+27. HDF5            - h5py library
+28. Feather/Arrow   - pyarrow library
+29. GraphDB         - neo4j/pydgraph libraries
 
 ✅ BENEFITS:
 - ONE import gets 30 serialization formats
@@ -107,8 +106,7 @@ from .orc import OrcSerializer, OrcError
 from .capnproto import CapnProtoSerializer, CapnProtoError
 from .flatbuffers import FlatBuffersSerializer, FlatBuffersError
 
-# Key-value stores (3 additional formats)
-from .leveldb import LevelDbSerializer, LevelDbError
+# Key-value stores (2 additional formats)
 from .lmdb import LmdbSerializer, LmdbError
 from .zarr import ZarrSerializer, ZarrError
 
@@ -169,8 +167,7 @@ __all__ = [
     "CapnProtoSerializer", "CapnProtoError",
     "FlatBuffersSerializer", "FlatBuffersError",
     
-    # Key-value stores (3 additional formats)
-    "LevelDbSerializer", "LevelDbError",
+    # Key-value stores (2 additional formats)
     "LmdbSerializer", "LmdbError", 
     "ZarrSerializer", "ZarrError",
     

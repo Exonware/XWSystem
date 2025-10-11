@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.385
+Version: 0.0.1.386
 Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -32,7 +32,7 @@ XWSystem - Enterprise-grade Python framework with AI-powered performance optimiz
 
 🎯 COMMON PATTERNS:
     # Serialization (30+ formats: Text, Binary, Enterprise, Key-Value, Scientific)
-    from xwsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, AvroSerializer, ProtobufSerializer, LevelDbSerializer, LmdbSerializer, ZarrSerializer, Hdf5Serializer, FeatherSerializer, GraphDbSerializer
+    from xwsystem import JsonSerializer, YamlSerializer, MsgPackSerializer, AvroSerializer, ProtobufSerializer, LmdbSerializer, ZarrSerializer, Hdf5Serializer, FeatherSerializer, GraphDbSerializer
     
     # Security & Crypto
     from xwsystem import SecureHash, SymmetricEncryption, PathValidator
@@ -181,8 +181,7 @@ from .serialization import (
     OrcSerializer, OrcError,
     CapnProtoSerializer, CapnProtoError,
     FlatBuffersSerializer, FlatBuffersError,
-    # Key-Value & Database formats (6 additional formats)
-    LevelDbSerializer, LevelDbError,
+    # Key-Value & Database formats (5 additional formats)
     LmdbSerializer, LmdbError,
     ZarrSerializer, ZarrError,
     Hdf5Serializer, Hdf5Error,
@@ -651,8 +650,7 @@ __all__ = [
     "OrcSerializer", "OrcError",
     "CapnProtoSerializer", "CapnProtoError",
     "FlatBuffersSerializer", "FlatBuffersError",
-    # Key-value stores (3 additional formats)
-    "LevelDbSerializer", "LevelDbError",
+    # Key-value stores (2 additional formats)
     "LmdbSerializer", "LmdbError",
     "ZarrSerializer", "ZarrError",
     

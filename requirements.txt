@@ -2,7 +2,7 @@
 # Company: eXonware.com
 # Author: Eng. Muhammad AlShehri
 # Email: connect@exonware.com
-# Version: 0.0.1.385
+# Version: 0.0.1.386
 # Generation Date: 06-Sep-2025
 #
 # This file contains all dependencies needed for xSystem's 30 serialization formats
@@ -23,11 +23,11 @@ neo4j>=4.4.0                      # Neo4j graph database driver
 pydgraph>=21.3.0                  # Dgraph graph database client
 
 # Key-Value Store Support
-plyvel>=1.5.0                     # LevelDB Python bindings
 lmdb>=1.4.0                       # Lightning Memory-Mapped Database
 zarr>=2.15.0                      # Zarr array storage format
 
 # Scientific & Analytics Support
+numpy>=1.20.0                     # NumPy arrays for scientific computing
 h5py>=3.8.0                       # HDF5 file format support
 pytz>=2023.3                      # Timezone support for datetime operations
 
@@ -136,6 +136,7 @@ opentelemetry-exporter-zipkin>=1.12.0  # Zipkin exporter for distributed tracing
 # HTTP Client and Enterprise Dependencies
 httpx>=0.24.0                    # Modern HTTP client for async operations
 
+# =============================================================================
 # =============================================================================
 # =============================================================================
 # =============================================================================

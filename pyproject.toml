@@ -73,12 +73,11 @@ full = [
     "flatbuffers>=2.0.0",
     
     # Key-value stores (actually used in codebase)
-    "rocksdb>=0.7.0; platform_system != 'Windows'",
-    "plyvel>=1.5.0; platform_system != 'Windows'",
     "lmdb>=1.4.0",
     "zarr>=2.15.0",
     
     # Scientific & analytics (actually used in codebase)
+    "numpy>=1.20.0",
     "h5py>=3.8.0",
     "neo4j>=4.4.0",
     "pydgraph>=21.3.0",
