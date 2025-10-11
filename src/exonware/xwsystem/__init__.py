@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.384
+Version: 0.0.1.385
 Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -135,14 +135,16 @@ from .utils.lazy_package import (
 # =============================================================================
 # LAZY INSTALLATION - Simple One-Line Configuration
 # =============================================================================
+# DISABLED BY DEFAULT - Users can enable manually if needed
 # Auto-detects if user installed with [lazy] extra: pip install xwsystem[lazy]
-config_package_lazy_install_enabled("xwsystem", install_hook=False)  # Configure lazy mode
+# config_package_lazy_install_enabled("xwsystem", install_hook=False)  # Configure lazy mode
 
 # =============================================================================
 # TWO-STAGE LAZY LOADING - Install import hook BEFORE importing serialization
 # =============================================================================
+# DISABLED BY DEFAULT - Prevents import hook interference
 # Install the hook NOW, before serialization imports, so it can intercept them
-install_import_hook("xwsystem")  # Install hook to intercept serialization module imports
+# install_import_hook("xwsystem")  # Install hook to intercept serialization module imports
 
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging

@@ -29,6 +29,7 @@ lazy = [
 full = [
     # Core serialization formats (actually used in codebase)
     "PyYAML>=5.4.0",
+    "pyyaml-include>=1.3.0",
     "ruamel.yaml>=0.17.0",
     "tomli-w>=1.0.0",
     "tomli>=2.0.0",
@@ -56,6 +57,7 @@ full = [
     "jsonpointer>=2.0.0",
     "jsonpatch>=1.33.0",
     "jsonschema>=4.17.0",
+    "rpds-py>=0.10.0",
     "xxhash>=3.2.0",
     "msgspec>=0.11.0",
     "rtoml>=0.7.0",
