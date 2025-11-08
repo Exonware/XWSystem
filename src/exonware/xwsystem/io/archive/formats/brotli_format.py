@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: November 1, 2025
 
 Brotli (.br) compression format - RANK #6 WEB COMPRESSION.

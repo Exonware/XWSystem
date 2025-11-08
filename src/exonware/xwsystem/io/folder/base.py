@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: 30-Oct-2025
 
 Base classes for folder operations.

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.383
+Version: 0.0.1.384
 Generation Date: September 04, 2025
 
 Plugin-specific error classes for XSystem plugin system.
@@ -29,7 +29,7 @@ class PluginError(Exception):
         if self.plugin_name:
             base_msg = f"[Plugin: {self.plugin_name}] {base_msg}"
         if self.plugin_version:
-            base_msg = f"{base_msg} (Version: 0.0.1.383
+            base_msg = f"{base_msg} (Version: 0.0.1.384
         if self.context:
             context_str = ", ".join(f"{k}={v}" for k, v in self.context.items())
             base_msg = f"{base_msg} (Context: {context_str})"
