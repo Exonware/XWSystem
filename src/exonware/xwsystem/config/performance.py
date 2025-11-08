@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Performance Configuration Management
@@ -193,7 +193,7 @@ class PerformanceConfig:
                 return
             
             # Import here to avoid circular imports
-            from ..serialization import JsonSerializer, YamlSerializer, TomlSerializer
+            from ..io.serialization import JsonSerializer, YamlSerializer, TomlSerializer
             
             # Determine format by extension
             if config_path.suffix.lower() in ('.json',):

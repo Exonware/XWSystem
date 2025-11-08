@@ -5,4 +5,5 @@ Unit tests for xSystem components.
 Organized by component functionality following pytest best practices.
 """
 
-from exonware.xwsystem.version import __version__ 
+# Note: Do not import from exonware.xwsystem here to avoid 
+# triggering full package initialization during test collection 

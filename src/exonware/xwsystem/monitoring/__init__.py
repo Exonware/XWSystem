@@ -2,7 +2,7 @@
 XSystem Monitoring Package
 
 Provides performance monitoring, metrics collection, system observation utilities,
-memory monitoring, error recovery, and resilience mechanisms.
+memory monitoring, error recovery, resilience mechanisms, and distributed tracing.
 """
 
 from .error_recovery import (
@@ -60,6 +60,24 @@ from .performance_validator import (
     stop_performance_validation,
     validate_performance,
 )
+from .tracing import (
+    TracingManager,
+    OpenTelemetryTracer,
+    JaegerTracer,
+    SpanContext,
+    TraceContext,
+    get_tracing_manager,
+    configure_tracing,
+    DistributedTracing,
+)
+from .base import ATracingProvider
+from .errors import TracingError, SpanError, TraceContextError, DistributedTracingError
+from .defs import SpanKind
+from .performance_manager_generic import (
+    GenericPerformanceManager,
+    PerformanceRecommendation,
+    HealthStatus,
+)
 
 __all__ = [
     # Performance Monitor
@@ -110,4 +128,23 @@ __all__ = [
     "validate_performance",
     "get_performance_statistics",
     "performance_monitor",
+    # Distributed Tracing
+    "TracingManager",
+    "OpenTelemetryTracer",
+    "JaegerTracer",
+    "SpanContext",
+    "TraceContext",
+    "get_tracing_manager",
+    "configure_tracing",
+    "DistributedTracing",
+    "ATracingProvider",
+    "TracingError",
+    "SpanError",
+    "TraceContextError",
+    "DistributedTracingError",
+    "SpanKind",
+    # Generic Performance Management
+    "GenericPerformanceManager",
+    "PerformanceRecommendation",
+    "HealthStatus",
 ]

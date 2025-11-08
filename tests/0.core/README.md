@@ -175,6 +175,13 @@ python core/security/runner.py         # Security tests directly
 - **Type safety** - Type safety validation
 - **Validation rules** - Custom validation rules
 
+### 9. Enterprise Features Core Tests
+- **Authentication** - OAuth2, JWT, SAML providers (security module)
+- **Distributed Tracing** - OpenTelemetry, Jaeger integration (monitoring module)
+- **Schema Registry** - Confluent, AWS Glue schema management (io/serialization module)
+- **Cross-module integration** - Features working together across modules
+- **Error handling** - Enterprise-specific error classes
+
 ## Test Data
 
 Each test category has its own `data/` directory for:
@@ -201,7 +208,7 @@ Each test category has its own `data/` directory for:
 - Config core tests (9/9 tests passing)
 - Core core tests (4/4 tests passing)
 - DateTime core tests (8/8 tests passing)
-- Enterprise core tests (7/7 tests passing)
+- Enterprise features core tests (6/6 tests passing) - **REFACTORED**: Features distributed across security/, monitoring/, io/serialization/
 - IPC core tests (9/9 tests passing)
 - Patterns core tests (9/9 tests passing)
 - Performance core tests (8/8 tests passing)

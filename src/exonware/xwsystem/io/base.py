@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 IO module base classes - abstract classes for input/output functionality.
@@ -224,6 +224,109 @@ class AFile(IFile, ABC):
     def safe_write_bytes(path: Union[str, Path], content: bytes) -> bool:
         """Safely write bytes to file."""
         return AFile.write_bytes(path, content)
+    
+    # ============================================================================
+    # STATIC UTILITY METHODS (File Manager Features)
+    # ============================================================================
+    
+    @staticmethod
+    def atomic_write(file_path: Union[str, Path], data: Union[str, bytes], 
+                    backup: bool = True) -> OperationResult:
+        """Atomically write data to file (static version)."""
+        from .common.atomic import AtomicFileWriter
+        try:
+            with AtomicFileWriter(Path(file_path), backup=backup) as writer:
+                if isinstance(data, str):
+                    writer.write(data.encode('utf-8'))
+                else:
+                    writer.write(data)
+            return OperationResult.SUCCESS
+        except Exception:
+            return OperationResult.FAILED
+    
+    @staticmethod
+    def atomic_copy(source: Union[str, Path], destination: Union[str, Path]) -> OperationResult:
+        """Atomically copy file (static version)."""
+        from .common.atomic import AtomicFileWriter
+        import shutil
+        try:
+            with open(source, 'rb') as src:
+                with AtomicFileWriter(Path(destination)) as writer:
+                    shutil.copyfileobj(src, writer)
+            return OperationResult.SUCCESS
+        except Exception:
+            return OperationResult.FAILED
+    
+    @staticmethod
+    def atomic_move(source: Union[str, Path], destination: Union[str, Path]) -> OperationResult:
+        """Atomically move file (static version)."""
+        result = AFile.atomic_copy(source, destination)
+        if result == OperationResult.SUCCESS:
+            try:
+                Path(source).unlink()
+                return OperationResult.SUCCESS
+            except Exception:
+                return OperationResult.FAILED
+        return OperationResult.FAILED
+    
+    @staticmethod
+    def atomic_delete(file_path: Union[str, Path], backup: bool = True) -> OperationResult:
+        """Atomically delete file (static version)."""
+        target = Path(file_path)
+        try:
+            if backup and target.exists():
+                backup_path = target.with_suffix(target.suffix + f'.backup.{int(time.time())}')
+                import shutil
+                shutil.copy2(target, backup_path)
+            
+            if target.exists():
+                target.unlink()
+            return OperationResult.SUCCESS
+        except Exception:
+            return OperationResult.FAILED
+    
+    @staticmethod
+    def create_backup(source: Union[str, Path], backup_dir: Union[str, Path]) -> Optional[Path]:
+        """Create backup of file (static version)."""
+        import shutil
+        source_path = Path(source)
+        backup_path = Path(backup_dir)
+        
+        try:
+            backup_path.mkdir(parents=True, exist_ok=True)
+            if source_path.is_file():
+                backup_file = backup_path / f"{source_path.name}.backup.{int(time.time())}"
+                shutil.copy2(source_path, backup_file)
+                return backup_file
+            return None
+        except Exception:
+            return None
+    
+    @staticmethod
+    def restore_backup(backup_path: Union[str, Path], target: Union[str, Path]) -> OperationResult:
+        """Restore from backup (static version)."""
+        import shutil
+        try:
+            Path(target).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(backup_path, target)
+            return OperationResult.SUCCESS
+        except Exception:
+            return OperationResult.FAILED
+    
+    @staticmethod
+    def create_temp_file(suffix: Optional[str] = None, prefix: Optional[str] = None) -> Path:
+        """Create temporary file (static version)."""
+        import tempfile
+        fd, temp_path = tempfile.mkstemp(suffix=suffix, prefix=prefix)
+        os.close(fd)
+        return Path(temp_path)
+    
+    @staticmethod
+    def create_temp_directory(suffix: Optional[str] = None, prefix: Optional[str] = None) -> Path:
+        """Create temporary directory (static version)."""
+        import tempfile
+        temp_path = tempfile.mkdtemp(suffix=suffix, prefix=prefix)
+        return Path(temp_path)
 
 
 # ============================================================================

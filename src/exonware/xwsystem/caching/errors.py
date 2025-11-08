@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Caching module errors - exception classes for caching functionality.
@@ -71,4 +71,29 @@ class CacheLockError(CacheError):
 
 class CacheEvictionError(CacheError):
     """Raised when cache eviction fails."""
+    pass
+
+
+class CacheValidationError(CacheError):
+    """Raised when cache validation fails (security check)."""
+    pass
+
+
+class CacheIntegrityError(CacheError):
+    """Raised when cache integrity check fails."""
+    pass
+
+
+class CacheRateLimitError(CacheError):
+    """Raised when cache rate limit is exceeded."""
+    pass
+
+
+class CacheValueSizeError(CacheError):
+    """Raised when cache value exceeds maximum allowed size."""
+    pass
+
+
+class CacheKeySizeError(CacheError):
+    """Raised when cache key exceeds maximum allowed size."""
     pass

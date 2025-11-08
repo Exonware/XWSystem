@@ -3,47 +3,70 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Caching module base classes - abstract classes for caching functionality.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union
-from .contracts import CacheType, EvictionPolicy, CacheStrategy
+from typing import Any, Dict, List, Optional, Union, Tuple, Hashable
+from .defs import CachePolicy
 
 
-class ACacheBase(ABC):
+class ACache(ABC):
     """Abstract base class for all cache implementations."""
     
-    def __init__(self, max_size: int = 1000, ttl: Optional[int] = None):
+    def __init__(self, capacity: int = 1000, ttl: Optional[int] = None):
         """
         Initialize cache base.
         
         Args:
-            max_size: Maximum cache size
+            capacity: Maximum cache size
             ttl: Time to live in seconds
         """
-        self.max_size = max_size
+        self.capacity = capacity
         self.ttl = ttl
         self._cache: Dict[str, Any] = {}
         self._access_times: Dict[str, float] = {}
         self._creation_times: Dict[str, float] = {}
     
     @abstractmethod
-    def get(self, key: str) -> Optional[Any]:
-        """Get value from cache."""
+    def get(self, key: Any, default: Any = None) -> Optional[Any]:
+        """
+        Get value from cache.
+        
+        Args:
+            key: Cache key (Hashable)
+            default: Default value if key not found
+            
+        Returns:
+            Cached value or default
+        """
         pass
     
     @abstractmethod
-    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
-        """Set value in cache."""
+    def put(self, key: Any, value: Any) -> None:
+        """
+        Put value in cache.
+        
+        Args:
+            key: Cache key (Hashable)
+            value: Value to cache
+        """
         pass
     
     @abstractmethod
-    def delete(self, key: str) -> bool:
-        """Delete value from cache."""
+    def delete(self, key: Any) -> bool:
+        """
+        Delete value from cache.
+        
+        Args:
+            key: Cache key to delete
+            
+        Returns:
+            True if key was deleted, False if not found
+        """
         pass
     
     @abstractmethod
@@ -65,18 +88,142 @@ class ACacheBase(ABC):
     def evict(self) -> None:
         """Evict entries from cache."""
         pass
+    
+    @abstractmethod
+    def keys(self) -> List[Hashable]:
+        """
+        Get list of all cache keys.
+        
+        Returns:
+            List of cache keys (Hashable objects)
+        """
+        pass
+    
+    @abstractmethod
+    def values(self) -> List[Any]:
+        """
+        Get list of all cache values.
+        
+        Returns:
+            List of cache values
+        """
+        pass
+    
+    @abstractmethod
+    def items(self) -> List[Tuple[Hashable, Any]]:
+        """
+        Get list of all key-value pairs.
+        
+        Returns:
+            List of (key, value) tuples
+        """
+        pass
+    
+    @abstractmethod
+    def get_stats(self) -> Dict[str, Any]:
+        """
+        Get cache statistics.
+        
+        Returns:
+            Dictionary with statistics (hits, misses, hit_rate, etc.)
+        """
+        pass
+    
+    def __contains__(self, key: Any) -> bool:
+        """
+        Check if key exists in cache.
+        
+        Args:
+            key: Cache key to check
+            
+        Returns:
+            True if key exists in cache
+        """
+        # Default implementation - subclasses can override for efficiency
+        return self.get(key) is not None
+    
+    def __len__(self) -> int:
+        """
+        Get number of items in cache.
+        
+        Returns:
+            Number of items in cache
+        """
+        return self.size()
+    
+    def get_many(self, keys: List[Hashable]) -> Dict[Hashable, Any]:
+        """
+        Get multiple values in a single operation.
+        
+        Args:
+            keys: List of keys to retrieve
+            
+        Returns:
+            Dictionary of key-value pairs found in cache
+            
+        Note:
+            More efficient than individual gets for batch operations.
+        """
+        results = {}
+        for key in keys:
+            value = self.get(key)
+            if value is not None:
+                results[key] = value
+        return results
+    
+    def put_many(self, items: Dict[Hashable, Any]) -> int:
+        """
+        Put multiple key-value pairs in a single operation.
+        
+        Args:
+            items: Dictionary of key-value pairs to cache
+            
+        Returns:
+            Number of items successfully cached
+            
+        Note:
+            More efficient than individual puts for batch operations.
+        """
+        count = 0
+        for key, value in items.items():
+            try:
+                self.put(key, value)
+                count += 1
+            except Exception:
+                # Continue with other items even if one fails
+                pass
+        return count
+    
+    def delete_many(self, keys: List[Hashable]) -> int:
+        """
+        Delete multiple keys in a single operation.
+        
+        Args:
+            keys: List of keys to delete
+            
+        Returns:
+            Number of keys successfully deleted
+            
+        Note:
+            More efficient than individual deletes for batch operations.
+        """
+        count = 0
+        for key in keys:
+            if self.delete(key):
+                count += 1
+        return count
 
 
 class ACacheManager(ABC):
     """Abstract base class for cache management."""
     
     @abstractmethod
-    def create_cache(self, name: str, cache_type: CacheType, **kwargs) -> ACacheBase:
+    def create_cache(self, name: str, cache_type: str, **kwargs) -> ACache:
         """Create a new cache instance."""
         pass
     
     @abstractmethod
-    def get_cache(self, name: str) -> Optional[ACacheBase]:
+    def get_cache(self, name: str) -> Optional[ACache]:
         """Get cache instance by name."""
         pass
     

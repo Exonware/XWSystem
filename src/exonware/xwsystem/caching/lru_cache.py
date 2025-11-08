@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 LRU (Least Recently Used) Cache implementation with thread-safety and async support.
@@ -15,6 +15,7 @@ from collections import OrderedDict
 from typing import Any, Dict, Optional, Union, Callable, Hashable
 
 from ..config.logging_setup import get_logger
+from .base import ACache
 
 logger = get_logger("xsystem.caching.lru_cache")
 
@@ -30,7 +31,7 @@ class CacheNode:
         self.access_time = time.time()
 
 
-class LRUCache:
+class LRUCache(ACache):
     """
     Thread-safe LRU (Least Recently Used) Cache.
     
@@ -40,6 +41,12 @@ class LRUCache:
     - Optional TTL support
     - Statistics tracking
     - Memory-efficient implementation
+    
+    API Note:
+        This class provides both put() and set() methods:
+        - put(key, value) - Preferred method (ACache interface)
+        - set(key, value, ttl) - Alternative method (Protocol interface)
+        Both work identically; use put() for consistency with codebase.
     """
     
     def __init__(self, capacity: int = 128, ttl: Optional[float] = None, name: Optional[str] = None):
@@ -52,10 +59,14 @@ class LRUCache:
             name: Optional name for debugging
         """
         if capacity <= 0:
-            raise ValueError("Capacity must be positive")
+            raise ValueError(
+                f"Cache capacity must be positive, got {capacity}. "
+                f"Example: LRUCache(capacity=128)"
+            )
         
-        self.capacity = capacity
-        self.ttl = ttl
+        # Call parent constructor
+        super().__init__(capacity=capacity, ttl=int(ttl) if ttl else None)
+        
         self.name = name or f"LRUCache-{id(self)}"
         
         # Cache storage
@@ -142,6 +153,20 @@ class LRUCache:
                 self._add_to_head(node)
                 logger.debug(f"Cache {self.name} added key: {key}")
     
+    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
+        """
+        Set value in cache (Protocol interface method).
+        
+        Note: This method exists for Protocol compatibility (Cacheable interface).
+        Internally delegates to put(). Prefer using put() for consistency.
+        
+        Args:
+            key: Key to store
+            value: Value to store
+            ttl: Optional time-to-live (not used in LRU, available for subclasses)
+        """
+        self.put(key, value)
+    
     def delete(self, key: Hashable) -> bool:
         """
         Delete key from cache.
@@ -179,6 +204,20 @@ class LRUCache:
         """Check if cache is at capacity."""
         with self._lock:
             return len(self._cache) >= self.capacity
+    
+    def evict(self) -> None:
+        """
+        Evict least recently used entry from cache.
+        Implementation of abstract method from ACacheBase.
+        """
+        with self._lock:
+            if len(self._cache) > 0:
+                lru_node = self._tail.prev
+                if lru_node != self._head:  # Ensure it's not the dummy head
+                    self._remove_node(lru_node)
+                    del self._cache[lru_node.key]
+                    self._evictions += 1
+                    logger.debug(f"Cache {self.name} manually evicted LRU key: {lru_node.key}")
     
     def keys(self) -> list:
         """Get list of all keys (in LRU order)."""
@@ -276,6 +315,17 @@ class LRUCache:
         """Delete item by key."""
         if not self.delete(key):
             raise KeyError(key)
+    
+    def __enter__(self):
+        """Context manager entry."""
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit - cleanup resources."""
+        # Optionally clear cache on exit (configurable behavior)
+        # For now, we don't auto-clear to preserve data
+        # Users can manually call clear() if needed
+        return False
 
 
 class AsyncLRUCache:
@@ -499,3 +549,47 @@ class AsyncLRUCache:
         """Move node to head of list."""
         self._remove_node(node)
         self._add_to_head(node)
+    
+    async def __aenter__(self):
+        """Async context manager entry."""
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        return False
+    
+    async def __aiter__(self):
+        """
+        Async iteration over keys.
+        
+        Example:
+            async for key in cache:
+                value = await cache.get(key)
+                print(f"{key}: {value}")
+        """
+        async with self._lock:
+            keys = list(self._cache.keys())
+        
+        for key in keys:
+            yield key
+    
+    async def items_async(self):
+        """
+        Async iteration over items.
+        
+        Yields:
+            Tuples of (key, value)
+            
+        Example:
+            async for key, value in cache.items_async():
+                print(f"{key}: {value}")
+        """
+        async with self._lock:
+            items_list = []
+            node = self._head.next
+            while node != self._tail:
+                items_list.append((node.key, node.value))
+                node = node.next
+        
+        for item in items_list:
+            yield item

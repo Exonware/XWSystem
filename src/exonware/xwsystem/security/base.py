@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Security module base classes - abstract classes for security functionality.
@@ -11,7 +11,7 @@ Security module base classes - abstract classes for security functionality.
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union, Tuple
-from .contracts import HashAlgorithm, EncryptionAlgorithm, KeyType, SecurityLevel
+from .defs import HashAlgorithm, EncryptionAlgorithm, SecurityLevel
 
 
 class ACryptographicBase(ABC):
@@ -126,7 +126,7 @@ class AHashBase(ABC):
 class AEncryptionBase(ABC):
     """Abstract base class for encryption operations."""
     
-    def __init__(self, algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES):
+    def __init__(self, algorithm: EncryptionAlgorithm = EncryptionAlgorithm.AES_256):
         """
         Initialize encryption base.
         
@@ -368,4 +368,50 @@ class ASecurityValidatorBase(ABC):
     @abstractmethod
     def get_security_score(self) -> float:
         """Get security score."""
+        pass
+
+
+# ============================================================================
+# AUTHENTICATION BASE CLASSES (Moved from enterprise)
+# ============================================================================
+
+from dataclasses import dataclass, field
+
+
+@dataclass
+class ATokenInfo:
+    """Token information structure."""
+    access_token: str
+    token_type: str = "Bearer"
+    expires_in: Optional[int] = None
+    refresh_token: Optional[str] = None
+    scope: Optional[str] = None
+
+
+@dataclass
+class AUserInfo:
+    """User information structure."""
+    user_id: str
+    username: Optional[str] = None
+    email: Optional[str] = None
+    roles: List[str] = field(default_factory=list)
+    attributes: Dict[str, Any] = field(default_factory=dict)
+
+
+class AAuthProvider(ABC):
+    """Abstract base class for authentication providers."""
+    
+    @abstractmethod
+    async def authenticate(self, credentials: Dict[str, Any]) -> ATokenInfo:
+        """Authenticate user with credentials."""
+        pass
+    
+    @abstractmethod
+    async def validate_token(self, token: str) -> AUserInfo:
+        """Validate authentication token."""
+        pass
+    
+    @abstractmethod
+    async def refresh_token(self, refresh_token: str) -> ATokenInfo:
+        """Refresh authentication token."""
         pass

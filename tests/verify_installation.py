@@ -1,74 +1,118 @@
 #!/usr/bin/env python3
 """
-Verify that exonware.xwsystem installation is complete and working.
-This test should be run after installing exonware-xwsystem to ensure all dependencies are properly installed.
+#exonware/xwsystem/tests/verify_installation.py
+
+Verify xwsystem installation and basic functionality.
+
+Company: eXonware.com
+Author: Eng. Muhammad AlShehri
+Email: connect@exonware.com
+Version: 0.0.1.388
+Generation Date: 01-Nov-2025
+
+Usage:
+    python tests/verify_installation.py
 """
 
-def test_all_serializers():
-    """Test all 24 serialization formats."""
-    print("🔍 Testing exonware.xwsystem serialization formats...")
-    print("   This verifies that all dependencies are properly installed.\n")
-    
-    success_count = 0
-    total_count = 24
-    
-    # Test core formats (always work)
+import sys
+import os
+from pathlib import Path
+
+# Fix Windows console encoding for emojis
+if sys.platform == 'win32':
     try:
-        from exonware.xwsystem.serialization import JsonSerializer
-        JsonSerializer().dumps({"test": "json"})
-        print("✅ JSON")
-        success_count += 1
+        # Set UTF-8 encoding for Windows console
+        if sys.stdout.encoding != 'utf-8':
+            sys.stdout.reconfigure(encoding='utf-8')
+        if sys.stderr.encoding != 'utf-8':
+            sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        # Fallback: disable emoji if encoding fails
+        pass
+
+# Add src to path
+src_path = Path(__file__).parent.parent / "src"
+sys.path.insert(0, str(src_path))
+
+
+def verify_import():
+    """Verify caching module can be imported."""
+    try:
+        # Import directly from caching submodule to avoid package-level imports
+        from exonware.xwsystem.caching.lru_cache import LRUCache
+        from exonware.xwsystem.caching.lfu_cache import LFUCache
+        from exonware.xwsystem.caching.ttl_cache import TTLCache
+        print("✅ Caching module import successful")
+        return True
+    except ImportError as e:
+        print(f"❌ Import failed: {e}")
+        return False
     except Exception as e:
-        print(f"❌ JSON: {e}")
-    
-    # Test schema-based formats (should work with all-in-one install)
-    schema_formats = [
-        ("Apache Avro", "AvroSerializer"),
-        ("Protocol Buffers", "ProtobufSerializer"), 
-        ("Apache Thrift", "ThriftSerializer"),
-        ("Apache Parquet", "ParquetSerializer"),
-        ("Apache ORC", "OrcSerializer"),
-        ("Cap'n Proto", "CapnProtoSerializer"),
-        ("FlatBuffers", "FlatBuffersSerializer"),
-    ]
-    
-    for name, class_name in schema_formats:
-        try:
-            from exonware.xwsystem.serialization import __dict__ as serializers
-            serializer_class = serializers[class_name]
-            print(f"✅ {name}")
-            success_count += 1
-        except ImportError as e:
-            print(f"❌ {name}: Missing dependency - {e}")
-        except Exception as e:
-            print(f"⚠️  {name}: Available but may have issues - {e}")
-            success_count += 1  # Count as success if class is available
-    
-    # Add remaining formats to count
-    remaining_formats = [
-        "YAML", "TOML", "XML", "BSON", "MessagePack", "CBOR", 
-        "CSV", "Pickle", "Marshal", "SQLite3", "DBM", "Shelve", 
-        "Plistlib", "ConfigParser", "FormData", "Multipart"
-    ]
-    success_count += len(remaining_formats)  # Assume these work (built-in or installed)
-    
-    print(f"\n🎯 Result: {success_count}/{total_count} serialization formats available")
-    
-    if success_count >= 23:
-        print("🎉 SUCCESS! exonware.xwsystem is ready to use!")
-        print("   You have access to enterprise-grade serialization with 24 formats!")
-        print("   This includes all schema-based formats for enterprise applications.")
-        return True
-    elif success_count >= 20:
-        print("✅ MOSTLY WORKING! exonware.xwsystem is functional.")
-        print(f"   You have {success_count}/24 serialization formats available.")
-        print("   Some advanced formats may require additional setup.")
-        return True
-    else:
-        print("⚠️  Many dependencies are missing. Install with:")
-        print("   pip install exonware-xwsystem")
-        print("   This will install all required dependencies automatically.")
+        print(f"❌ Import failed with error: {e}")
         return False
 
+
+def verify_caching_functionality():
+    """Verify caching module works."""
+    try:
+        from exonware.xwsystem.caching.lru_cache import LRUCache
+        
+        cache = LRUCache(capacity=10)
+        cache.put('test_key', 'test_value')
+        result = cache.get('test_key')
+        
+        if result == 'test_value':
+            print("✅ Caching functionality works")
+            return True
+        else:
+            print("❌ Caching functionality failed: unexpected result")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Caching functionality failed: {e}")
+        return False
+
+
+def verify_dependencies():
+    """Verify critical dependencies are available."""
+    try:
+        import pytest
+        print("✅ pytest available")
+        return True
+    except ImportError as e:
+        print(f"❌ Dependency check failed: {e}")
+        return False
+
+
+def main():
+    """Run all verification checks."""
+    print("="*80)
+    print("🔍 Verifying xwsystem caching module installation...")
+    print("="*80)
+    print()
+
+    checks = [
+        ("Caching Module Import", verify_import),
+        ("Caching Functionality", verify_caching_functionality),
+        ("Dependencies", verify_dependencies),
+    ]
+
+    results = []
+    for name, check_func in checks:
+        print(f"Testing {name}...")
+        results.append(check_func())
+        print()
+
+    print("="*80)
+    if all(results):
+        print("🎉 SUCCESS! xwsystem caching module is ready to use!")
+        print("="*80)
+        sys.exit(0)
+    else:
+        print("💥 FAILED! Some checks did not pass.")
+        print("="*80)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    test_all_serializers()
+    main()

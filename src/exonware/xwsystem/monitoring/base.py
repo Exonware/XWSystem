@@ -3,15 +3,18 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Monitoring module base classes - abstract classes for monitoring functionality.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union, Callable
-from .contracts import MetricType, AlertLevel, MonitorState, HealthStatus
+from typing import Any, Dict, List, Optional, Union, Callable, TYPE_CHECKING
+from .defs import MetricType, AlertLevel, HealthStatus, SpanKind
+
+if TYPE_CHECKING:
+    from .tracing import SpanContext
 
 
 class APerformanceMonitorBase(ABC):
@@ -302,4 +305,39 @@ class ASystemMonitorBase(ABC):
     @abstractmethod
     def get_system_info(self) -> Dict[str, Any]:
         """Get comprehensive system information."""
+        pass
+
+
+# ============================================================================
+# TRACING BASE CLASSES (Moved from enterprise)
+# ============================================================================
+
+
+class ATracingProvider(ABC):
+    """Abstract base class for tracing providers."""
+    
+    @abstractmethod
+    def start_span(
+        self, 
+        name: str, 
+        kind: 'SpanKind' = None,
+        parent: Optional['SpanContext'] = None,
+        attributes: Optional[Dict[str, Any]] = None
+    ) -> 'SpanContext':
+        """Start a new span."""
+        pass
+    
+    @abstractmethod
+    def finish_span(self, span: 'SpanContext', status: str = "OK", error: Optional[Exception] = None) -> None:
+        """Finish a span."""
+        pass
+    
+    @abstractmethod
+    def add_span_attribute(self, span: 'SpanContext', key: str, value: Any) -> None:
+        """Add attribute to span."""
+        pass
+    
+    @abstractmethod
+    def add_span_event(self, span: 'SpanContext', name: str, attributes: Optional[Dict[str, Any]] = None) -> None:
+        """Add event to span."""
         pass

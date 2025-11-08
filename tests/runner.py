@@ -13,6 +13,15 @@ import sys
 import subprocess
 from pathlib import Path
 
+# Configure UTF-8 encoding for Windows console (GUIDELINES_TEST.md compliance)
+if sys.platform == "win32":
+    try:
+        import io
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    except Exception:
+        pass  # If reconfiguration fails, continue with default encoding
+
 
 def run_tests_with_pytest(test_path: str, marker: str = None, category: str = None):
     """Run tests using pytest with appropriate configuration."""
@@ -61,7 +70,7 @@ def run_core_tests():
     """Run all core tests."""
     print("🚀 Running CORE tests...")
     print("=" * 50)
-    return run_tests_with_pytest("core", "xwsystem_core")
+    return run_tests_with_pytest("0.core", "xwsystem_core")
 
 
 def run_unit_tests():

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -149,49 +149,40 @@ from .utils.lazy_package import (
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging
 
-# Serialization utilities (24 formats total + intelligent auto-detection)
-from .serialization import (
+# Serialization utilities (17 core formats + intelligent auto-detection)
+# Enterprise formats (Protobuf, Avro, Parquet, HDF5, etc.) available in exonware-xwformats
+from .io.serialization import (
     ISerialization,
     ASerialization,
     SerializationError,
-    # Core 12 formats
-    JsonSerializer, JsonError,
-    YamlSerializer, YamlError,
-    TomlSerializer, TomlError,
-    XmlSerializer, XmlError,
-    BsonSerializer, BsonError,
-    MsgPackSerializer,
-    CborSerializer, CborError,
-    CsvSerializer, CsvError,
-    PickleSerializer, PickleError,
-    MarshalSerializer, MarshalError,
-    FormDataSerializer, FormDataError,
-    MultipartSerializer, MultipartError,
-    # Built-in Python modules (5 additional formats)
-    ConfigParserSerializer, ConfigParserError,
-    Sqlite3Serializer, Sqlite3Error,
-    DbmSerializer, DbmError,
-    ShelveSerializer, ShelveError,
-    PlistlibSerializer, PlistlibError,
-    # Enterprise formats (7 additional formats)
-    AvroSerializer, AvroError,
-    ProtobufSerializer, ProtobufError,
-    ThriftSerializer, ThriftError,
-    ParquetSerializer, ParquetError,
-    OrcSerializer, OrcError,
-    CapnProtoSerializer, CapnProtoError,
-    FlatBuffersSerializer, FlatBuffersError,
-    # Key-Value & Database formats (5 additional formats)
-    LmdbSerializer, LmdbError,
-    ZarrSerializer, ZarrError,
-    Hdf5Serializer, Hdf5Error,
-    FeatherSerializer, FeatherError,
-    GraphDbSerializer, GraphDbError,
-    # Intelligent auto-detection
-    XWSerializer, dumps, loads, save_file, load_file,
+    # Text formats (8)
+    XWJsonSerializer, JsonSerializer,
+    XWYamlSerializer, YamlSerializer,
+    XWTomlSerializer, TomlSerializer,
+    XWXmlSerializer, XmlSerializer,
+    XWCsvSerializer, CsvSerializer,
+    XWConfigParserSerializer, ConfigParserSerializer,
+    XWFormDataSerializer, FormDataSerializer,
+    XWMultipartSerializer, MultipartSerializer,
+    # Binary formats (6)
+    XWMsgPackSerializer, MsgPackSerializer,
+    XWPickleSerializer, PickleSerializer,
+    XWBsonSerializer, BsonSerializer,
+    XWMarshalSerializer, MarshalSerializer,
+    XWCborSerializer, CborSerializer,
+    XWPlistSerializer, PlistlibSerializer,
+    # Database formats (3)
+    XWSqlite3Serializer, Sqlite3Serializer,
+    XWDbmSerializer, DbmSerializer,
+    XWShelveSerializer, ShelveSerializer,
+    # Registry
+    SerializationRegistry, get_serialization_registry,
     # Flyweight optimization
     get_serializer, get_flyweight_stats, clear_serializer_cache, 
     get_cache_info, create_serializer, SerializerPool,
+    # Auto-detection utilities
+    XWSerializer, AutoSerializer,
+    detect_format,
 )
 
 # HTTP utilities
@@ -208,7 +199,7 @@ from .runtime import EnvironmentManager, ReflectionUtils
 from .plugins import PluginManager, PluginBase, PluginRegistry
 
 # I/O utilities
-from .io.atomic_file import (
+from .io.common.atomic import (
     AtomicFileWriter,
     FileOperationError,
     safe_read_bytes,
@@ -217,7 +208,7 @@ from .io.atomic_file import (
     safe_write_bytes,
     safe_write_text,
 )
-from .io.async_operations import (
+from .io.stream.async_operations import (
     AsyncAtomicFileWriter, async_atomic_write,
     async_safe_write_text, async_safe_write_bytes,
     async_safe_read_text, async_safe_read_bytes, async_safe_read_with_fallback
@@ -273,8 +264,8 @@ from .threading.async_primitives import (
     AsyncCondition, AsyncResourcePool
 )
 
-# Performance management (imported separately to avoid circular imports)
-# from .performance import GenericPerformanceManager, PerformanceRecommendation, HealthStatus
+# Performance management (now in monitoring module)
+from .monitoring import GenericPerformanceManager, PerformanceRecommendation, HealthStatus
 
 # Caching utilities
 from .caching import (
@@ -414,15 +405,21 @@ from .validation.type_safety import (
     SafeTypeValidator, GenericSecurityError, validate_untrusted_data
 )
 
-# Enterprise utilities
-from .enterprise import (
-    ASchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
-    SchemaRegistryError, SchemaNotFoundError, SchemaValidationError,
-    TracingManager, OpenTelemetryTracer, JaegerTracer,
-    TracingError, SpanContext, TraceContext,
+# Enterprise utilities - distributed across security, monitoring, and io/serialization
+from .security import (
     OAuth2Provider, JWTProvider, SAMLProvider,
     AuthenticationError, AuthorizationError, TokenExpiredError
 )
+from .monitoring import (
+    TracingManager, OpenTelemetryTracer, JaegerTracer,
+    TracingError, SpanContext, TraceContext
+)
+# NOTE: Schema Registry classes moved to exonware-xwschema
+# Available in: pip install exonware-xwschema
+# from .io.serialization import (
+#     ASchemaRegistry, ConfluentSchemaRegistry, AwsGlueSchemaRegistry,
+#     SchemaRegistryError, SchemaNotFoundError, SchemaValidationError
+# )
 
 # Core interfaces
 from .core.contracts import IStringable
@@ -466,7 +463,7 @@ def quick_serialize(data, format="json", **kwargs):
         >>> quick_serialize({"hello": "world"}, "avro")     # Enterprise format
         # Returns Avro binary data
     """
-    from .serialization import create_serializer
+    from .io.serialization import create_serializer
     serializer = create_serializer(format)
     return serializer.dumps(data, **kwargs)
 
@@ -496,10 +493,10 @@ def quick_deserialize(data, format="auto", **kwargs):
         {'hello': 'world'}
     """
     if format == "auto":
-        from .serialization import XWSerializer
+        from .io.serialization import XWSerializer
         return XWSerializer().loads(data, **kwargs)
     else:
-        from .serialization import create_serializer
+        from .io.serialization import create_serializer
         serializer = create_serializer(format)
         return serializer.loads(data, **kwargs)
 
@@ -579,7 +576,7 @@ def list_available_formats():
         >>> print(f"Total formats: {len(formats['all'])}")
         >>> print(f"Enterprise formats: {formats['enterprise']}")
     """
-    from .serialization.flyweight import create_serializer
+    from .io.serialization.flyweight import create_serializer
     
     # Test which formats are available by trying to create serializers
     all_formats = [
@@ -619,48 +616,38 @@ def list_available_formats():
 __all__ = [
         # Core interfaces
     "IStringable",
-        # Serialization (30 formats)
+        # Serialization (17 core formats - enterprise formats in exonware-xwformats)
     "ISerialization",
     "ASerialization", 
     "SerializationError",
-    # Core 12 formats
-    "JsonSerializer", "JsonError",
-    "YamlSerializer", "YamlError",
-    "TomlSerializer", "TomlError",
-    "XmlSerializer", "XmlError", 
-    "BsonSerializer", "BsonError",
-    "MsgPackSerializer",
-    "CborSerializer", "CborError",
-    "CsvSerializer", "CsvError",
-    "PickleSerializer", "PickleError",
-    "MarshalSerializer", "MarshalError",
-    "FormDataSerializer", "FormDataError",
-    "MultipartSerializer", "MultipartError",
-    # Built-in Python modules (5 additional formats)
-    "ConfigParserSerializer", "ConfigParserError",
-    "Sqlite3Serializer", "Sqlite3Error",
-    "DbmSerializer", "DbmError",
-    "ShelveSerializer", "ShelveError",
-    "PlistlibSerializer", "PlistlibError",
-    # Schema-based formats (7 enterprise formats)
-    "AvroSerializer", "AvroError",
-    "ProtobufSerializer", "ProtobufError",
-    "ThriftSerializer", "ThriftError",
-    "ParquetSerializer", "ParquetError",
-    "OrcSerializer", "OrcError",
-    "CapnProtoSerializer", "CapnProtoError",
-    "FlatBuffersSerializer", "FlatBuffersError",
-    # Key-value stores (2 additional formats)
-    "LmdbSerializer", "LmdbError",
-    "ZarrSerializer", "ZarrError",
     
-    # Scientific & analytics (3 additional formats)
-    "Hdf5Serializer", "Hdf5Error",
-    "FeatherSerializer", "FeatherError",
-    "GraphDbSerializer", "GraphDbError",
-    # Intelligent auto-detection
-    "XWSerializer", "dumps", "loads", "save_file", "load_file",
-    # Flyweight optimization
+    # Text formats (8) - I→A→XW pattern
+    "XWJsonSerializer", "JsonSerializer",
+    "XWYamlSerializer", "YamlSerializer",
+    "XWTomlSerializer", "TomlSerializer",
+    "XWXmlSerializer", "XmlSerializer",
+    "XWCsvSerializer", "CsvSerializer",
+    "XWConfigParserSerializer", "ConfigParserSerializer",
+    "XWFormDataSerializer", "FormDataSerializer",
+    "XWMultipartSerializer", "MultipartSerializer",
+    
+    # Binary formats (6) - I→A→XW pattern
+    "XWMsgPackSerializer", "MsgPackSerializer",
+    "XWPickleSerializer", "PickleSerializer",
+    "XWBsonSerializer", "BsonSerializer",
+    "XWMarshalSerializer", "MarshalSerializer",
+    "XWCborSerializer", "CborSerializer",
+    "XWPlistSerializer", "PlistlibSerializer",
+    
+    # Database formats (3) - I→A→XW pattern
+    "XWSqlite3Serializer", "Sqlite3Serializer",
+    "XWDbmSerializer", "DbmSerializer",
+    "XWShelveSerializer", "ShelveSerializer",
+    
+    # Registry and utilities
+    "SerializationRegistry", "get_serialization_registry",
+    "XWSerializer", "AutoSerializer",
+    "detect_format",
     "get_serializer", "get_flyweight_stats", "clear_serializer_cache", 
     "get_cache_info", "create_serializer", "SerializerPool",
     # HTTP
@@ -867,8 +854,8 @@ __all__ = [
     "ValidationError",
     
     # Enterprise Features
-    "ASchemaRegistry", "ConfluentSchemaRegistry", "AwsGlueSchemaRegistry",
-    "SchemaRegistryError", "SchemaNotFoundError", "SchemaValidationError",
+    # NOTE: Schema Registry classes moved to exonware-xwschema
+    # Available in: pip install exonware-xwschema
     "TracingManager", "OpenTelemetryTracer", "JaegerTracer",
     "TracingError", "SpanContext", "TraceContext",
     "OAuth2Provider", "JWTProvider", "SAMLProvider",

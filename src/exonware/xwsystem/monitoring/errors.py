@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Monitoring module errors - exception classes for monitoring functionality.
@@ -92,4 +92,29 @@ class SystemResourceError(SystemMonitorError):
 
 class SystemHealthError(SystemMonitorError):
     """Raised when system health check fails."""
+    pass
+
+
+# ============================================================================
+# TRACING ERRORS (Moved from enterprise)
+# ============================================================================
+
+
+class TracingError(MonitoringError):
+    """Base exception for tracing operations."""
+    pass
+
+
+class SpanError(TracingError):
+    """Raised when span operation fails."""
+    pass
+
+
+class TraceContextError(TracingError):
+    """Raised when trace context is invalid."""
+    pass
+
+
+class DistributedTracingError(MonitoringError):
+    """Raised when distributed tracing fails."""
     pass

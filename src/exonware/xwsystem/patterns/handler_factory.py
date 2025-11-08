@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
 from .contracts import IHandler
 
-from ..io.atomic_file import AtomicFileWriter, atomic_write
+from ..io.common.atomic import AtomicFileWriter, atomic_write
 from ..security.path_validator import PathSecurityError, PathValidator
 from ..structures.circular_detector import (
     CircularReferenceDetector,

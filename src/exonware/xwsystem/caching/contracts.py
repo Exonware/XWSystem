@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Caching protocol interfaces for XWSystem.
@@ -758,6 +758,52 @@ class ICachePersistence(ABC):
         Args:
             format_name: Format name
         """
+        pass
+
+
+# ============================================================================
+# BASIC CACHE INTERFACE
+# ============================================================================
+
+class ICache(ABC):
+    """
+    Basic cache interface for disk-based and specialized caches.
+    
+    Root cause fixed: Added missing ICache interface that was being used by
+    TwoTierCache and DiskCache but didn't exist in contracts.
+    
+    This is a simpler interface than ICacheable, designed for caches that
+    use string keys (like disk caches and two-tier caches).
+    """
+    
+    @abstractmethod
+    def get(self, key: str) -> Optional[Any]:
+        """Get value from cache."""
+        pass
+    
+    @abstractmethod
+    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
+        """Set value in cache."""
+        pass
+    
+    @abstractmethod
+    def delete(self, key: str) -> bool:
+        """Delete value from cache."""
+        pass
+    
+    @abstractmethod
+    def clear(self) -> bool:
+        """Clear all cached values."""
+        pass
+    
+    @abstractmethod
+    def exists(self, key: str) -> bool:
+        """Check if key exists in cache."""
+        pass
+    
+    @abstractmethod
+    def size(self) -> int:
+        """Get number of cached items."""
         pass
 
 

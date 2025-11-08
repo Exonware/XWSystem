@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Advanced HTTP client with HTTP/2, streaming, pluggable transports, and modern features.
@@ -490,7 +490,7 @@ class AdvancedHttpClient:
             progress_callback: Optional callback for progress updates
             **kwargs: Additional request arguments
         """
-        from ..io.async_operations import async_safe_write_bytes
+        from ..io.stream.async_operations import async_safe_write_bytes
         
         chunk_size = chunk_size or self.config.streaming.chunk_size
         

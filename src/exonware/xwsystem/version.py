@@ -1,12 +1,12 @@
 """
-Centralized version management for xwsystem.
+Centralized version management for eXonware projects.
 
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Generation Date: October 11, 2025
+Generation Date: November 09, 2025
 
-This module provides centralized version management for the entire xwsystem project.
+This module provides centralized version management for the entire project.
 All version references should import from this module to ensure consistency.
 """
 
@@ -15,13 +15,13 @@ All version references should import from this module to ensure consistency.
 # =============================================================================
 
 # Main version - update this to change version across entire project
-__version__ = "0.0.1.387"
+__version__ = "0.0.1.383"
 
 # Version components for programmatic access
 VERSION_MAJOR = 0
 VERSION_MINOR = 0
 VERSION_PATCH = 1
-VERSION_BUILD = 387# Set to None for releases, or build number for dev builds
+VERSION_BUILD = 383  # Set to None for releases, or build number for dev builds
 
 # Version metadata
 VERSION_SUFFIX = ""  # e.g., "dev", "alpha", "beta", "rc1"
@@ -65,7 +65,7 @@ def is_release_version() -> bool:
 __all__ = [
     "__version__",
     "VERSION_MAJOR",
-    "VERSION_MINOR", 
+    "VERSION_MINOR",
     "VERSION_PATCH",
     "VERSION_BUILD",
     "VERSION_SUFFIX",

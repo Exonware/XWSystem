@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: 07-Sep-2025
 
 Security types and enums for XWSystem.
@@ -81,3 +81,11 @@ class AuditEvent(Enum):
     CREATE = "create"
     EXECUTE = "execute"
     FAILED_ACCESS = "failed_access"
+
+
+class OAuth2GrantType(Enum):
+    """OAuth2 grant types."""
+    AUTHORIZATION_CODE = "authorization_code"
+    CLIENT_CREDENTIALS = "client_credentials"
+    RESOURCE_OWNER = "password"
+    REFRESH_TOKEN = "refresh_token"

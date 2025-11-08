@@ -7,7 +7,7 @@ Production-grade TTL caching for XSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generated: 2025-01-27
 """
 
@@ -17,6 +17,7 @@ import threading
 from typing import Any, Dict, Optional, Tuple, Union
 from dataclasses import dataclass
 import logging
+from .base import ACache
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +43,7 @@ class TTLEntry:
         self.access_count += 1
 
 
-class TTLCache:
+class TTLCache(ACache):
     """
     Production-grade Time-To-Live cache with automatic expiration.
     
@@ -69,8 +70,15 @@ class TTLCache:
             cleanup_interval: Cleanup interval in seconds
             name: Cache name for debugging
         """
-        self.capacity = capacity
-        self.ttl = ttl
+        if capacity <= 0:
+            raise ValueError(
+                f"Cache capacity must be positive, got {capacity}. "
+                f"Example: TTLCache(capacity=128, ttl=300.0)"
+            )
+        
+        # Call parent constructor
+        super().__init__(capacity=capacity, ttl=int(ttl))
+        
         self.cleanup_interval = cleanup_interval
         self.name = name
         
@@ -185,6 +193,18 @@ class TTLCache:
                 logger.error(f"TTL cache put error: {e}")
                 return False
     
+    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
+        """
+        Set value in cache (abstract method implementation).
+        Delegates to put() for backward compatibility.
+        
+        Args:
+            key: Key to store
+            value: Value to store
+            ttl: Optional time-to-live in seconds
+        """
+        self.put(key, value, float(ttl) if ttl is not None else None)
+    
     def get(self, key: str, default: Any = None) -> Any:
         """
         Retrieve a value from the cache.
@@ -248,6 +268,19 @@ class TTLCache:
         """Get current cache size."""
         with self._lock:
             return len(self._cache)
+    
+    def is_full(self) -> bool:
+        """Check if cache is at capacity."""
+        with self._lock:
+            return len(self._cache) >= self.capacity
+    
+    def evict(self) -> None:
+        """
+        Evict entry from cache (uses LRU strategy).
+        Implementation of abstract method from ACacheBase.
+        """
+        with self._lock:
+            self._evict_lru()
     
     def contains(self, key: str) -> bool:
         """Check if key exists and is not expired."""

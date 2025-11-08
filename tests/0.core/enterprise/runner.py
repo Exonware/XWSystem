@@ -1,8 +1,17 @@
 #exonware/xwsystem/tests/core/enterprise/runner.py
 """
-Enterprise Core Test Runner
+Enterprise Features Core Test Runner
 
-Runs comprehensive enterprise core tests for XSystem enterprise functionality.
+Runs comprehensive tests for enterprise features distributed across:
+- security/ (Authentication: OAuth2, JWT, SAML)
+- monitoring/ (Distributed Tracing: OpenTelemetry, Jaeger)
+- io/serialization/ (Schema Registry: Confluent, AWS Glue)
+
+Company: eXonware.com
+Author: Eng. Muhammad AlShehri
+Email: connect@exonware.com
+Version: 0.0.1.387
+Generation Date: November 04, 2025
 """
 
 import sys
@@ -45,20 +54,31 @@ def apply_emojis(text: str) -> str:
         return text
 
 def main():
-    """Run enterprise core tests."""
-    print(apply_emojis("[TEST] Running CORE Enterprise Tests..."))
+    """Run enterprise features core tests."""
+    print(apply_emojis("[TEST] Running CORE Enterprise Features Tests..."))
     print("=" * 50)
     
     try:
-        import sys
-        from pathlib import Path
-        test_basic_path = Path(__file__).parent / "test_core_xwsystem_enterprise.py"
-        sys.path.insert(0, str(test_basic_path.parent))
-
-        import test_core_xwsystem_enterprise
-        return test_core_xwsystem_enterprise.main()
+        # Add parent directory to path for module import
+        test_dir = Path(__file__).parent
+        
+        # Direct execution of test file
+        test_file = test_dir / "test_core_xsystem_enterprise.py"
+        
+        # Execute the test module
+        import runpy
+        result = runpy.run_path(str(test_file), run_name="__main__")
+        
+        # The test file exits with sys.exit(), so if we get here, it passed
+        return 0
+        
+    except SystemExit as e:
+        # Capture exit code from test module
+        return e.code if e.code is not None else 0
     except Exception as e:
-        print(apply_emojis(f"[FAIL] Failed to run enterprise core tests: {e}"))
+        print(apply_emojis(f"[FAIL] Failed to run enterprise feature tests: {e}"))
+        import traceback
+        traceback.print_exc()
         return 1
 
 

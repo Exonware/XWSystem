@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.387
+Version: 0.0.1.383
 Generation Date: September 04, 2025
 
 Security module errors - exception classes for security functionality.
@@ -97,4 +97,39 @@ class SecurityConfigurationError(SecurityError):
 
 class SecurityPolicyError(SecurityError):
     """Raised when security policy is violated."""
+    pass
+
+
+# ============================================================================
+# AUTHENTICATION ERRORS (Moved from enterprise)
+# ============================================================================
+
+
+class AuthenticationError(SecurityError):
+    """Raised when authentication fails."""
+    pass
+
+
+class AuthorizationError(SecurityError):
+    """Raised when authorization fails."""
+    pass
+
+
+class TokenExpiredError(AuthenticationError):
+    """Raised when authentication token has expired."""
+    pass
+
+
+class OAuth2Error(AuthenticationError):
+    """Raised when OAuth2 operation fails."""
+    pass
+
+
+class JWTError(AuthenticationError):
+    """Raised when JWT operation fails."""
+    pass
+
+
+class SAMLError(AuthenticationError):
+    """Raised when SAML operation fails."""
     pass
