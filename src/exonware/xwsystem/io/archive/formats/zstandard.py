@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.385
+Version: 0.0.1.388
 Generation Date: November 1, 2025
 
 Zstandard (.zst) compression format - RANK #2 MODERN STANDARD.
