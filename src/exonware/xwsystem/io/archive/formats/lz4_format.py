@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.388
+Version: 0.0.1.389
 Generation Date: November 1, 2025
 
 LZ4 compression format - RANK #7 FASTEST COMPRESSION.

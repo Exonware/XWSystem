@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.388
+Version: 0.0.1.389
 Generation Date: November 04, 2025
 
 Universal Codec Registry - High-performance registry for all codec types.

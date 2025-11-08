@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.388
+Version: 0.0.1.389
 Generation Date: November 2, 2025
 
 BSON serialization - Binary JSON format (MongoDB).
