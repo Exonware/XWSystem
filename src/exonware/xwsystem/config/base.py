@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.396
+Version: 0.0.1.397
 Generation Date: September 04, 2025
 
 Config module base classes - abstract classes for configuration functionality.
