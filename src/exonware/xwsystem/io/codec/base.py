@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.399
+Version: 0.0.1.400
 Generation Date: October 30, 2025
 
 Base classes, registry, adapters, and helper functions for codec system.

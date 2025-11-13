@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.399
+Version: 0.0.1.400
 Generation Date: 30-Oct-2025
 
 I/O utilities for safe file operations, path management, and codec integration.
