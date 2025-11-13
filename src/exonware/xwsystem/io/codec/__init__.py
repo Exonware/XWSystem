@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.395
+Version: 0.0.1.396
 Generation Date: October 30, 2025
 
 Universal Codec Abstraction for eXonware.

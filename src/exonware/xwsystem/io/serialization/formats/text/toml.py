@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.395
+Version: 0.0.1.396
 Generation Date: November 2, 2025
 
 TOML serialization - Configuration file format.

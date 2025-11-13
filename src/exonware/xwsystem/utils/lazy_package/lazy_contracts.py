@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.395
+Version: 0.0.1.396
 Generation Date: 10-Oct-2025
 
 Contracts for Lazy Loading System

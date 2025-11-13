@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.395
+Version: 0.0.1.396
 Generation Date: September 04, 2025
 
 Shared base classes (merged from the former core module).
