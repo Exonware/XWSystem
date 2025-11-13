@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.397
+Version: 0.0.1.398
 Generation Date: 01-Nov-2025
 
 Bloom filter-enhanced cache for faster negative lookups.

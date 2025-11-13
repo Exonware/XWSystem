@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.397
+Version: 0.0.1.398
 Generation Date: November 2, 2025
 
 CSV serialization - Comma-separated values format.
