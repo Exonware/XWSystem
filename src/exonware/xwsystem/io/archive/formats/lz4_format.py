@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 LZ4 compression format - RANK #7 FASTEST COMPRESSION.
@@ -25,11 +25,8 @@ from typing import List, Optional
 from ...contracts import IArchiveFormat
 from ...errors import ArchiveError
 
-# Optional import - install with: pip install lz4
-try:
-    import lz4.frame as lz4
-except ImportError:
-    lz4 = None
+# Lazy import for lz4 - the lazy hook will automatically handle ImportError
+import lz4.frame as lz4
 
 
 class Lz4Archiver(IArchiveFormat):

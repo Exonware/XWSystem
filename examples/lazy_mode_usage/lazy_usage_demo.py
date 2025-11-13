@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import sys
 import traceback
-from typing import Any, Dict
+from typing import Any, Callable, Dict
 
 from exonware.xwsystem.utils.lazy_package import (
     LazyInstallConfig,

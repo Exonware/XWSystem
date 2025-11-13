@@ -1,7 +1,7 @@
 """
 Unit tests for io.archive.archive_files module
 
-Tests concrete archive file implementations (XWZipFile, XWTarFile).
+Tests concrete archive file implementations (ZipFile, TarFile).
 Following GUIDELINES_TEST.md structure and eXonware testing standards.
 
 Company: eXonware.com
@@ -26,9 +26,8 @@ class TestZipFile:
         """Test ZipFile uses XWZipArchiver via composition."""
         # ZipFile should use XWZipArchiver instance
         # This follows composition over inheritance pattern
-        from exonware.xwsystem.io.archive.archivers import XWZipArchiver
-        assert XWZipArchiver is not None
-
+        from exonware.xwsystem.io.archive.archivers import ZipArchiver
+        assert ZipArchiver is not None
 
 @pytest.mark.xsystem_unit
 class TestTarFile:
@@ -41,6 +40,6 @@ class TestTarFile:
     def test_tar_file_uses_composition(self):
         """Test TarFile uses XWTarArchiver via composition."""
         # TarFile should use XWTarArchiver instance
-        from exonware.xwsystem.io.archive.archivers import XWTarArchiver
-        assert XWTarArchiver is not None
+        from exonware.xwsystem.io.archive.archivers import TarArchiver
+        assert TarArchiver is not None
 

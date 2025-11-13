@@ -24,22 +24,17 @@ def demo_lazy_install_configuration():
     print("🚀 DEMO 1: Lazy Install Configuration")
     print("=" * 60)
     
-    from exonware.xwsystem.config.lazy_config import (
-        lib_config_lazy_install,
-        enable_lazy_install,
-        disable_lazy_install,
-        is_lazy_install_enabled,
-        get_package_name,
-        get_all_packages,
-        UNIVERSAL_PACKAGES
+    from exonware.xwsystem.utils.lazy_package.config import (
+        LazyConfig,
+        DEFAULT_LAZY_CONFIG,
     )
     
-    print(f"📊 Current lazy install status: {lib_config_lazy_install}")
-    print(f"📊 Is enabled: {is_lazy_install_enabled()}")
+    print(f"📊 Current lazy install status: {LazyConfig.get_config()}")
+    print(f"📊 Is enabled: {LazyConfig.is_enabled()}")
     
     # Show some package mappings
     print(f"\n📦 Package mappings (showing first 10):")
-    packages = get_all_packages()
+    packages = LazyConfig.get_all_packages()
     for i, (import_name, package_name) in enumerate(list(packages.items())[:10]):
         print(f"   {import_name} → {package_name}")
     
@@ -49,19 +44,19 @@ def demo_lazy_install_configuration():
     test_imports = ['msgpack', 'cv2', 'yaml', 'sklearn', 'requests']
     print(f"\n🔍 Package name resolution:")
     for import_name in test_imports:
-        package_name = get_package_name(import_name)
+        package_name = LazyConfig.get_package_name(import_name)
         print(f"   {import_name} → {package_name}")
     
     # Toggle lazy install
     print(f"\n🔄 Toggling lazy install...")
-    if is_lazy_install_enabled():
-        disable_lazy_install()
+    if LazyConfig.is_enabled():
+        LazyConfig.disable()
         print("   ✅ Lazy install disabled")
     else:
-        enable_lazy_install()
+        LazyConfig.enable()
         print("   ✅ Lazy install enabled")
     
-    print(f"📊 New status: {is_lazy_install_enabled()}")
+    print(f"📊 New status: {LazyConfig.is_enabled()}")
 
 def demo_lazy_import_with_install():
     """Demo 2: Lazy Import with Install"""
@@ -119,7 +114,7 @@ def demo_environment_control():
     print("🚀 DEMO 4: Environment Variable Control")
     print("=" * 60)
     
-    from exonware.xwsystem.config.lazy_config import load_from_environment
+    from exonware.xwsystem.utils.lazy_package.config import load_from_environment
     
     print("🌍 Environment variable control:")
     print("   Set XWSYSTEM_LAZY_INSTALL=true to enable")
@@ -173,7 +168,7 @@ def demo_universal_coverage():
     print("🚀 DEMO 6: Universal Coverage")
     print("=" * 60)
     
-    from exonware.xwsystem.config.lazy_config import UNIVERSAL_PACKAGES
+    from exonware.xwsystem.utils.lazy_package.config import UNIVERSAL_PACKAGES
     
     # Categorize packages
     categories = {

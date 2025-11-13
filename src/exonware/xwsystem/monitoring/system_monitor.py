@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: September 04, 2025
 
 System-wide monitoring and hardware introspection utilities.
@@ -275,9 +275,6 @@ class SystemMonitor:
         Returns:
             True if process was killed
         """
-        if not PSUTIL_AVAILABLE:
-            raise RuntimeError("psutil is required for process management")
-        
         try:
             proc = psutil.Process(pid)
             

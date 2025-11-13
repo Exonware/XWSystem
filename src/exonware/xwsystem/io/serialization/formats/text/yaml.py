@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 YAML serialization - Human-readable data serialization format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWYamlSerializer (concrete implementation)
+- Concrete: YamlSerializer
 """
 
 from typing import Any, Optional, Union
@@ -22,24 +22,22 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 # Lazy import for yaml (PyYAML)
-try:
-    import yaml
-except ImportError:
-    yaml = None
+# The lazy hook will automatically handle ImportError and install PyYAML if missing
+import yaml
 
 
-class XWYamlSerializer(ASerialization):
+class YamlSerializer(ASerialization):
     """
-    YAML serializer - follows I→A→XW pattern.
+    YAML serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWYamlSerializer (concrete implementation)
+    Concrete: YamlSerializer
     
     Uses PyYAML library for YAML handling.
     
     Examples:
-        >>> serializer = XWYamlSerializer()
+        >>> serializer = YamlSerializer()
         >>> 
         >>> # Encode data
         >>> yaml_str = serializer.encode({"key": "value"})
@@ -57,11 +55,6 @@ class XWYamlSerializer(ASerialization):
     def __init__(self):
         """Initialize YAML serializer."""
         super().__init__()
-        if yaml is None:
-            raise ImportError(
-                "PyYAML is required for YAML serialization. "
-                "Install with: pip install PyYAML"
-            )
     
     # ========================================================================
     # CODEC METADATA
@@ -185,8 +178,4 @@ class XWYamlSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-YamlSerializer = XWYamlSerializer
 

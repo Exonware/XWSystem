@@ -3,17 +3,12 @@
 """Database-based serialization formats (core lightweight formats only)."""
 
 # Core lightweight database formats (built-in, ~0 KB)
-from .sqlite3 import XWSqlite3Serializer, Sqlite3Serializer
-from .dbm import XWDbmSerializer, DbmSerializer
-from .shelve import XWShelveSerializer, ShelveSerializer
+from .sqlite3 import Sqlite3Serializer
+from .dbm import DbmSerializer
+from .shelve import ShelveSerializer
 
 __all__ = [
-    # I→A→XW pattern (XW prefix)
-    "XWSqlite3Serializer",
-    "XWDbmSerializer",
-    "XWShelveSerializer",
-    
-    # Backward compatibility aliases
+    # Primary serializers
     "Sqlite3Serializer",
     "DbmSerializer",
     "ShelveSerializer",

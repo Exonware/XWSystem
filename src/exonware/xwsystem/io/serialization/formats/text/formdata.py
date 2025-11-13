@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 FormData serialization - URL-encoded form data.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWFormDataSerializer (concrete implementation)
+- Concrete: FormDataSerializer
 """
 
 from urllib.parse import urlencode, parse_qs
@@ -23,18 +23,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWFormDataSerializer(ASerialization):
+class FormDataSerializer(ASerialization):
     """
-    FormData serializer - follows I→A→XW pattern.
+    FormData serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWFormDataSerializer (concrete implementation)
+    Concrete: FormDataSerializer
     
     Uses Python's built-in urllib.parse for form data encoding.
     
     Examples:
-        >>> serializer = XWFormDataSerializer()
+        >>> serializer = FormDataSerializer()
         >>> 
         >>> # Encode data
         >>> form_str = serializer.encode({"username": "john", "password": "secret"})
@@ -172,8 +172,4 @@ class XWFormDataSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-FormDataSerializer = XWFormDataSerializer
 

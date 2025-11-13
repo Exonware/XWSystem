@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Serialization module - 29+ serialization formats with I→A→XW pattern.
@@ -32,26 +32,28 @@ from .registry import SerializationRegistry, get_serialization_registry
 # )
 # Available in: pip install exonware-xwschema
 
-# Text formats (8 formats)
+# Text formats (10 formats)
 from .formats.text import (
-    XWJsonSerializer, JsonSerializer,
-    XWYamlSerializer, YamlSerializer,
-    XWTomlSerializer, TomlSerializer,
-    XWXmlSerializer, XmlSerializer,
-    XWCsvSerializer, CsvSerializer,
-    XWConfigParserSerializer, ConfigParserSerializer,
-    XWFormDataSerializer, FormDataSerializer,
-    XWMultipartSerializer, MultipartSerializer,
+    JsonSerializer,
+    Json5Serializer,
+    JsonLinesSerializer,
+    YamlSerializer,
+    TomlSerializer,
+    XmlSerializer,
+    CsvSerializer,
+    ConfigParserSerializer,
+    FormDataSerializer,
+    MultipartSerializer,
 )
 
 # Binary formats (6 formats)
 from .formats.binary import (
-    XWMsgPackSerializer, MsgPackSerializer,
-    XWPickleSerializer, PickleSerializer,
-    XWBsonSerializer, BsonSerializer,
-    XWMarshalSerializer, MarshalSerializer,
-    XWCborSerializer, CborSerializer,
-    XWPlistSerializer, PlistlibSerializer,
+    MsgPackSerializer,
+    PickleSerializer,
+    BsonSerializer,
+    MarshalSerializer,
+    CborSerializer,
+    PlistSerializer,
 )
 
 # NOTE: Enterprise schema formats moved to exonware-xwformats
@@ -64,9 +66,9 @@ from .formats.binary import (
 
 # Database formats (3 core formats)
 from .formats.database import (
-    XWSqlite3Serializer, Sqlite3Serializer,
-    XWDbmSerializer, DbmSerializer,
-    XWShelveSerializer, ShelveSerializer,
+    Sqlite3Serializer,
+    DbmSerializer,
+    ShelveSerializer,
 )
 
 # NOTE: Enterprise database formats moved to exonware-xwformats
@@ -88,14 +90,15 @@ _codec_registry = get_registry()
 
 # Register all core serializers
 for _serializer_class in [
-    # Text formats (8)
-    XWJsonSerializer, XWYamlSerializer, XWTomlSerializer, XWXmlSerializer,
-    XWCsvSerializer, XWConfigParserSerializer, XWFormDataSerializer, XWMultipartSerializer,
+    # Text formats (10)
+    JsonSerializer, Json5Serializer, JsonLinesSerializer, YamlSerializer,
+    TomlSerializer, XmlSerializer, CsvSerializer, ConfigParserSerializer,
+    FormDataSerializer, MultipartSerializer,
     # Binary formats (6)
-    XWMsgPackSerializer, XWPickleSerializer, XWBsonSerializer, XWMarshalSerializer,
-    XWCborSerializer, XWPlistSerializer,
+    MsgPackSerializer, PickleSerializer, BsonSerializer, MarshalSerializer,
+    CborSerializer, PlistSerializer,
     # Database formats (3)
-    XWSqlite3Serializer, XWDbmSerializer, XWShelveSerializer,
+    Sqlite3Serializer, DbmSerializer, ShelveSerializer,
 ]:
     try:
         _codec_registry.register(_serializer_class)
@@ -117,28 +120,30 @@ __all__ = [
     "SerializationRegistry",
     "get_serialization_registry",
     
-    # Text formats (8 - I→A→XW pattern)
-    "XWJsonSerializer", "JsonSerializer",
-    "XWYamlSerializer", "YamlSerializer",
-    "XWTomlSerializer", "TomlSerializer",
-    "XWXmlSerializer", "XmlSerializer",
-    "XWCsvSerializer", "CsvSerializer",
-    "XWConfigParserSerializer", "ConfigParserSerializer",
-    "XWFormDataSerializer", "FormDataSerializer",
-    "XWMultipartSerializer", "MultipartSerializer",
+    # Text formats (10)
+    "JsonSerializer",
+    "Json5Serializer",
+    "JsonLinesSerializer",
+    "YamlSerializer",
+    "TomlSerializer",
+    "XmlSerializer",
+    "CsvSerializer",
+    "ConfigParserSerializer",
+    "FormDataSerializer",
+    "MultipartSerializer",
     
-    # Binary formats (6 - I→A→XW pattern)
-    "XWMsgPackSerializer", "MsgPackSerializer",
-    "XWPickleSerializer", "PickleSerializer",
-    "XWBsonSerializer", "BsonSerializer",
-    "XWMarshalSerializer", "MarshalSerializer",
-    "XWCborSerializer", "CborSerializer",
-    "XWPlistSerializer", "PlistlibSerializer",
+    # Binary formats (6)
+    "MsgPackSerializer",
+    "PickleSerializer",
+    "BsonSerializer",
+    "MarshalSerializer",
+    "CborSerializer",
+    "PlistSerializer",
     
-    # Database formats (3 - I→A→XW pattern)
-    "XWSqlite3Serializer", "Sqlite3Serializer",
-    "XWDbmSerializer", "DbmSerializer",
-    "XWShelveSerializer", "ShelveSerializer",
+    # Database formats (3)
+    "Sqlite3Serializer",
+    "DbmSerializer",
+    "ShelveSerializer",
     
     # Supporting utilities
     "SerializationFormat",

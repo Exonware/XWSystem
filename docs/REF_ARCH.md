@@ -123,6 +123,23 @@ exonware-xwsystem/
 
 **Design Pattern:** Decorator pattern
 
+### 7. IPC Module (`ipc/`)
+
+**Purpose:** Inter-process communication primitives (process pools, message queues, shared memory managers).
+
+**Key Components:**
+- `process_pool.py` – Synchronous + async process orchestration with worker management.
+- `message_queue.py` – Queue-based messaging for processes or threads.
+- `shared_memory.py` – Shared buffers with synchronization helpers.
+- `async_fabric.py` (NEW) – Async Process Fabric facade coordinating the above primitives with unified lifecycle hooks.
+
+**Design Notes:**
+- `AsyncProcessFabric` composes the existing primitives, wrapping them in an async-friendly orchestration API that enforces consistent startup/shutdown semantics.
+- The facade exposes task submission, async iteration, and shared resource helpers while delegating execution logic to existing modules. This preserves backwards compatibility.
+- Lifecycle instrumentation plugs into monitoring hooks (emitters to be wired in subsequent iterations) and surfaces consistent error handling using `ipc.errors`.
+
+**Design Patterns:** Facade + Mediator (AsyncProcessFabric mediates coordination between queues, pools, and shared memory).
+
 ---
 
 ## ?? Design Patterns

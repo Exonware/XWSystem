@@ -3,16 +3,35 @@ Test IPC (Inter-Process Communication) functionality.
 """
 
 import pytest
+import sys
 import asyncio
 import time
 import multiprocessing as mp
 from unittest.mock import Mock, patch
 
 from src.exonware.xwsystem import (
-    ProcessManager, ProcessInfo, SharedMemoryManager, SharedData,
-    MessageQueue, AsyncMessageQueue, ProcessPool, AsyncProcessPool,
-    Pipe, AsyncPipe
+    ProcessManager,
+    ProcessInfo,
+    SharedMemoryManager,
+    SharedData,
+    MessageQueue,
+    AsyncMessageQueue,
+    ProcessPool,
+    AsyncProcessPool,
+    Pipe,
+    AsyncPipe,
 )
+from src.exonware.xwsystem.ipc import AsyncProcessFabric
+
+
+def _fabric_identity(value):
+    """Simple picklable function for process pool tests."""
+    return value
+
+
+def _fabric_ingest(dataset: str) -> dict:
+    """Mock dataset ingest task executed inside the process pool."""
+    return {"dataset": dataset, "status": "ingested"}
 
 
 class TestProcessManager:
@@ -29,7 +48,10 @@ class TestProcessManager:
         """Test starting a simple process."""
         with ProcessManager() as manager:
             # Start a simple echo process
-            success = manager.start_process("test_echo", ["echo", "hello"])
+            success = manager.start_process(
+                "test_echo",
+                [sys.executable, "-c", "print('hello')"],
+            )
             assert success
             
             # Check process info
@@ -398,6 +420,57 @@ class TestIntegration:
                 assert len(results) == 2
                 assert "processed: message1" in results
                 assert "processed: message2" in results
+
+
+class TestAsyncProcessFabric:
+    """Tests for the AsyncProcessFabric orchestration facade."""
+
+    @pytest.mark.asyncio
+    async def test_submit_and_iter_results(self):
+        fabric = AsyncProcessFabric()
+        async with fabric.session() as session:
+            task_ids = [
+                await session.submit(_fabric_ingest, "customers"),
+                await session.submit(_fabric_ingest, "orders"),
+            ]
+
+            results = []
+            async for result in session.iter_results(task_ids, timeout=5.0):
+                results.append(result)
+
+        assert len(results) == 2
+        datasets = {entry["dataset"] for entry in results}
+        assert datasets == {"customers", "orders"}
+        assert all(entry["status"] == "ingested" for entry in results)
+
+    @pytest.mark.asyncio
+    async def test_publish_consume_with_channels(self):
+        fabric = AsyncProcessFabric()
+        async with fabric.session() as session:
+            await session.publish("alpha", {"value": 1})
+            await session.publish("beta", {"value": 2})
+
+            beta_payload = await session.consume("beta", timeout=1.0)
+            assert beta_payload == {"value": 2}
+
+            # Remaining message should still be available without channel filter
+            alpha_payload = await session.consume(timeout=1.0)
+            assert alpha_payload == {"value": 1}
+
+    @pytest.mark.asyncio
+    async def test_shared_memory_lifecycle(self):
+        fabric = AsyncProcessFabric()
+        segment_name = f"fabric_segment_{int(time.time() * 1000)}"
+
+        async with fabric.session() as session:
+            segment = session.share(segment_name, size=256)
+            assert segment.name == segment_name
+            segment.set({"ok": True})
+
+            same_segment = session.share(segment_name, create_if_missing=False)
+            assert same_segment.get() == {"ok": True}
+
+            assert session.release_shared(segment_name)
 
 
 # Utility functions for testing

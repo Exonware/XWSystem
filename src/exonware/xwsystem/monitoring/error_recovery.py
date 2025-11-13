@@ -5,11 +5,13 @@ This module provides comprehensive error recovery, circuit breaker patterns,
 retry mechanisms, and graceful degradation for production deployment.
 """
 
+import asyncio
 import functools
 import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Type, Union
+
 from .defs import CircuitState
 
 from ..config.logging_setup import get_logger
@@ -308,6 +310,43 @@ class ErrorRecoveryManager:
         # This should never be reached
         raise last_exception
 
+    async def async_retry_with_backoff(
+        self,
+        func: Callable,
+        max_retries: int = 3,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+        backoff_factor: float = 2.0,
+        exceptions: tuple = (Exception,),
+        *args,
+        **kwargs,
+    ) -> Any:
+        """
+        Execute coroutine function with exponential backoff retry.
+
+        Args mirror retry_with_backoff but operate asynchronously to avoid
+        blocking the event loop while waiting between retries.
+        """
+        last_exception = None
+        delay = base_delay
+
+        for attempt in range(max_retries + 1):
+            try:
+                return await func(*args, **kwargs)
+            except exceptions as e:
+                last_exception = e
+
+                if attempt == max_retries:
+                    logger.error(f"❌ Async function failed after {max_retries} retries: {e}")
+                    raise
+
+                logger.warning(f"🔄 Async retry {attempt + 1}/{max_retries} after {delay:.1f}s: {e}")
+                await asyncio.sleep(delay)
+                delay = min(delay * backoff_factor, max_delay)
+
+        # This should never be reached
+        raise last_exception
+
     def graceful_degradation(
         self,
         primary_func: Callable,
@@ -501,9 +540,27 @@ def retry_with_backoff(
     """
 
     def decorator(func: Callable) -> Callable:
+        manager = get_error_recovery_manager()
+
+        if asyncio.iscoroutinefunction(func):
+
+            @functools.wraps(func)
+            async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+                return await manager.async_retry_with_backoff(
+                    func,
+                    max_retries,
+                    base_delay,
+                    max_delay,
+                    backoff_factor,
+                    exceptions,
+                    *args,
+                    **kwargs,
+                )
+
+            return async_wrapper
+
         @functools.wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            manager = get_error_recovery_manager()
+        def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
             return manager.retry_with_backoff(
                 func,
                 max_retries,
@@ -515,7 +572,7 @@ def retry_with_backoff(
                 **kwargs,
             )
 
-        return wrapper
+        return sync_wrapper
 
     return decorator
 

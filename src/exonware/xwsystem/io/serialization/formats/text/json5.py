@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 02-Nov-2025
 
 JSON5 Serialization - Extended JSON with Comments and Trailing Commas
@@ -26,22 +26,21 @@ Priority 5 (Extensibility): Compatible with standard JSON
 from typing import Any, Dict, Optional, Union
 from pathlib import Path
 
-try:
-    import json5
-except ImportError:
-    json5 = None
+# Lazy import for json5 - the lazy hook will automatically handle ImportError
+import json5
 
 from ...base import ASerialization
 from ...contracts import ISerialization
 
 
-class XWJson5Serializer(ASerialization):
+class Json5Serializer(ASerialization):
     """
     JSON5 serializer with comment support.
     
-    I: ISerialization (interface)
-    A: ASerialization (abstract base)
-    XW: XWJson5Serializer (concrete implementation)
+    Following I→A pattern:
+    - I: ISerialization (interface)
+    - A: ASerialization (abstract base)
+    - Concrete: Json5Serializer
     """
     
     def __init__(self):
@@ -107,8 +106,4 @@ class XWJson5Serializer(ASerialization):
             data = data.decode('utf-8')
         
         return json5.loads(data)
-
-
-# Backward compatibility alias
-Json5Serializer = XWJson5Serializer
 

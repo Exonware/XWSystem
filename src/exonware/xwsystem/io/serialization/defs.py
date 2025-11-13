@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 07-Sep-2025
 
 Serialization types and enums for XWSystem.
@@ -56,6 +56,15 @@ class SerializationCapability(Flag):
     ZERO_COPY = auto()
     CANONICAL = auto()
     RANDOM_ACCESS = auto()
+    # Advanced features (added in ADR-001)
+    PATH_BASED_UPDATES = auto()  # Supports JSONPointer/XPath/YAML path updates
+    ATOMIC_PATH_WRITE = auto()  # Can atomically update paths without loading full file
+    SCHEMA_VALIDATION = auto()  # Supports schema validation
+    INCREMENTAL_STREAMING = auto()  # True incremental streaming (not chunked full-file)
+    MULTI_DOCUMENT = auto()  # Supports multiple documents in one file
+    QUERY_SUPPORT = auto()  # Supports query/filter operations (JSONPath, XPath)
+    MERGE_OPERATIONS = auto()  # Supports merge/update operations
+    LAZY_LOADING = auto()  # Supports lazy loading for large files
 
 
 class CompatibilityLevel(Enum):

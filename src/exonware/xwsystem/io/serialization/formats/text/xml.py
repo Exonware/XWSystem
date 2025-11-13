@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 XML serialization - Extensible Markup Language.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWXmlSerializer (concrete implementation)
+- Concrete: XmlSerializer
 """
 
 from typing import Any, Optional, Union
@@ -22,33 +22,33 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 # Use defusedxml for security
+# Try defusedxml first (more secure), fallback to standard library if not available
+# The lazy hook will handle defusedxml installation if missing
 try:
     import defusedxml.ElementTree as ET
     from defusedxml import defuse_stdlib
     defuse_stdlib()
 except ImportError:
+    # Fallback to standard library (always available)
     import xml.etree.ElementTree as ET
 
-try:
-    import dicttoxml
-    import xmltodict
-except ImportError:
-    dicttoxml = None
-    xmltodict = None
+# Lazy import for dicttoxml and xmltodict - the lazy hook will automatically handle ImportError
+import dicttoxml
+import xmltodict
 
 
-class XWXmlSerializer(ASerialization):
+class XmlSerializer(ASerialization):
     """
-    XML serializer - follows I→A→XW pattern.
+    XML serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWXmlSerializer (concrete implementation)
+    Concrete: XmlSerializer
     
     Uses defusedxml, dicttoxml, and xmltodict for secure XML handling.
     
     Examples:
-        >>> serializer = XWXmlSerializer()
+        >>> serializer = XmlSerializer()
         >>> 
         >>> # Encode data
         >>> xml_str = serializer.encode({"user": {"name": "John", "age": 30}})
@@ -207,8 +207,4 @@ class XWXmlSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-XmlSerializer = XWXmlSerializer
 

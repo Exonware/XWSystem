@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: September 04, 2025
 
 Automatic serializer that detects format and delegates to appropriate serializer.
@@ -72,7 +72,7 @@ class AutoSerializer:
             'SQLite3': ('sqlite3', 'Sqlite3Serializer'),
             'DBM': ('dbm', 'DbmSerializer'),
             'Shelve': ('shelve', 'ShelveSerializer'),
-            'Plistlib': ('plistlib', 'PlistlibSerializer'),
+            'Plistlib': ('plistlib', 'PlistSerializer'),
             
             # Schema-based formats
             'Avro': ('avro', 'AvroSerializer'),

@@ -3,29 +3,20 @@
 """Binary serialization formats (core lightweight formats)."""
 
 # Core binary formats
-from .msgpack import XWMsgPackSerializer, MsgPackSerializer
-from .pickle import XWPickleSerializer, PickleSerializer
-from .bson import XWBsonSerializer, BsonSerializer
-from .marshal import XWMarshalSerializer, MarshalSerializer
-from .cbor import XWCborSerializer, CborSerializer
-from .plistlib import XWPlistSerializer, PlistlibSerializer
+from .msgpack import MsgPackSerializer
+from .pickle import PickleSerializer
+from .bson import BsonSerializer
+from .marshal import MarshalSerializer
+from .cbor import CborSerializer
+from .plistlib import PlistSerializer
 
 __all__ = [
-    # I→A→XW pattern (XW prefix)
-    "XWMsgPackSerializer",
-    "XWPickleSerializer",
-    "XWBsonSerializer",
-    "XWMarshalSerializer",
-    "XWCborSerializer",
-    "XWPlistSerializer",
-    
-    # Backward compatibility aliases
     "MsgPackSerializer",
     "PickleSerializer",
     "BsonSerializer",
     "MarshalSerializer",
     "CborSerializer",
-    "PlistlibSerializer",
+    "PlistSerializer",
 ]
 
 # NOTE: Enterprise binary formats moved to xwformats:

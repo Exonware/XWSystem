@@ -17,8 +17,14 @@ if src_path not in sys.path:
     sys.path.insert(0, src_path)
 
 try:
-from exonware.xwsystem.config.logging import LoggingConfig, logging_config, logging_disable, logging_enable, logging_set_level
-from exonware.xwsystem.config.logging_setup import setup_logging, get_logger
+    from exonware.xwsystem.config.logging import (
+        LoggingConfig,
+        logging_config,
+        logging_disable,
+        logging_enable,
+        logging_set_level,
+    )
+    from exonware.xwsystem.config.logging_setup import setup_logging, get_logger
 except ImportError as e:
     pytest.skip(f"Logging config import failed: {e}", allow_module_level=True)
 

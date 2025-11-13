@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: September 05, 2025
 
 Flyweight Pattern Implementation for Serializers
@@ -339,7 +339,7 @@ def create_serializer(format_name: str, **config: Any) -> ISerialization:
         JsonSerializer, YamlSerializer, TomlSerializer, XmlSerializer,
         CsvSerializer, ConfigParserSerializer, PickleSerializer, MarshalSerializer,
         BsonSerializer, MsgPackSerializer, CborSerializer,
-        DbmSerializer, ShelveSerializer, PlistlibSerializer,
+        DbmSerializer, ShelveSerializer, PlistSerializer,
         FormDataSerializer, MultipartSerializer
     )
     
@@ -364,7 +364,7 @@ def create_serializer(format_name: str, **config: Any) -> ISerialization:
         'cbor': CborSerializer,
         'dbm': DbmSerializer,
         'shelve': ShelveSerializer,
-        'plist': PlistlibSerializer,
+        'plist': PlistSerializer,
         'formdata': FormDataSerializer,
         'multipart': MultipartSerializer,
     }

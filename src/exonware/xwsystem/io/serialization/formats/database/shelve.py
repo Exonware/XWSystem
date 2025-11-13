@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Shelve serialization - Persistent dictionary storage.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWShelveSerializer (concrete implementation)
+- Concrete: ShelveSerializer
 """
 
 import shelve
@@ -23,8 +23,8 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWShelveSerializer(ASerialization):
-    """Shelve serializer - follows I→A→XW pattern."""
+class ShelveSerializer(ASerialization):
+    """Shelve serializer - follows the I→A pattern."""
     
     @property
     def codec_id(self) -> str:
@@ -69,7 +69,4 @@ class XWShelveSerializer(ASerialization):
     def decode(self, repr: Union[bytes, str], *, options: Optional[DecodeOptions] = None) -> Any:
         """Shelve decode requires file path - use load_file() instead."""
         raise NotImplementedError("Shelve requires file-based operations - use load_file()")
-
-
-ShelveSerializer = XWShelveSerializer
 

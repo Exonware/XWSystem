@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Marshal serialization - Python internal serialization.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWMarshalSerializer (concrete implementation)
+- Concrete: MarshalSerializer
 """
 
 import marshal
@@ -23,13 +23,13 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWMarshalSerializer(ASerialization):
+class MarshalSerializer(ASerialization):
     """
-    Marshal serializer - follows I→A→XW pattern.
+    Marshal serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWMarshalSerializer (concrete implementation)
+    Concrete: MarshalSerializer
     
     Uses Python's built-in marshal module.
     
@@ -37,7 +37,7 @@ class XWMarshalSerializer(ASerialization):
     storage across Python versions!
     
     Examples:
-        >>> serializer = XWMarshalSerializer()
+        >>> serializer = MarshalSerializer()
         >>> 
         >>> # Encode data
         >>> marshal_bytes = serializer.encode([1, 2, 3, "hello"])
@@ -159,8 +159,4 @@ class XWMarshalSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-MarshalSerializer = XWMarshalSerializer
 

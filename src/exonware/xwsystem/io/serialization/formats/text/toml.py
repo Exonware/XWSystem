@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 TOML serialization - Configuration file format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWTomlSerializer (concrete implementation)
+- Concrete: TomlSerializer
 """
 
 import sys
@@ -26,30 +26,25 @@ from ....errors import SerializationError
 if sys.version_info >= (3, 11):
     import tomllib
 else:
-    try:
-        import tomli as tomllib
-    except ImportError:
-        tomllib = None
+    # Lazy import for tomli - the lazy hook will automatically handle ImportError
+    import tomli as tomllib
 
-# For writing TOML
-try:
-    import tomli_w
-except ImportError:
-    tomli_w = None
+# Lazy import for tomli_w - the lazy hook will automatically handle ImportError
+import tomli_w
 
 
-class XWTomlSerializer(ASerialization):
+class TomlSerializer(ASerialization):
     """
-    TOML serializer - follows I→A→XW pattern.
+    TOML serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWTomlSerializer (concrete implementation)
+    Concrete: TomlSerializer
     
     Uses tomllib/tomli for reading and tomli_w for writing.
     
     Examples:
-        >>> serializer = XWTomlSerializer()
+        >>> serializer = TomlSerializer()
         >>> 
         >>> # Encode data
         >>> toml_str = serializer.encode({"database": {"port": 5432}})
@@ -196,8 +191,4 @@ class XWTomlSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-TomlSerializer = XWTomlSerializer
 

@@ -728,16 +728,40 @@ spent in repeated encoding operations.
 ### Pause/Cancel Phase
 
 **Pausing:**
-- Update status: 🟢 In Progress ? ⏸️ Paused
+- Update status: 🟢 In Progress → ⏸️ Paused
 - Document reason for pause
 - Document restart conditions
 - Log in logs/SUMMARY_PLAN.md
 
 **Cancelling:**
-- Update status: ? ? Cancelled
+- Update status: 🟢 In Progress → ❌ Cancelled
 - Document reason for cancellation
 - Document lessons learned
 - Log in logs/SUMMARY_PLAN.md
+
+---
+
+### Active Lifecycle Checklist – PLAN_20251109_1500_ASYNC_PROCESS_FABRIC
+
+**Focus:** Deliver the Async Process Fabric facade while honoring plan → code → test → benchmark → docs checkpoints.
+
+1. **Plan**
+   - Maintain `PLAN_20251109_1500_ASYNC_PROCESS_FABRIC.md` under `docs/logs/plans/` with status updates and assumptions.
+   - Sync scope entries with `REF_PROJECT.md` (iteration table) and `REF_IDEA.md` (IDEA-018 status).
+2. **Code**
+   - Implement `AsyncProcessFabric` in `src/exonware/xwsystem/ipc/async_fabric.py`.
+   - Update `ipc/__init__.py` and IPC registries to expose the new facade.
+3. **Test**
+   - Add unit coverage in `tests/1.unit/ipc_tests/` validating async submission, iteration, and graceful shutdown behaviour.
+   - Run IPC unit suites (`pytest tests/1.unit/ipc_tests -k async_fabric`) and capture outcomes in the testing logs.
+4. **Benchmark**
+   - Document throughput/latency scenarios in `REF_BENCH.md`; add or stub a harness in `benchmarks/` as time permits.
+   - Record benchmark executions (if any) in `docs/logs/benchmarks/`.
+5. **Docs & Logs**
+   - Update `REF_API.md`, `REF_USAGE.md`, `REF_PLAN.md`, `REF_ARCH.md`, `REF_PROJECT.md`, and `REF_IDEA.md` to reflect the new facade.
+   - Summarise lifecycle execution in `docs/logs/plans/PLAN_20251109_1500_ASYNC_PROCESS_FABRIC.md` and add a change entry in `docs/logs/changes/`.
+
+Use this checklist to keep every lifecycle phase synchronized while the plan remains active.
 
 ---
 

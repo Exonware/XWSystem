@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 10-Oct-2025
 
 Lazy Package - Unified Lazy Loading System
@@ -149,6 +149,8 @@ from .lazy_core import (
     check_externally_managed_environment,
 )
 
+from .config import LazyConfig, DEFAULT_LAZY_CONFIG
+
 # Version info
 __version__ = "0.0.1.382"
 __author__ = "Eng. Muhammad AlShehri"
@@ -248,6 +250,8 @@ __all__ = [
     
     # Configuration
     'config_package_lazy_install_enabled',
+    'LazyConfig',
+    'DEFAULT_LAZY_CONFIG',
     
     # Security & Policy
     'set_package_allow_list',

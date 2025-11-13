@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -56,6 +56,13 @@ from typing import TYPE_CHECKING
 # Performance optimization: lazy import expensive modules
 if TYPE_CHECKING:
     from typing import Any
+
+# =============================================================================
+# EARLY LAZY BOOTSTRAP - Install hook before any imports
+# =============================================================================
+# Import bootstrap FIRST to install hook if [lazy] extra detected
+# This ensures hook is active before serialization modules are imported
+from . import _lazy_bootstrap  # This installs hook if [lazy] extra detected
 
 # =============================================================================
 # LAZY LOADING SYSTEM - Unified Package
@@ -132,6 +139,9 @@ from .utils.lazy_package import (
     check_externally_managed_environment,
 )
 
+# Auto-detect [lazy] installation mode and install import hook only when enabled
+config_package_lazy_install_enabled("xwsystem")
+
 # =============================================================================
 # LAZY INSTALLATION - Simple One-Line Configuration
 # =============================================================================
@@ -149,32 +159,34 @@ from .utils.lazy_package import (
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging
 
-# Serialization utilities (17 core formats + intelligent auto-detection)
+# Serialization utilities (19 core formats + intelligent auto-detection)
 # Enterprise formats (Protobuf, Avro, Parquet, HDF5, etc.) available in exonware-xwformats
 from .io.serialization import (
     ISerialization,
     ASerialization,
     SerializationError,
-    # Text formats (8)
-    XWJsonSerializer, JsonSerializer,
-    XWYamlSerializer, YamlSerializer,
-    XWTomlSerializer, TomlSerializer,
-    XWXmlSerializer, XmlSerializer,
-    XWCsvSerializer, CsvSerializer,
-    XWConfigParserSerializer, ConfigParserSerializer,
-    XWFormDataSerializer, FormDataSerializer,
-    XWMultipartSerializer, MultipartSerializer,
+    # Text formats (10)
+    JsonSerializer,
+    Json5Serializer,
+    JsonLinesSerializer,
+    YamlSerializer,
+    TomlSerializer,
+    XmlSerializer,
+    CsvSerializer,
+    ConfigParserSerializer,
+    FormDataSerializer,
+    MultipartSerializer,
     # Binary formats (6)
-    XWMsgPackSerializer, MsgPackSerializer,
-    XWPickleSerializer, PickleSerializer,
-    XWBsonSerializer, BsonSerializer,
-    XWMarshalSerializer, MarshalSerializer,
-    XWCborSerializer, CborSerializer,
-    XWPlistSerializer, PlistlibSerializer,
+    MsgPackSerializer,
+    PickleSerializer,
+    BsonSerializer,
+    MarshalSerializer,
+    CborSerializer,
+    PlistSerializer,
     # Database formats (3)
-    XWSqlite3Serializer, Sqlite3Serializer,
-    XWDbmSerializer, DbmSerializer,
-    XWShelveSerializer, ShelveSerializer,
+    Sqlite3Serializer,
+    DbmSerializer,
+    ShelveSerializer,
     # Registry
     SerializationRegistry, get_serialization_registry,
     # Flyweight optimization
@@ -298,13 +310,13 @@ from .monitoring.system_monitor import (
 )
 
 # DateTime utilities
-from .datetime import (
+from .utils.dt import (
     humanize_timedelta, humanize_timestamp, time_ago, time_until,
     duration_to_human, parse_human_duration, TimezoneManager,
     convert_timezone, get_timezone_info, list_timezones,
     format_datetime
 )
-from .datetime.parsing import parse_datetime, parse_date, parse_time, parse_iso8601, parse_timestamp
+from .utils.dt.parsing import parse_datetime, parse_date, parse_time, parse_iso8601, parse_timestamp
 
 # IPC utilities
 from .ipc import (
@@ -422,7 +434,7 @@ from .monitoring import (
 # )
 
 # Core interfaces
-from .core.contracts import IStringable
+from .shared.contracts import IStringable
 
 # Note: Protocol definitions are now in their respective module contracts files:
 # - core/contracts.py for core interfaces (IStringable, IID, INative, etc.)
@@ -621,28 +633,30 @@ __all__ = [
     "ASerialization", 
     "SerializationError",
     
-    # Text formats (8) - I→A→XW pattern
-    "XWJsonSerializer", "JsonSerializer",
-    "XWYamlSerializer", "YamlSerializer",
-    "XWTomlSerializer", "TomlSerializer",
-    "XWXmlSerializer", "XmlSerializer",
-    "XWCsvSerializer", "CsvSerializer",
-    "XWConfigParserSerializer", "ConfigParserSerializer",
-    "XWFormDataSerializer", "FormDataSerializer",
-    "XWMultipartSerializer", "MultipartSerializer",
+    # Text formats (8) - I→A pattern
+    "JsonSerializer",
+    "Json5Serializer",
+    "JsonLinesSerializer",
+    "YamlSerializer",
+    "TomlSerializer",
+    "XmlSerializer",
+    "CsvSerializer",
+    "ConfigParserSerializer",
+    "FormDataSerializer",
+    "MultipartSerializer",
     
-    # Binary formats (6) - I→A→XW pattern
-    "XWMsgPackSerializer", "MsgPackSerializer",
-    "XWPickleSerializer", "PickleSerializer",
-    "XWBsonSerializer", "BsonSerializer",
-    "XWMarshalSerializer", "MarshalSerializer",
-    "XWCborSerializer", "CborSerializer",
-    "XWPlistSerializer", "PlistlibSerializer",
+    # Binary formats (6) - I→A pattern
+    "MsgPackSerializer",
+    "PickleSerializer",
+    "BsonSerializer",
+    "MarshalSerializer",
+    "CborSerializer",
+    "PlistSerializer",
     
-    # Database formats (3) - I→A→XW pattern
-    "XWSqlite3Serializer", "Sqlite3Serializer",
-    "XWDbmSerializer", "DbmSerializer",
-    "XWShelveSerializer", "ShelveSerializer",
+    # Database formats (3) - I→A pattern
+    "Sqlite3Serializer",
+    "DbmSerializer",
+    "ShelveSerializer",
     
     # Registry and utilities
     "SerializationRegistry", "get_serialization_registry",

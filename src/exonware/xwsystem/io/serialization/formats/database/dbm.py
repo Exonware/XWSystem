@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 DBM serialization - Unix database manager.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWDbmSerializer (concrete implementation)
+- Concrete: DbmSerializer
 """
 
 import dbm
@@ -23,8 +23,8 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWDbmSerializer(ASerialization):
-    """DBM serializer - follows I→A→XW pattern."""
+class DbmSerializer(ASerialization):
+    """DBM serializer - follows the I→A pattern."""
     
     @property
     def codec_id(self) -> str:
@@ -69,7 +69,4 @@ class XWDbmSerializer(ASerialization):
     def decode(self, repr: Union[bytes, str], *, options: Optional[DecodeOptions] = None) -> Any:
         """DBM decode requires file path - use load_file() instead."""
         raise NotImplementedError("DBM requires file-based operations - use load_file()")
-
-
-DbmSerializer = XWDbmSerializer
 

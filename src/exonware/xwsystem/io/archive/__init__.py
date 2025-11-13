@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 Archive and compression with REGISTRY PATTERN!
@@ -60,7 +60,7 @@ from .formats import (
 )
 
 # NEW: Archivers (Codecs - In-memory) - I→A→XW pattern
-from .archivers import XWZipArchiver, XWTarArchiver
+from .archivers import ZipArchiver, TarArchiver
 
 # NEW: Archive Files (File persistence) - I→A→XW pattern
 from .archive_files import ZipFile, TarFile
@@ -103,11 +103,8 @@ __all__ = [
     "DecompressionError",
     
     # Archivers (Codecs - In-memory) - I→A→XW pattern
-    "XWZipArchiver",
-    "XWTarArchiver",
-    # Backward compatibility aliases
-    "ZipArchiver",  # Alias for XWZipArchiver
-    "TarArchiver",  # Alias for XWTarArchiver
+    "ZipArchiver",
+    "TarArchiver",
     
     # Archive Files (File persistence)
     "ZipFile",
@@ -122,8 +119,3 @@ __all__ = [
     "Archive",
     "Compression",
 ]
-
-# Backward compatibility aliases
-# Archivers (codecs)
-ZipArchiver = XWZipArchiver
-TarArchiver = XWTarArchiver

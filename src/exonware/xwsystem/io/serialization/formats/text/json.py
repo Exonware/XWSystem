@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 JSON serialization - Universal, human-readable data interchange format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWJsonSerializer (concrete implementation)
+- Concrete: JsonSerializer
 """
 
 import json
@@ -23,18 +23,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWJsonSerializer(ASerialization):
+class JsonSerializer(ASerialization):
     """
-    JSON serializer - follows I→A→XW pattern.
+    JSON serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWJsonSerializer (concrete implementation)
+    Concrete: JsonSerializer
     
     Uses Python's built-in `json` library for reliable JSON handling.
     
     Examples:
-        >>> serializer = XWJsonSerializer()
+        >>> serializer = JsonSerializer()
         >>> 
         >>> # Encode data
         >>> json_str = serializer.encode({"key": "value"})
@@ -90,6 +90,25 @@ class XWJsonSerializer(ASerialization):
     @property
     def aliases(self) -> list[str]:
         return ["json", "JSON"]
+    
+    # ========================================================================
+    # ADVANCED FEATURE CAPABILITIES
+    # ========================================================================
+    
+    @property
+    def supports_path_based_updates(self) -> bool:
+        """JSON supports path-based updates via JSONPointer."""
+        return True
+    
+    @property
+    def supports_atomic_path_write(self) -> bool:
+        """JSON supports atomic path writes using JSONPointer."""
+        return True
+    
+    @property
+    def supports_query(self) -> bool:
+        """JSON supports queries via JSONPath."""
+        return True
     
     # ========================================================================
     # CORE ENCODE/DECODE (Using official json library)
@@ -182,8 +201,191 @@ class XWJsonSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-JsonSerializer = XWJsonSerializer
+    
+    # ========================================================================
+    # ADVANCED FEATURES (Path-based operations)
+    # ========================================================================
+    
+    def atomic_update_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        value: Any, 
+        **options
+    ) -> None:
+        """
+        Atomically update a single path in a JSON file using JSONPointer.
+        
+        Uses jsonpointer library for efficient path operations. For large files,
+        this still loads the entire file but provides atomic write guarantees.
+        Future optimizations could use streaming JSON parsers for true partial updates.
+        
+        Args:
+            file_path: Path to the JSON file
+            path: JSONPointer path (e.g., "/users/0/name")
+            value: Value to set at the specified path
+            **options: Options (backup=True, etc.)
+        
+        Raises:
+            SerializationError: If update fails
+            ValueError: If path is invalid
+            KeyError: If path doesn't exist
+        
+        Example:
+            >>> serializer = JsonSerializer()
+            >>> serializer.atomic_update_path("config.json", "/database/host", "localhost")
+        """
+        # Import jsonpointer (lazy loaded via lazy_package system)
+        import jsonpointer
+        
+        try:
+            path_obj = Path(file_path)
+            if not path_obj.exists():
+                raise FileNotFoundError(f"File not found: {path_obj}")
+            
+            # Validate path security
+            from ...utils.path_ops import validate_path_security
+            validate_path_security(path)
+            
+            # Load entire file (for now - future: streaming parser for large files)
+            data = self.load_file(file_path, **options)
+            
+            # Use jsonpointer to set value
+            jsonpointer.set_pointer(data, path, value)
+            
+            # Save atomically using AtomicFileWriter
+            from ....common.atomic import AtomicFileWriter
+            
+            repr_data = self.encode(data, options=options or None)
+            path_obj.parent.mkdir(parents=True, exist_ok=True)
+            
+            backup = options.get('backup', True)
+            with AtomicFileWriter(path_obj, backup=backup) as writer:
+                if isinstance(repr_data, bytes):
+                    writer.write(repr_data)
+                else:
+                    encoding = options.get('encoding', 'utf-8')
+                    writer.write(repr_data.encode(encoding))
+                    
+        except (FileNotFoundError, ValueError, KeyError, jsonpointer.JsonPointerException) as e:
+            raise
+        except Exception as e:
+            raise SerializationError(
+                f"Failed to atomically update path '{path}' in JSON file: {e}",
+                format_name=self.format_name,
+                original_error=e
+            ) from e
+    
+    def atomic_read_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        **options
+    ) -> Any:
+        """
+        Read a single path from a JSON file using JSONPointer.
+        
+        Uses jsonpointer library for efficient path operations. For large files,
+        this still loads the entire file. Future optimizations could use streaming
+        JSON parsers for true partial reads.
+        
+        Args:
+            file_path: Path to the JSON file
+            path: JSONPointer path (e.g., "/users/0/name")
+            **options: Options
+        
+        Returns:
+            Value at the specified path
+        
+        Raises:
+            SerializationError: If read fails
+            KeyError: If path doesn't exist
+        
+        Example:
+            >>> serializer = JsonSerializer()
+            >>> host = serializer.atomic_read_path("config.json", "/database/host")
+        """
+        # Import jsonpointer (lazy loaded via lazy_package system)
+        import jsonpointer
+        
+        try:
+            path_obj = Path(file_path)
+            if not path_obj.exists():
+                raise FileNotFoundError(f"File not found: {path_obj}")
+            
+            # Validate path security
+            from ...utils.path_ops import validate_path_security
+            validate_path_security(path)
+            
+            # Load entire file (for now - future: streaming parser for large files)
+            data = self.load_file(file_path, **options)
+            
+            # Use jsonpointer to get value
+            return jsonpointer.resolve_pointer(data, path)
+            
+        except (FileNotFoundError, jsonpointer.JsonPointerException) as e:
+            if isinstance(e, jsonpointer.JsonPointerException):
+                raise KeyError(f"Path not found: {path}") from e
+            raise
+        except Exception as e:
+            raise SerializationError(
+                f"Failed to read path '{path}' from JSON file: {e}",
+                format_name=self.format_name,
+                original_error=e
+            ) from e
+    
+    def query(
+        self, 
+        file_path: Union[str, Path], 
+        query_expr: str, 
+        **options
+    ) -> Any:
+        """
+        Query JSON file using JSONPath expression.
+        
+        Uses jsonpath-ng library for JSONPath queries.
+        
+        Args:
+            file_path: Path to the JSON file
+            query_expr: JSONPath expression (e.g., "$.users[*].name")
+            **options: Query options
+        
+        Returns:
+            Query results (list of matching values)
+        
+        Raises:
+            SerializationError: If query fails
+            ValueError: If query expression is invalid
+        
+        Example:
+            >>> serializer = JsonSerializer()
+            >>> names = serializer.query("users.json", "$.users[*].name")
+        """
+        # Import jsonpath_ng (lazy loaded via lazy_package system)
+        from jsonpath_ng import parse as parse_jsonpath
+        
+        try:
+            path_obj = Path(file_path)
+            if not path_obj.exists():
+                raise FileNotFoundError(f"File not found: {path_obj}")
+            
+            # Load file
+            data = self.load_file(file_path, **options)
+            
+            # Parse JSONPath expression
+            jsonpath_expr = parse_jsonpath(query_expr)
+            
+            # Execute query
+            matches = [match.value for match in jsonpath_expr.find(data)]
+            
+            return matches
+            
+        except (FileNotFoundError, ValueError) as e:
+            raise
+        except Exception as e:
+            raise SerializationError(
+                f"Failed to query JSON file with expression '{query_expr}': {e}",
+                format_name=self.format_name,
+                original_error=e
+            ) from e
 

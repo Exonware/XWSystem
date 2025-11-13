@@ -122,6 +122,40 @@ Performance is **Priority #4** in eXonware. These targets reflect xwsystem-speci
 | Stream 10MB | Local server | < 200ms | < 300ms | ✅ Met |
 | Connection pool | 100 connections | < 5ms/request | < 10ms | ✅ Met |
 
+### Async Process Fabric (NEW)
+
+#### Task Submission Throughput
+
+| Scenario | Target | Maximum | Status |
+|----------|--------|---------|--------|
+| Submit 1k lightweight tasks | ≥ 5,000 ops/s | ≥ 4,000 ops/s | 📋 Planned |
+| Submit 1k CPU-bound tasks | ≥ 1,200 ops/s | ≥ 1,000 ops/s | 📋 Planned |
+
+**Notes:** Measure using the `AsyncProcessFabric` facade over `AsyncProcessPool`. Benchmark harness to live in `benchmarks/async_fabric_benchmarks.py` (TBD). Collect metrics: ops/s, mean execution latency, worker saturation.
+
+#### Queue Latency
+
+| Scenario | Target | Maximum | Status |
+|----------|--------|---------|--------|
+| Publish→Consume round-trip (single producer/consumer) | < 5 ms | < 10 ms | 📋 Planned |
+| Publish→Consume with channel filter (3 channels) | < 8 ms | < 15 ms | 📋 Planned |
+
+**Notes:** Exercise `session.publish()` and `session.consume()` with and without channel filters. Capture P50/P95 latency and queue depth under load.
+
+#### Shared Memory Operations
+
+| Scenario | Target | Maximum | Status |
+|----------|--------|---------|--------|
+| Segment create+write (256 KB payload) | < 2 ms | < 5 ms | 📋 Planned |
+| Segment reuse (read existing payload) | < 1 ms | < 3 ms | 📋 Planned |
+
+**Notes:** Use `session.share()` / `session.release_shared()` to validate overhead for repeated attach/detach cycles.
+
+**Benchmark Harness TODOs:**
+- Scaffold async benchmark runner (`benchmarks/async_fabric_benchmarks.py`) leveraging `pytest-benchmark` or `anyio` loops.
+- Emit results to `docs/logs/benchmarks/` and update `logs/benchmarks/INDEX.md` once execution completes.
+- Integrate monitoring hooks (future iteration) to capture pool utilization during runs.
+
 ---
 
 ### Memory Performance

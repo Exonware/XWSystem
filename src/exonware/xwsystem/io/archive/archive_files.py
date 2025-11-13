@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 Archive FILES - File persistence for archives.
@@ -12,8 +12,8 @@ Archive FILES - File persistence for archives.
 IArchiveFile extends IFile and USES IArchiver for compression.
 
 Composition Pattern:
-- XWZipFile extends XWFile
-- XWZipFile USES ZipArchiver internally
+- ZipFile extends XWFile
+- ZipFile USES ZipArchiver internally
 - Separates file I/O from data transformation
 
 Priority 1 (Security): Safe file operations
@@ -31,7 +31,7 @@ from typing import Any, Dict, Optional, List, Union
 from ..archive.base import AArchiveFile
 from ..contracts import IArchiveFile, IArchiver
 from ..errors import ArchiveError
-from .archivers import XWZipArchiver, XWTarArchiver
+from .archivers import ZipArchiver, TarArchiver
 
 
 class ZipFile(AArchiveFile):
@@ -51,7 +51,7 @@ class ZipFile(AArchiveFile):
     
     Examples:
         >>> # Create zip file
-        >>> zip_file = XWZipFile("backup.zip")
+        >>> zip_file = ZipFile("backup.zip")
         >>> 
         >>> # Add files to archive
         >>> zip_file.add_files([Path("file1.txt"), Path("file2.txt")])
@@ -65,8 +65,8 @@ class ZipFile(AArchiveFile):
     
     def __init__(self, path: Union[str, Path]):
         """Initialize zip archive file."""
-        super().__init__(path, archiver=XWZipArchiver())
-        self._archiver = XWZipArchiver()  # Composition!
+        super().__init__(path, archiver=ZipArchiver())
+        self._archiver = ZipArchiver()  # Composition!
     
     def add_files(self, files: List[Path], **options) -> None:
         """
@@ -146,7 +146,7 @@ class TarFile(AArchiveFile):
     
     USES XWTarArchiver internally (composition).
     
-    Similar to XWZipFile but for tar format.
+    Similar to ZipFile but for tar format.
     Supports compression: gzip, bz2, xz
     """
     
@@ -158,8 +158,8 @@ class TarFile(AArchiveFile):
             path: Archive file path
             compression: Compression type ('', 'gz', 'bz2', 'xz')
         """
-        super().__init__(path, archiver=XWTarArchiver())
-        self._archiver = XWTarArchiver()  # Composition!
+        super().__init__(path, archiver=TarArchiver())
+        self._archiver = TarArchiver()  # Composition!
         self._compression = compression
     
     def add_files(self, files: List[Path], **options) -> None:
@@ -215,4 +215,6 @@ class TarFile(AArchiveFile):
     def get_archiver(self) -> IArchiver:
         """Get the underlying archiver codec."""
         return self._archiver
+
+
 

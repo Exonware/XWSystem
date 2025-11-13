@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Serialization Registry - Delegates to UniversalCodecRegistry.
@@ -164,7 +164,7 @@ class SerializationRegistry:
             serializer_class: Serializer class to register
         
         Examples:
-            >>> registry.register(XWJsonSerializer)
+            >>> registry.register(JsonSerializer)
         """
         self._codec_registry.register(serializer_class)
 

@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 Codec-integrated I/O - THE KILLER FEATURE!
@@ -19,7 +19,7 @@ Priority 5 (Extensibility): Works with ANY codec + ANY data source
 """
 
 from pathlib import Path
-from typing import Generic, TypeVar, Union, Optional, Iterator
+from typing import Generic, TypeVar, Union, Optional, Iterator, Any
 
 from ..contracts import ICodecIO, IPagedCodecIO, IDataSource, IPagedDataSource
 
@@ -134,6 +134,97 @@ class CodecIO(Generic[T, R], ICodecIO[T, R]):
     def delete(self) -> None:
         """Delete source."""
         self._source.delete()
+    
+    def update_path(self, path: str, value: Any, **opts) -> None:
+        """
+        Update a single path in the file using atomic path operations if supported.
+        
+        Checks if the codec (serializer) supports atomic path updates. If supported,
+        uses atomic_update_path for efficient updates. Otherwise, falls back to
+        full-file load/modify/save.
+        
+        Args:
+            path: Path expression (format-specific: JSONPointer, XPath, etc.)
+            value: Value to set at the specified path
+            **opts: Options (backup, atomic, etc.)
+        
+        Raises:
+            NotImplementedError: If path updates not supported and fallback fails
+            IOError: If update operation fails
+        
+        Example:
+            >>> io = CodecIO.from_file("config.json")
+            >>> io.update_path("/database/host", "localhost")
+        """
+        # Check if codec supports atomic path operations
+        if hasattr(self._codec, 'supports_atomic_path_write') and self._codec.supports_atomic_path_write:
+            # Get file path from source
+            if hasattr(self._source, '_path'):
+                file_path = self._source._path
+                # Use atomic path update
+                self._codec.atomic_update_path(file_path, path, value, **opts)
+                return
+        
+        # Fallback: load full file, update in memory, save
+        data = self.load(**opts)
+        
+        # Simple path update (subclasses should override for format-specific logic)
+        if isinstance(data, dict) and path.startswith('/'):
+            from ..serialization.utils.path_ops import set_value_by_path
+            set_value_by_path(data, path, value, create=opts.get('create', False))
+        else:
+            raise NotImplementedError(
+                f"Path updates not supported for codec {type(self._codec).__name__} "
+                f"and data type {type(data)}"
+            )
+        
+        # Save updated data
+        self.save(data, **opts)
+    
+    def read_path(self, path: str, **opts) -> Any:
+        """
+        Read a single path from the file using atomic path operations if supported.
+        
+        Checks if the codec (serializer) supports atomic path reads. If supported,
+        uses atomic_read_path for efficient reads. Otherwise, falls back to
+        full-file load and path extraction.
+        
+        Args:
+            path: Path expression (format-specific: JSONPointer, XPath, etc.)
+            **opts: Options
+        
+        Returns:
+            Value at the specified path
+        
+        Raises:
+            NotImplementedError: If path reads not supported
+            KeyError: If path doesn't exist
+            IOError: If read operation fails
+        
+        Example:
+            >>> io = CodecIO.from_file("config.json")
+            >>> host = io.read_path("/database/host")
+        """
+        # Check if codec supports atomic path operations
+        if hasattr(self._codec, 'supports_atomic_path_write') and self._codec.supports_atomic_path_write:
+            # Get file path from source
+            if hasattr(self._source, '_path'):
+                file_path = self._source._path
+                # Use atomic path read
+                return self._codec.atomic_read_path(file_path, path, **opts)
+        
+        # Fallback: load full file, extract path
+        data = self.load(**opts)
+        
+        # Simple path extraction (subclasses should override for format-specific logic)
+        if isinstance(data, dict) and path.startswith('/'):
+            from ..serialization.utils.path_ops import get_value_by_path
+            return get_value_by_path(data, path)
+        else:
+            raise NotImplementedError(
+                f"Path reads not supported for codec {type(self._codec).__name__} "
+                f"and data type {type(data)}"
+            )
     
     @staticmethod
     def from_file(path: Union[str, Path], mode: str = 'rb', encoding: Optional[str] = None):

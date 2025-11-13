@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 CSV serialization - Comma-separated values format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWCsvSerializer (concrete implementation)
+- Concrete: CsvSerializer
 """
 
 import csv
@@ -24,18 +24,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWCsvSerializer(ASerialization):
+class CsvSerializer(ASerialization):
     """
-    CSV serializer - follows I→A→XW pattern.
+    CSV serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWCsvSerializer (concrete implementation)
+    Concrete: CsvSerializer
     
     Uses Python's built-in csv module.
     
     Examples:
-        >>> serializer = XWCsvSerializer()
+        >>> serializer = CsvSerializer()
         >>> 
         >>> # Encode list of dicts
         >>> csv_str = serializer.encode([
@@ -210,8 +210,4 @@ class XWCsvSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-CsvSerializer = XWCsvSerializer
 

@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 Zstandard (.zst) compression format - RANK #2 MODERN STANDARD.
@@ -25,11 +25,8 @@ from typing import List, Optional
 from ...contracts import IArchiveFormat
 from ...errors import ArchiveError
 
-# Optional import - install with: pip install zstandard
-try:
-    import zstandard
-except ImportError:
-    zstandard = None
+# Lazy import for zstandard - the lazy hook will automatically handle ImportError
+import zstandard
 
 
 class ZstandardArchiver(IArchiveFormat):

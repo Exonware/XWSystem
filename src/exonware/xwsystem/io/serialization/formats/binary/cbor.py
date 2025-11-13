@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 CBOR serialization - Concise Binary Object Representation.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWCborSerializer (concrete implementation)
+- Concrete: CborSerializer
 """
 
 from typing import Any, Optional, Union
@@ -21,24 +21,22 @@ from ....contracts import EncodeOptions, DecodeOptions
 from ....defs import CodecCapability
 from ....errors import SerializationError
 
-try:
-    import cbor2
-except ImportError:
-    cbor2 = None
+# Lazy import for cbor2 - the lazy hook will automatically handle ImportError
+import cbor2
 
 
-class XWCborSerializer(ASerialization):
+class CborSerializer(ASerialization):
     """
-    CBOR serializer - follows I→A→XW pattern.
+    CBOR serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWCborSerializer (concrete implementation)
+    Concrete: CborSerializer
     
     Uses cbor2 library for CBOR serialization.
     
     Examples:
-        >>> serializer = XWCborSerializer()
+        >>> serializer = CborSerializer()
         >>> 
         >>> # Encode data
         >>> cbor_bytes = serializer.encode({"key": "value"})
@@ -172,8 +170,4 @@ class XWCborSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-CborSerializer = XWCborSerializer
 

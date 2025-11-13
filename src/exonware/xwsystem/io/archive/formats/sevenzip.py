@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 7z archive format implementation - RANK #1 BEST COMPRESSION.
@@ -24,11 +24,8 @@ from typing import List, Optional
 from ...contracts import IArchiveFormat
 from ...errors import ArchiveError
 
-# Optional import - install with: pip install py7zr
-try:
-    import py7zr
-except ImportError:
-    py7zr = None
+# Lazy import for py7zr - the lazy hook will automatically handle ImportError
+import py7zr
 
 
 class SevenZipArchiver(IArchiveFormat):

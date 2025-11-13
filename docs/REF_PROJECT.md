@@ -180,6 +180,18 @@ exonware-xwsystem is the foundation library powering the entire eXonware ecosyst
 
 **Purpose:** Unified framework replacing 50+ Python dependencies with consistent, production-grade APIs.
 
+### 🔄 Current Iteration: Async Process Fabric (IDEA-018)
+
+| Field | Details |
+|-------|---------|
+| Objective | Deliver the first Async Process Fabric facade that unifies process pools, message queues, and shared memory coordination. |
+| Scope | Add `AsyncProcessFabric` API, expose through IPC exports, update reference docs, capture benchmarks/testing according to lifecycle. |
+| Stakeholders | Eng. Muhammad AlShehri (Lead), xwnode/xwdata maintainers (consumers), Platform Tooling team (observer). |
+| Timeline | Kickoff 09-Nov-2025; target completion 11-Nov-2025. |
+| Success Criteria | 1) Facade available via `exonware.xwsystem.ipc`; 2) Unit tests covering async submission and shutdown; 3) Lifecycle docs/logs updated; 4) Bench scenarios recorded. |
+
+**Usage Guidance:** The runtime example in `REF_USAGE.md` (“Async Process Fabric Example”) illustrates recommended session management patterns, including task submission, result streaming, and channel-aware publish/consume flows.
+
 ### 📊 Feature Completion Status
 
 | Feature | Status | Completion | Priority | Notes |

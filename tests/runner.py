@@ -36,6 +36,7 @@ def run_tests_with_pytest(test_path: str, marker: str = None, category: str = No
         "--tb=short",           # Short traceback format
         "-x",                   # Stop on first failure
         "--strict-markers",     # Treat unknown markers as errors
+        "--import-mode=importlib",
     ]
     
     # Add marker if specified
@@ -77,14 +78,14 @@ def run_unit_tests():
     """Run all unit tests."""
     print("🚀 Running UNIT tests...")
     print("=" * 50)
-    return run_tests_with_pytest("unit", "xwsystem_unit")
+    return run_tests_with_pytest("1.unit", "xwsystem_unit")
 
 
 def run_integration_tests():
     """Run all integration tests."""
     print("🚀 Running INTEGRATION tests...")
     print("=" * 50)
-    return run_tests_with_pytest("integration", "xwsystem_integration")
+    return run_tests_with_pytest("2.integration", "xwsystem_integration")
 
 
 def run_performance_tests():
@@ -97,12 +98,12 @@ def run_performance_tests():
 def run_specific_unit_category(category: str):
     """Run specific unit test category."""
     
-    test_dir = Path(__file__).parent / "unit" / category
+    test_dir = Path(__file__).parent / "1.unit" / category
     
     if not test_dir.exists():
         print(f"❌ Test category '{category}' not found")
         print("Available unit categories:")
-        unit_dir = Path(__file__).parent / "unit"
+        unit_dir = Path(__file__).parent / "1.unit"
         for item in unit_dir.iterdir():
             if item.is_dir() and not item.name.startswith('__'):
                 print(f"  - {item.name}")
@@ -181,10 +182,19 @@ def run_all_tests():
 def run_with_pytest(category: str = None, marker: str = None):
     """Run tests using pytest directly."""
     
-    cmd = [sys.executable, "-m", "pytest", "tests/", "-v"]
+    cmd = [sys.executable, "-m", "pytest", "-v", "--tb=short", "--import-mode=importlib"]
+    category_map = {
+        "core": "tests/0.core",
+        "unit": "tests/1.unit",
+        "integration": "tests/2.integration",
+        "performance": "tests/performance",
+    }
     
     if category:
-        cmd.extend([f"tests/{category}/"])
+        mapped = category_map.get(category, category)
+        cmd.append(mapped)
+    else:
+        cmd.append("tests/")
     
     if marker:
         cmd.extend(["-m", marker])

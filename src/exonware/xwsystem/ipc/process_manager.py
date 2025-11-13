@@ -318,24 +318,6 @@ class ProcessManager:
         self.shutdown_all()
 
 
-    def start_process(self, target: Callable, name: str = None) -> str:
-        """
-        Start a process with a target function (for backward compatibility).
-        
-        Args:
-            target: Function to run in the process
-            name: Optional name for the process
-            
-        Returns:
-            Process ID
-        """
-        if name is None:
-            name = f"process_{len(self.processes)}"
-        
-        # For simplicity, just return a mock process ID
-        # In a real implementation, this would start the process
-        return name
-    
     def get_process_status(self, process_id: str) -> str:
         """
         Get the status of a process.
@@ -349,7 +331,7 @@ class ProcessManager:
         process_info = self.get_process_info(process_id)
         if process_info:
             return process_info.status
-        return "running"  # Default status
+        return "unknown"  # Default status when process is not tracked
 
 
 def is_ipc_available() -> bool:

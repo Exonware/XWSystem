@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 MessagePack serialization - Efficient binary serialization.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWMsgPackSerializer (concrete implementation)
+- Concrete: MsgPackSerializer
 """
 
 from typing import Any, Optional, Union
@@ -21,24 +21,22 @@ from ....contracts import EncodeOptions, DecodeOptions
 from ....defs import CodecCapability
 from ....errors import SerializationError
 
-try:
-    import msgpack
-except ImportError:
-    msgpack = None
+# Lazy import for msgpack - the lazy hook will automatically handle ImportError
+import msgpack
 
 
-class XWMsgPackSerializer(ASerialization):
+class MsgPackSerializer(ASerialization):
     """
-    MessagePack serializer - follows I→A→XW pattern.
+    MessagePack serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWMsgPackSerializer (concrete implementation)
+    Concrete: MsgPackSerializer
     
     Uses msgpack library for efficient binary serialization.
     
     Examples:
-        >>> serializer = XWMsgPackSerializer()
+        >>> serializer = MsgPackSerializer()
         >>> 
         >>> # Encode data
         >>> msgpack_bytes = serializer.encode({"key": "value"})
@@ -186,8 +184,4 @@ class XWMsgPackSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-MsgPackSerializer = XWMsgPackSerializer
 

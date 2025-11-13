@@ -232,7 +232,7 @@ zip_codec = get_codec_by_id("zip")  # Returns ZipArchiver
 
 ```python
 # Works with files on disk
-zip_file = XWZipFile("backup.zip")
+zip_file = ZipFile("backup.zip")
 
 # Add files (uses ZipArchiver internally)
 zip_file.add_files([Path("a.txt"), Path("b.txt")])

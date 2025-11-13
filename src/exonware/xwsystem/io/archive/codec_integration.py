@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 Archive-Codec Integration - Register archivers with CodecRegistry.
@@ -22,7 +22,7 @@ Priority 5 (Extensibility): Auto-registration
 """
 
 from ..codec.registry import get_registry
-from .archivers import XWZipArchiver, XWTarArchiver
+from .archivers import ZipArchiver, TarArchiver
 
 
 def register_archivers_as_codecs():
@@ -41,13 +41,13 @@ def register_archivers_as_codecs():
     
     # Register codec-based archivers with UniversalCodecRegistry
     try:
-        registry.register(XWZipArchiver)
+        registry.register(ZipArchiver)
     except Exception as e:
         import logging
         logging.debug(f"Failed to register XWZipArchiver: {e}")
     
     try:
-        registry.register(XWTarArchiver)
+        registry.register(TarArchiver)
     except Exception as e:
         import logging
         logging.debug(f"Failed to register XWTarArchiver: {e}")

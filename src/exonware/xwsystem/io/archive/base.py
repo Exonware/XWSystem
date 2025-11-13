@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 Base classes and registries for archive system.
@@ -185,7 +185,7 @@ class AArchiveFile(AFile, IArchiveFile, ABC):
     
     I: IArchiveFile (interface)
     A: AArchiveFile (abstract base - this class)
-    XW: XWArchiveFile implementations (XWZipFile, XWTarFile, etc.)
+    XW: XWArchiveFile implementations (ZipFile, TarFile, etc.)
     
     Extends AFile for file I/O and provides archive-specific methods.
     Uses composition pattern: contains an IArchiver instance for compression.

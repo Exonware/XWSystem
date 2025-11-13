@@ -2,43 +2,38 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 BSON serialization - Binary JSON format (MongoDB).
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWBsonSerializer (concrete implementation)
+- Concrete: BsonSerializer
 """
 
+from importlib import import_module
 from typing import Any, Optional, Union
-from pathlib import Path
 
 from ...base import ASerialization
 from ....contracts import EncodeOptions, DecodeOptions
 from ....defs import CodecCapability
 from ....errors import SerializationError
 
-try:
-    import bson
-except ImportError:
-    bson = None
 
-
-class XWBsonSerializer(ASerialization):
+class BsonSerializer(ASerialization):
     """
-    BSON serializer - follows I→A→XW pattern.
+    BSON serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWBsonSerializer (concrete implementation)
+    Concrete: BsonSerializer
     
     Uses pymongo's bson library for MongoDB-compatible binary JSON.
     
     Examples:
-        >>> serializer = XWBsonSerializer()
+        >>> serializer = BsonSerializer()
         >>> 
         >>> # Encode data
         >>> bson_bytes = serializer.encode({"key": "value"})
@@ -56,11 +51,7 @@ class XWBsonSerializer(ASerialization):
     def __init__(self):
         """Initialize BSON serializer."""
         super().__init__()
-        if bson is None:
-            raise ImportError(
-                "pymongo is required for BSON serialization. "
-                "Install with: pip install pymongo"
-            )
+        self._bson = import_module("bson")
     
     # ========================================================================
     # CODEC METADATA
@@ -133,7 +124,7 @@ class XWBsonSerializer(ASerialization):
                 value = {"data": value}
             
             # Encode to BSON bytes
-            bson_bytes = bson.encode(value)
+            bson_bytes = self._bson.encode(value)
             
             return bson_bytes
             
@@ -166,7 +157,7 @@ class XWBsonSerializer(ASerialization):
                 repr = repr.encode('utf-8')
             
             # Decode from BSON bytes
-            data = bson.decode(repr)
+            data = self._bson.decode(repr)
             
             return data
             
@@ -176,8 +167,4 @@ class XWBsonSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-BsonSerializer = XWBsonSerializer
 

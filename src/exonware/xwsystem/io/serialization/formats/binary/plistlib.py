@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Plist serialization - Apple property list format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWPlistSerializer (concrete implementation)
+- Concrete: PlistSerializer
 """
 
 import plistlib
@@ -23,18 +23,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWPlistSerializer(ASerialization):
+class PlistSerializer(ASerialization):
     """
-    Plist serializer - follows I→A→XW pattern.
+    Plist serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWPlistSerializer (concrete implementation)
+    Concrete: PlistSerializer
     
     Uses Python's built-in plistlib module for Apple plist files.
     
     Examples:
-        >>> serializer = XWPlistSerializer()
+        >>> serializer = PlistSerializer()
         >>> 
         >>> # Encode data
         >>> plist_bytes = serializer.encode({"key": "value"})
@@ -171,8 +171,4 @@ class XWPlistSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-PlistlibSerializer = XWPlistSerializer
 

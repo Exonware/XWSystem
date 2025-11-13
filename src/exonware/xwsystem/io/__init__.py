@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 I/O utilities for safe file operations, path management, and codec integration.
@@ -201,6 +201,7 @@ __all__ = [
     # Archive + Compression
     "Archive", "Compression",
     "ZipArchiver", "TarArchiver",
+    "ZipFile", "TarFile",
     "ArchiveFormatRegistry", "get_global_archive_registry",
     "register_archive_format", "get_archiver_for_file",
     

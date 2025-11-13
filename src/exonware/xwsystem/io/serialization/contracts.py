@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Serialization contracts - ISerialization interface extending ICodec.
@@ -239,6 +239,197 @@ class ISerialization(ICodec[Any, Union[bytes, str]], ABC):
         
         Returns:
             Deserialized data
+        """
+        pass
+    
+    # ========================================================================
+    # ADVANCED FEATURES (Optional - format-specific implementations)
+    # ========================================================================
+    
+    @abstractmethod
+    def atomic_update_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        value: Any, 
+        **options
+    ) -> None:
+        """
+        Atomically update a single path in a file without loading the entire file.
+        
+        This method allows efficient updates to large files by only modifying
+        the specific path (e.g., JSONPointer "/users/0/name") without loading
+        the entire file into memory.
+        
+        Args:
+            file_path: Path to the file to update
+            path: Path expression (format-specific: JSONPointer, XPath, YAML path, etc.)
+            value: Value to set at the specified path
+            **options: Format-specific options (backup, atomic, etc.)
+        
+        Raises:
+            NotImplementedError: If this format doesn't support path-based updates
+            SerializationError: If the update operation fails
+            ValueError: If the path is invalid or doesn't exist
+        
+        Example:
+            >>> serializer.atomic_update_path("config.json", "/database/host", "localhost")
+        """
+        pass
+    
+    @abstractmethod
+    def atomic_read_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        **options
+    ) -> Any:
+        """
+        Read a single path from a file without loading the entire file.
+        
+        This method allows efficient reads from large files by only accessing
+        the specific path (e.g., JSONPointer "/users/0/name") without loading
+        the entire file into memory.
+        
+        Args:
+            file_path: Path to the file to read from
+            path: Path expression (format-specific: JSONPointer, XPath, YAML path, etc.)
+            **options: Format-specific options
+        
+        Returns:
+            Value at the specified path
+        
+        Raises:
+            NotImplementedError: If this format doesn't support path-based reads
+            SerializationError: If the read operation fails
+            ValueError: If the path is invalid or doesn't exist
+            KeyError: If the path doesn't exist in the file
+        
+        Example:
+            >>> host = serializer.atomic_read_path("config.json", "/database/host")
+        """
+        pass
+    
+    @abstractmethod
+    def validate_with_schema(
+        self, 
+        data: Any, 
+        schema: Any, 
+        **options
+    ) -> bool:
+        """
+        Validate data against a schema.
+        
+        Args:
+            data: Data to validate
+            schema: Schema definition (format-specific)
+            **options: Validation options
+        
+        Returns:
+            True if data is valid
+        
+        Raises:
+            NotImplementedError: If this format doesn't support schema validation
+            SerializationError: If validation fails
+        """
+        pass
+    
+    @abstractmethod
+    def incremental_save(
+        self, 
+        items: Iterator[Any], 
+        file_path: Union[str, Path], 
+        **options
+    ) -> None:
+        """
+        Incrementally save items to a file using true streaming (not chunked full-file).
+        
+        This method writes items one at a time as they're provided, enabling
+        memory-efficient handling of large datasets.
+        
+        Args:
+            items: Iterator of items to save
+            file_path: Path to save file
+            **options: Format-specific options
+        
+        Raises:
+            NotImplementedError: If this format doesn't support incremental streaming
+            SerializationError: If save operation fails
+        """
+        pass
+    
+    @abstractmethod
+    def incremental_load(
+        self, 
+        file_path: Union[str, Path], 
+        **options
+    ) -> Iterator[Any]:
+        """
+        Incrementally load items from a file using true streaming.
+        
+        This method reads items one at a time as they're needed, enabling
+        memory-efficient handling of large files.
+        
+        Args:
+            file_path: Path to load from
+            **options: Format-specific options
+        
+        Yields:
+            Items from the file one at a time
+        
+        Raises:
+            NotImplementedError: If this format doesn't support incremental streaming
+            SerializationError: If load operation fails
+        """
+        pass
+    
+    @abstractmethod
+    def query(
+        self, 
+        file_path: Union[str, Path], 
+        query_expr: str, 
+        **options
+    ) -> Any:
+        """
+        Query/filter data from a file using format-specific query language.
+        
+        Supports query languages like JSONPath for JSON, XPath for XML, etc.
+        
+        Args:
+            file_path: Path to the file to query
+            query_expr: Query expression (format-specific: JSONPath, XPath, etc.)
+            **options: Query options
+        
+        Returns:
+            Query results (format-specific)
+        
+        Raises:
+            NotImplementedError: If this format doesn't support queries
+            SerializationError: If query operation fails
+            ValueError: If query expression is invalid
+        """
+        pass
+    
+    @abstractmethod
+    def merge(
+        self, 
+        file_path: Union[str, Path], 
+        updates: Dict[str, Any], 
+        **options
+    ) -> None:
+        """
+        Merge updates into a file.
+        
+        Performs deep or shallow merge depending on format capabilities.
+        
+        Args:
+            file_path: Path to the file to update
+            updates: Dictionary of updates to merge
+            **options: Merge options (deep, shallow, etc.)
+        
+        Raises:
+            NotImplementedError: If this format doesn't support merge operations
+            SerializationError: If merge operation fails
         """
         pass
 

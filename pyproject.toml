@@ -25,6 +25,8 @@ text = "MIT"
 lazy = [
     # Dependencies needed for lazy install functionality
     "importlib-metadata>=4.0.0",
+    "toml>=0.10.2",
+    "setuptools>=65.0.0",
 ]
 full = [
     # Core serialization formats (actually used in codebase)
@@ -56,6 +58,7 @@ full = [
     "ijson>=3.2.0",
     "jsonpointer>=2.0.0",
     "jsonpatch>=1.33.0",
+    "jsonpath-ng>=1.6.0",
     "jsonschema>=4.17.0",
     "rpds-py>=0.10.0",
     "xxhash>=3.2.0",

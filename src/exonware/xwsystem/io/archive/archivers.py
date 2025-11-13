@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 30-Oct-2025
 
 Archive codecs - In-memory archive processors.
@@ -30,11 +30,11 @@ from typing import Any, Dict, Optional, List, Union
 
 from ..archive.base import AArchiver
 from ..contracts import IArchiver, EncodeOptions, DecodeOptions
-from ..defs import ArchiveFormat
+from ..defs import ArchiveFormat, CodecCapability, CodecCategory
 from ..errors import ArchiveError, EncodeError, DecodeError
 
 
-class XWZipArchiver(AArchiver):
+class ZipArchiver(AArchiver):
     """
     Zip archive codec - operates in MEMORY.
     
@@ -80,14 +80,12 @@ class XWZipArchiver(AArchiver):
         return [".zip"]
     
     @property
-    def capabilities(self) -> 'CodecCapability':
-        from ..defs import CodecCapability
+    def capabilities(self) -> CodecCapability:
         return CodecCapability.BIDIRECTIONAL
     
     @property
-    def category(self) -> 'CodecCategory':
+    def category(self) -> CodecCategory:
         """Codec category: ARCHIVE."""
-        from ..defs import CodecCategory
         return CodecCategory.ARCHIVE
     
     @property
@@ -95,9 +93,8 @@ class XWZipArchiver(AArchiver):
         """Codec aliases."""
         return ["zip", "ZIP"]
     
-    def supports_capability(self, capability: 'CodecCapability') -> bool:
+    def supports_capability(self, capability: CodecCapability) -> bool:
         """Check capability support."""
-        from ..defs import CodecCapability
         return capability in (CodecCapability.BIDIRECTIONAL, CodecCapability.COMPRESSION)
     
     def encode(self, value: Any, *, options: Optional[EncodeOptions] = None) -> bytes:
@@ -186,7 +183,7 @@ class XWZipArchiver(AArchiver):
         return self.decode(archive_bytes, options=options)
 
 
-class XWTarArchiver(AArchiver):
+class TarArchiver(AArchiver):
     """
     Tar archive codec - operates in MEMORY.
     
@@ -213,14 +210,12 @@ class XWTarArchiver(AArchiver):
         return [".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tar.xz"]
     
     @property
-    def capabilities(self) -> 'CodecCapability':
-        from ..defs import CodecCapability
+    def capabilities(self) -> CodecCapability:
         return CodecCapability.BIDIRECTIONAL
     
     @property
-    def category(self) -> 'CodecCategory':
+    def category(self) -> CodecCategory:
         """Codec category: ARCHIVE."""
-        from ..defs import CodecCategory
         return CodecCategory.ARCHIVE
     
     @property
@@ -228,9 +223,8 @@ class XWTarArchiver(AArchiver):
         """Codec aliases."""
         return ["tar", "TAR"]
     
-    def supports_capability(self, capability: 'CodecCapability') -> bool:
+    def supports_capability(self, capability: CodecCapability) -> bool:
         """Check capability support."""
-        from ..defs import CodecCapability
         return capability in (CodecCapability.BIDIRECTIONAL, CodecCapability.COMPRESSION)
     
     def encode(self, value: Any, *, options: Optional[EncodeOptions] = None) -> bytes:
@@ -285,6 +279,8 @@ class XWTarArchiver(AArchiver):
             
         except Exception as e:
             raise DecodeError(f"Failed to extract tar archive: {e}")
+
+
     
     def compress(self, data: Any, **options) -> bytes:
         """User-friendly: Compress data to tar bytes."""

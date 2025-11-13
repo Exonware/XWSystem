@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Multipart serialization - Multipart form data format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWMultipartSerializer (concrete implementation)
+- Concrete: MultipartSerializer
 """
 
 from email.mime.multipart import MIMEMultipart
@@ -29,18 +29,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWMultipartSerializer(ASerialization):
+class MultipartSerializer(ASerialization):
     """
-    Multipart serializer - follows I→A→XW pattern.
+    Multipart serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWMultipartSerializer (concrete implementation)
+    Concrete: MultipartSerializer
     
     Uses Python's built-in email.mime modules for multipart handling.
     
     Examples:
-        >>> serializer = XWMultipartSerializer()
+        >>> serializer = MultipartSerializer()
         >>> 
         >>> # Encode data with files
         >>> data = {
@@ -209,8 +209,4 @@ class XWMultipartSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-MultipartSerializer = XWMultipartSerializer
 

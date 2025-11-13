@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 RAR5 archive format implementation - RANK #3 PROPRIETARY COMPRESSION.
@@ -24,11 +24,8 @@ from typing import List, Optional
 from ...contracts import IArchiveFormat
 from ...errors import ArchiveError
 
-# Optional import - install with: pip install rarfile
-try:
-    import rarfile
-except ImportError:
-    rarfile = None
+# Lazy import for rarfile - the lazy hook will automatically handle ImportError
+import rarfile
 
 
 class RarArchiver(IArchiveFormat):

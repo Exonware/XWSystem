@@ -69,9 +69,15 @@ class MessageQueue(Generic[T]):
         self.enable_priority = enable_priority
         
         # Create appropriate queue
+        self._manager = None
         if queue_type == MessageQueueType.PROCESS_SAFE:
             if enable_priority:
-                self._queue = mp.Queue(maxsize) if maxsize > 0 else mp.Queue()
+                self._manager = mp.Manager()
+                self._queue = (
+                    self._manager.PriorityQueue(maxsize)
+                    if maxsize > 0
+                    else self._manager.PriorityQueue()
+                )
             else:
                 self._queue = mp.Queue(maxsize) if maxsize > 0 else mp.Queue()
         else:  # THREAD_SAFE
@@ -121,8 +127,7 @@ class MessageQueue(Generic[T]):
             
             if self.queue_type == MessageQueueType.PROCESS_SAFE:
                 if timeout is not None:
-                    # multiprocessing.Queue doesn't support timeout directly
-                    self._queue.put(queue_item, block=True)
+                    self._queue.put(queue_item, block=True, timeout=timeout)
                 else:
                     self._queue.put(queue_item, block=True)
             else:
@@ -154,8 +159,7 @@ class MessageQueue(Generic[T]):
         try:
             if self.queue_type == MessageQueueType.PROCESS_SAFE:
                 if timeout is not None:
-                    # Simplified timeout handling for multiprocessing
-                    queue_item = self._queue.get(block=True)
+                    queue_item = self._queue.get(block=True, timeout=timeout)
                 else:
                     queue_item = self._queue.get(block=True)
             else:
@@ -218,6 +222,12 @@ class MessageQueue(Generic[T]):
         """Gracefully shutdown the queue."""
         self._shutdown.set()
         logger.info("Message queue shutdown initiated")
+        if self._manager:
+            try:
+                self._manager.shutdown()
+                self._manager = None
+            except Exception as exc:
+                logger.debug(f"Error shutting down manager: {exc}")
     
     def send(self, message: T, priority: int = 0, timeout: Optional[float] = None) -> bool:
         """

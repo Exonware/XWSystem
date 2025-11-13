@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 ConfigParser serialization - INI file format.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWConfigParserSerializer (concrete implementation)
+- Concrete: ConfigParserSerializer
 """
 
 import configparser
@@ -24,18 +24,18 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWConfigParserSerializer(ASerialization):
+class ConfigParserSerializer(ASerialization):
     """
-    ConfigParser serializer - follows I→A→XW pattern.
+    ConfigParser serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWConfigParserSerializer (concrete implementation)
+    Concrete: ConfigParserSerializer
     
     Uses Python's built-in configparser module for INI files.
     
     Examples:
-        >>> serializer = XWConfigParserSerializer()
+        >>> serializer = ConfigParserSerializer()
         >>> 
         >>> # Encode data
         >>> ini_str = serializer.encode({
@@ -191,8 +191,4 @@ class XWConfigParserSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-ConfigParserSerializer = XWConfigParserSerializer
 

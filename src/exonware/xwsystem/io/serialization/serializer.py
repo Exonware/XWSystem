@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: September 04, 2025
 
 XWSerializer - Unified intelligent serializer with I/O integration and auto-serialization.
@@ -118,7 +118,7 @@ class XWSerializer(ASerialization):
             'SQLite3': ('sqlite3', 'Sqlite3Serializer'),
             'DBM': ('dbm', 'DbmSerializer'),
             'Shelve': ('shelve', 'ShelveSerializer'),
-            'Plistlib': ('plistlib', 'PlistlibSerializer'),
+            'Plistlib': ('plistlib', 'PlistSerializer'),
             
             # Schema-based formats
             'Avro': ('avro', 'AvroSerializer'),
@@ -574,6 +574,207 @@ class XWSerializer(ASerialization):
             except Exception as e:
                 logger.error(f"Atomic load failed for {target_path}: {e}")
                 raise SerializationError(f"Atomic load failed: {e}")
+    
+    # ============================================================================
+    # ADVANCED FEATURES DELEGATION
+    # ============================================================================
+    
+    def atomic_update_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        value: Any, 
+        **options
+    ) -> None:
+        """
+        Atomically update a single path in a file (delegates to specialized serializer).
+        
+        Detects format from file path and delegates to specialized serializer if it
+        supports path-based updates. Falls back gracefully if not supported.
+        
+        Args:
+            file_path: Path to the file to update
+            path: Path expression (format-specific)
+            value: Value to set at the specified path
+            **options: Format-specific options
+        
+        Raises:
+            NotImplementedError: If format doesn't support path-based updates
+            SerializationError: If update fails
+        """
+        target_path = Path(file_path)
+        
+        if self.validate_paths:
+            self._path_validator.validate_path(target_path)
+        
+        with performance_monitor("atomic_update_path"):
+            try:
+                # Detect format and get specialized serializer
+                format_hint = self._detect_format_from_path(target_path)
+                specialized = self._ensure_specialized(
+                    file_path=target_path,
+                    format_hint=format_hint
+                )
+                
+                # Delegate to specialized serializer
+                specialized.atomic_update_path(target_path, path, value, **options)
+                logger.debug(f"Atomically updated path '{path}' in {target_path}")
+                
+            except NotImplementedError:
+                raise
+            except Exception as e:
+                logger.error(f"Atomic path update failed for {target_path}: {e}")
+                raise SerializationError(f"Atomic path update failed: {e}") from e
+    
+    def atomic_read_path(
+        self, 
+        file_path: Union[str, Path], 
+        path: str, 
+        **options
+    ) -> Any:
+        """
+        Read a single path from a file (delegates to specialized serializer).
+        
+        Detects format from file path and delegates to specialized serializer if it
+        supports path-based reads. Falls back gracefully if not supported.
+        
+        Args:
+            file_path: Path to the file to read from
+            path: Path expression (format-specific)
+            **options: Format-specific options
+        
+        Returns:
+            Value at the specified path
+        
+        Raises:
+            NotImplementedError: If format doesn't support path-based reads
+            SerializationError: If read fails
+            KeyError: If path doesn't exist
+        """
+        target_path = Path(file_path)
+        
+        if not target_path.exists():
+            raise FileNotFoundError(f"File not found: {target_path}")
+        
+        if self.validate_paths:
+            self._path_validator.validate_path(target_path)
+        
+        with performance_monitor("atomic_read_path"):
+            try:
+                # Detect format and get specialized serializer
+                format_hint = self._detect_format_from_path(target_path)
+                specialized = self._ensure_specialized(
+                    file_path=target_path,
+                    format_hint=format_hint
+                )
+                
+                # Delegate to specialized serializer
+                result = specialized.atomic_read_path(target_path, path, **options)
+                logger.debug(f"Read path '{path}' from {target_path}")
+                return result
+                
+            except (NotImplementedError, KeyError, FileNotFoundError):
+                raise
+            except Exception as e:
+                logger.error(f"Atomic path read failed for {target_path}: {e}")
+                raise SerializationError(f"Atomic path read failed: {e}") from e
+    
+    def query(
+        self, 
+        file_path: Union[str, Path], 
+        query_expr: str, 
+        **options
+    ) -> Any:
+        """
+        Query a file using format-specific query language (delegates to specialized serializer).
+        
+        Detects format from file path and delegates to specialized serializer if it
+        supports queries. Falls back gracefully if not supported.
+        
+        Args:
+            file_path: Path to the file to query
+            query_expr: Query expression (format-specific: JSONPath, XPath, etc.)
+            **options: Query options
+        
+        Returns:
+            Query results
+        
+        Raises:
+            NotImplementedError: If format doesn't support queries
+            SerializationError: If query fails
+        """
+        target_path = Path(file_path)
+        
+        if not target_path.exists():
+            raise FileNotFoundError(f"File not found: {target_path}")
+        
+        if self.validate_paths:
+            self._path_validator.validate_path(target_path)
+        
+        with performance_monitor("query"):
+            try:
+                # Detect format and get specialized serializer
+                format_hint = self._detect_format_from_path(target_path)
+                specialized = self._ensure_specialized(
+                    file_path=target_path,
+                    format_hint=format_hint
+                )
+                
+                # Delegate to specialized serializer
+                result = specialized.query(target_path, query_expr, **options)
+                logger.debug(f"Queried {target_path} with expression '{query_expr}'")
+                return result
+                
+            except (NotImplementedError, ValueError, FileNotFoundError):
+                raise
+            except Exception as e:
+                logger.error(f"Query failed for {target_path}: {e}")
+                raise SerializationError(f"Query failed: {e}") from e
+    
+    def merge(
+        self, 
+        file_path: Union[str, Path], 
+        updates: Dict[str, Any], 
+        **options
+    ) -> None:
+        """
+        Merge updates into a file (delegates to specialized serializer).
+        
+        Detects format from file path and delegates to specialized serializer if it
+        supports merge operations. Falls back gracefully if not supported.
+        
+        Args:
+            file_path: Path to the file to update
+            updates: Dictionary of updates to merge
+            **options: Merge options
+        
+        Raises:
+            NotImplementedError: If format doesn't support merge operations
+            SerializationError: If merge fails
+        """
+        target_path = Path(file_path)
+        
+        if self.validate_paths:
+            self._path_validator.validate_path(target_path)
+        
+        with performance_monitor("merge"):
+            try:
+                # Detect format and get specialized serializer
+                format_hint = self._detect_format_from_path(target_path)
+                specialized = self._ensure_specialized(
+                    file_path=target_path,
+                    format_hint=format_hint
+                )
+                
+                # Delegate to specialized serializer
+                specialized.merge(target_path, updates, **options)
+                logger.debug(f"Merged updates into {target_path}")
+                
+            except NotImplementedError:
+                raise
+            except Exception as e:
+                logger.error(f"Merge failed for {target_path}: {e}")
+                raise SerializationError(f"Merge failed: {e}") from e
     
     # ============================================================================
     # BATCH OPERATIONS

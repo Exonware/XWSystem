@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 Pickle serialization - Python object serialization.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWPickleSerializer (concrete implementation)
+- Concrete: PickleSerializer
 """
 
 import pickle
@@ -23,13 +23,13 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWPickleSerializer(ASerialization):
+class PickleSerializer(ASerialization):
     """
-    Pickle serializer - follows I→A→XW pattern.
+    Pickle serializer - follows the I→A pattern.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWPickleSerializer (concrete implementation)
+    Concrete: PickleSerializer
     
     Uses Python's built-in pickle module.
     
@@ -37,7 +37,7 @@ class XWPickleSerializer(ASerialization):
     data from trusted sources!
     
     Examples:
-        >>> serializer = XWPickleSerializer()
+        >>> serializer = PickleSerializer()
         >>> 
         >>> # Encode data
         >>> pickle_bytes = serializer.encode({"key": "value"})
@@ -177,8 +177,4 @@ class XWPickleSerializer(ASerialization):
                 format_name=self.format_name,
                 original_error=e
             )
-
-
-# Backward compatibility alias
-PickleSerializer = XWPickleSerializer
 

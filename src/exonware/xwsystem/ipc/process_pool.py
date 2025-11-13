@@ -11,12 +11,13 @@ Generation Date: September 05, 2025
 """
 
 import asyncio
-import multiprocessing as mp
 import concurrent.futures
-from typing import Any, Callable, List, Optional, Union, Dict
-from dataclasses import dataclass
-import time
+import functools
 import logging
+import multiprocessing as mp
+import time
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -359,7 +360,8 @@ class AsyncProcessPool:
         # Create async task
         async def run_task():
             loop = asyncio.get_event_loop()
-            return await loop.run_in_executor(self._executor, fn, *args)
+            callable_fn = functools.partial(fn, *args, **kwargs)
+            return await loop.run_in_executor(self._executor, callable_fn)
         
         task = asyncio.create_task(run_task())
         self._active_tasks[task_id] = task

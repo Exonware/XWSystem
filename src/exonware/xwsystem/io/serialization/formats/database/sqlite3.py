@@ -2,15 +2,15 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 2, 2025
 
 SQLite3 serialization - Embedded database storage.
 
-Following I→A→XW pattern:
+Following I→A pattern:
 - I: ISerialization (interface)
 - A: ASerialization (abstract base)
-- XW: XWSqlite3Serializer (concrete implementation)
+- Concrete: Sqlite3Serializer
 """
 
 import sqlite3
@@ -23,8 +23,8 @@ from ....defs import CodecCapability
 from ....errors import SerializationError
 
 
-class XWSqlite3Serializer(ASerialization):
-    """SQLite3 serializer - follows I→A→XW pattern."""
+class Sqlite3Serializer(ASerialization):
+    """SQLite3 serializer - follows the I→A pattern."""
     
     @property
     def codec_id(self) -> str:
@@ -69,7 +69,4 @@ class XWSqlite3Serializer(ASerialization):
     def decode(self, repr: Union[bytes, str], *, options: Optional[DecodeOptions] = None) -> Any:
         """SQLite3 decode requires file path - use load_file() instead."""
         raise NotImplementedError("SQLite3 requires file-based operations - use load_file()")
-
-
-Sqlite3Serializer = XWSqlite3Serializer
 

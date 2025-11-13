@@ -15,9 +15,9 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent / "src"))
 
 try:
-    from exonware.xwsystem.core.base import BaseCore
-    from exonware.xwsystem.core.contracts import ICore
-    from exonware.xwsystem.core.errors import CoreError
+    from exonware.xwsystem.shared.base import BaseCore
+    from exonware.xwsystem.shared.contracts import ICore
+    from exonware.xwsystem.shared.errors import CoreError
 except ImportError as e:
     print(f"Import error: {e}")
     # Create mock classes for testing

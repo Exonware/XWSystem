@@ -10,7 +10,7 @@ Email: connect@exonware.com
 """
 
 import pytest
-from exonware.xwsystem.io.archive.archivers import XWZipArchiver, XWTarArchiver
+from exonware.xwsystem.io.archive.archivers import ZipArchiver, TarArchiver
 from exonware.xwsystem.io.archive.base import AArchiver
 
 
@@ -20,16 +20,16 @@ class TestZipArchiver:
     
     def test_zip_archiver_can_be_instantiated(self):
         """Test that XWZipArchiver can be created."""
-        archiver = XWZipArchiver()
+        archiver = ZipArchiver()
         assert archiver is not None
     
     def test_zip_archiver_extends_aarchiver(self):
         """Test XWZipArchiver extends AArchiver."""
-        assert issubclass(XWZipArchiver, AArchiver)
+        assert issubclass(ZipArchiver, AArchiver)
     
     def test_zip_archiver_has_encode_decode(self):
         """Test XWZipArchiver has codec methods."""
-        archiver = XWZipArchiver()
+        archiver = ZipArchiver()
         assert hasattr(archiver, 'encode')
         assert hasattr(archiver, 'decode')
 
@@ -40,16 +40,16 @@ class TestTarArchiver:
     
     def test_tar_archiver_can_be_instantiated(self):
         """Test that XWTarArchiver can be created."""
-        archiver = XWTarArchiver()
+        archiver = TarArchiver()
         assert archiver is not None
     
     def test_tar_archiver_extends_aarchiver(self):
         """Test XWTarArchiver extends AArchiver."""
-        assert issubclass(XWTarArchiver, AArchiver)
+        assert issubclass(TarArchiver, AArchiver)
     
     def test_tar_archiver_has_encode_decode(self):
         """Test XWTarArchiver has codec methods."""
-        archiver = XWTarArchiver()
+        archiver = TarArchiver()
         assert hasattr(archiver, 'encode')
         assert hasattr(archiver, 'decode')
 
@@ -61,10 +61,10 @@ class TestBackwardCompatibility:
     def test_ziparchiver_alias_exists(self):
         """Test ZipArchiver alias exists for backward compatibility."""
         from exonware.xwsystem.io.archive import ZipArchiver
-        assert ZipArchiver is XWZipArchiver
+        assert ZipArchiver is ZipArchiver
     
     def test_tararchiver_alias_exists(self):
         """Test TarArchiver alias exists for backward compatibility."""
         from exonware.xwsystem.io.archive import TarArchiver
-        assert TarArchiver is XWTarArchiver
+        assert TarArchiver is TarArchiver
 

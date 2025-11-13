@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 10-Oct-2025
 
 Lazy Loading System - Core Implementation
@@ -36,7 +36,6 @@ Core Goal: Per-Package Lazy Loading
 import os
 import re
 import json
-import toml
 import sys
 import subprocess
 import importlib
@@ -154,6 +153,8 @@ class LazyDiscovery(APackageDiscovery):
         'gc', 'inspect', 'traceback', 'atexit', 'codecs', 'locale', 'gettext',
         'argparse', 'optparse', 'configparser', 'fileinput', 'stat', 'platform',
         'unittest', 'doctest', 'pdb', 'profile', 'cProfile', 'timeit', 'trace',
+        # Internal / optional modules that must never trigger auto-install
+        'compression', 'socks', 'wimlib',
     }
     
     # Common import name to package name mappings
@@ -254,8 +255,34 @@ class LazyDiscovery(APackageDiscovery):
             return
         
         try:
-            with open(pyproject_path, 'r', encoding='utf-8') as f:
-                data = toml.load(f)
+            try:
+                import tomllib  # Python 3.11+
+                toml_parser = tomllib  # type: ignore[assignment]
+            except ImportError:
+                try:
+                    import tomli as tomllib  # type: ignore[assignment]
+                    toml_parser = tomllib
+                except ImportError:
+                    logger.info(
+                        "TOML parser not available; attempting to lazy-install 'tomli'..."
+                    )
+                    try:
+                        subprocess.run(
+                            [sys.executable, "-m", "pip", "install", "tomli"],
+                            check=False,
+                            capture_output=True,
+                        )
+                        import tomli as tomllib  # type: ignore[assignment]
+                        toml_parser = tomllib
+                    except Exception as install_exc:
+                        logger.warning(
+                            "tomli installation failed; skipping pyproject.toml discovery "
+                            f"({install_exc})"
+                        )
+                        return
+
+            with open(pyproject_path, 'rb') as f:
+                data = toml_parser.load(f)
             
             dependencies = []
             if 'project' in data and 'dependencies' in data['project']:
@@ -1028,47 +1055,57 @@ class LazyMetaPathFinder:
             logger.debug(f"[RECURSION GUARD] Import '{fullname}' already in progress, skipping hook")
             return None
         
-        # Two-stage lazy loading for serialization modules
-        if fullname.startswith('exonware.xwsystem.serialization.'):
-            module_suffix = fullname[len('exonware.xwsystem.serialization.'):]
-            
-            if module_suffix and '.' not in module_suffix:
-                logger.info(f"[HOOK] Candidate for wrapping: {fullname}")
+        # Two-stage lazy loading for serialization and archive modules
+        # Root cause fix: Hook was watching wrong path (exonware.xwsystem.serialization.*)
+        # Actual path is exonware.xwsystem.io.serialization.*
+        # Also watch archive formats to handle optional dependencies like wimlib
+        # Priority impact: Usability (#2) - Missing dependencies not auto-installed
+        watched_prefixes = [
+            'exonware.xwsystem.io.serialization.',
+            'exonware.xwsystem.io.archive.formats.',
+        ]
+        
+        for prefix in watched_prefixes:
+            if fullname.startswith(prefix):
+                module_suffix = fullname[len(prefix):]
                 
-                _mark_import_started(fullname)
-                try:
-                    if getattr(_importing, 'active', False):
-                        logger.debug(f"[HOOK] Recursion guard active, skipping {fullname}")
-                        return None
+                if module_suffix and '.' not in module_suffix:
+                    logger.info(f"[HOOK] Candidate for wrapping: {fullname}")
                     
+                    _mark_import_started(fullname)
                     try:
-                        logger.debug(f"[HOOK] Looking for spec: {fullname}")
-                        spec = importlib.util.find_spec(fullname)
-                        if spec is not None:
-                            logger.debug(f"[HOOK] Spec found, trying normal import: {fullname}")
-                            _importing.active = True
-                            try:
-                                __import__(fullname)
-                                logger.info(f"✓ [HOOK] Module {fullname} imported successfully, no wrapping needed")
-                                return None
-                            finally:
-                                _importing.active = False
-                    except ImportError as e:
-                        logger.info(f"⚠ [HOOK] Module {fullname} has missing dependencies, wrapping: {e}")
-                        wrapped_spec = self._wrap_serialization_module(fullname)
-                        if wrapped_spec is not None:
-                            logger.info(f"✓ [HOOK] Successfully wrapped: {fullname}")
-                            return wrapped_spec
-                        logger.warning(f"✗ [HOOK] Failed to wrap: {fullname}")
-                    except (ModuleNotFoundError,) as e:
-                        logger.debug(f"[HOOK] Module {fullname} not found, skipping wrap: {e}")
-                        pass
-                    except Exception as e:
-                        logger.warning(f"[HOOK] Error checking module {fullname}: {e}")
-                finally:
-                    _mark_import_finished(fullname)
-            
-            return None
+                        if getattr(_importing, 'active', False):
+                            logger.debug(f"[HOOK] Recursion guard active, skipping {fullname}")
+                            return None
+                        
+                        try:
+                            logger.debug(f"[HOOK] Looking for spec: {fullname}")
+                            spec = importlib.util.find_spec(fullname)
+                            if spec is not None:
+                                logger.debug(f"[HOOK] Spec found, trying normal import: {fullname}")
+                                _importing.active = True
+                                try:
+                                    __import__(fullname)
+                                    logger.info(f"✓ [HOOK] Module {fullname} imported successfully, no wrapping needed")
+                                    return None
+                                finally:
+                                    _importing.active = False
+                        except ImportError as e:
+                            logger.info(f"⚠ [HOOK] Module {fullname} has missing dependencies, wrapping: {e}")
+                            wrapped_spec = self._wrap_serialization_module(fullname)
+                            if wrapped_spec is not None:
+                                logger.info(f"✓ [HOOK] Successfully wrapped: {fullname}")
+                                return wrapped_spec
+                            logger.warning(f"✗ [HOOK] Failed to wrap: {fullname}")
+                        except (ModuleNotFoundError,) as e:
+                            logger.debug(f"[HOOK] Module {fullname} not found, skipping wrap: {e}")
+                            pass
+                        except Exception as e:
+                            logger.warning(f"[HOOK] Error checking module {fullname}: {e}")
+                    finally:
+                        _mark_import_finished(fullname)
+                
+                return None
         
         # Only handle top-level packages
         if '.' in fullname:
@@ -1153,6 +1190,8 @@ class LazyMetaPathFinder:
                 
                 if deferred_imports:
                     logger.info(f"✓ [STAGE 1] Module {fullname} loaded with {len(deferred_imports)} deferred imports: {list(deferred_imports.keys())}")
+                    # Replace None values with deferred import proxies (for modules that catch ImportError and set to None)
+                    self._replace_none_with_deferred(module, deferred_imports)
                     self._wrap_module_classes(module, deferred_imports)
                 else:
                     logger.info(f"✓ [STAGE 1] Module {fullname} loaded with NO deferred imports (all dependencies available)")
@@ -1169,6 +1208,29 @@ class LazyMetaPathFinder:
         except Exception as e:
             logger.debug(f"Could not wrap {fullname}: {e}")
             return None
+    
+    def _replace_none_with_deferred(self, module, deferred_imports: Dict):
+        """
+        Replace None values in module namespace with deferred import proxies.
+        
+        Some modules catch ImportError and set the variable to None (e.g., yaml = None).
+        This method replaces those None values with DeferredImportError proxies so the
+        hook can install missing packages when the variable is accessed.
+        """
+        logger.debug(f"[STAGE 1] Replacing None with deferred imports in {module.__name__}")
+        replaced_count = 0
+        
+        for dep_name, deferred_import in deferred_imports.items():
+            # Check if module has this variable set to None
+            if hasattr(module, dep_name):
+                current_value = getattr(module, dep_name)
+                if current_value is None:
+                    logger.info(f"[STAGE 1] Replacing {dep_name}=None with deferred import proxy in {module.__name__}")
+                    setattr(module, dep_name, deferred_import)
+                    replaced_count += 1
+        
+        if replaced_count > 0:
+            logger.info(f"✓ [STAGE 1] Replaced {replaced_count} None values with deferred imports in {module.__name__}")
     
     def _wrap_module_classes(self, module, deferred_imports: Dict):
         """Wrap classes in a module that depend on deferred imports."""
@@ -1521,13 +1583,17 @@ _lazy_importer = LazyImporter()
 _global_registry = LazyModuleRegistry()
 
 
+_lazy_importer = LazyImporter()
+_global_registry = LazyModuleRegistry()
+
+
 def enable_lazy_imports() -> None:
-    """Enable lazy imports."""
+    """Enable lazy imports (loader only)."""
     _lazy_importer.enable()
 
 
 def disable_lazy_imports() -> None:
-    """Disable lazy imports."""
+    """Disable lazy imports (loader only)."""
     _lazy_importer.disable()
 
 
@@ -1599,33 +1665,7 @@ def _detect_lazy_installation(package_name: str) -> bool:
         if package_name in _lazy_detection_cache:
             return _lazy_detection_cache[package_name]
     
-    # Method 1: Check via pkg_resources
-    try:
-        import pkg_resources
-        
-        package_names_to_try = [
-            f"exonware-{package_name}",
-            package_name,
-            f"exonware.{package_name}"
-        ]
-        
-        for pkg_name in package_names_to_try:
-            try:
-                dist = pkg_resources.get_distribution(pkg_name)
-                if hasattr(dist, 'extras'):
-                    if 'lazy' in dist.extras:
-                        logger.info(f"✅ Detected [lazy] extra for {package_name}")
-                        with _lazy_detection_lock:
-                            _lazy_detection_cache[package_name] = True
-                        return True
-                        
-            except pkg_resources.DistributionNotFound:
-                continue
-                
-    except ImportError:
-        logger.debug("pkg_resources not available, trying alternative methods")
-    
-    # Method 2: Check via importlib.metadata (Python 3.8+)
+    # Method 1: Check via importlib.metadata (Python 3.8+)
     try:
         if sys.version_info >= (3, 8):
             from importlib import metadata
@@ -1633,6 +1673,7 @@ def _detect_lazy_installation(package_name: str) -> bool:
             package_names_to_try = [
                 f"exonware-{package_name}",
                 package_name,
+                f"exonware.{package_name}"
             ]
             
             for pkg_name in package_names_to_try:
@@ -1648,9 +1689,18 @@ def _detect_lazy_installation(package_name: str) -> bool:
                                     with _lazy_detection_lock:
                                         _lazy_detection_cache[package_name] = True
                                     return True
-                                except:
+                                except metadata.PackageNotFoundError:
                                     pass
-                except Exception:
+                    entry_points = metadata.entry_points()
+                    for group_name in ('console_scripts', 'exonware.lazy'):
+                        eps = entry_points.select(group=group_name)
+                        for ep in eps:
+                            if ep.dist.name == pkg_name and ep.extras and 'lazy' in ep.extras:
+                                logger.info(f"✅ Detected [lazy] entry point for {package_name}")
+                                with _lazy_detection_lock:
+                                    _lazy_detection_cache[package_name] = True
+                                return True
+                except metadata.PackageNotFoundError:
                     continue
     except Exception as e:
         logger.debug(f"importlib.metadata check failed: {e}")
@@ -1679,17 +1729,32 @@ class LazyInstallConfig:
     _configs: Dict[str, bool] = {}
     _modes: Dict[str, str] = {}
     _initialized: Dict[str, bool] = {}
+    _manual_overrides: Dict[str, bool] = {}
     
     @classmethod
-    def set(cls, package_name: str, enabled: bool, mode: str = "auto", install_hook: bool = True) -> None:
+    def set(
+        cls,
+        package_name: str,
+        enabled: bool,
+        mode: str = "auto",
+        install_hook: bool = True,
+        manual: bool = False,
+    ) -> None:
         """Enable or disable lazy installation for a specific package."""
         package_key = package_name.lower()
+        
+        if manual:
+            cls._manual_overrides[package_key] = True
+        elif cls._manual_overrides.get(package_key):
+            logger.debug(
+                f"Lazy install config for {package_key} already overridden manually; skipping auto configuration."
+            )
+            return
         
         cls._configs[package_key] = enabled
         cls._modes[package_key] = mode
         
-        if enabled and not cls._initialized.get(package_key):
-            cls._initialize_package(package_key, enabled, mode, install_hook=install_hook)
+        cls._initialize_package(package_key, enabled, mode, install_hook=install_hook)
     
     @classmethod
     def _initialize_package(cls, package_key: str, enabled: bool, mode: str, install_hook: bool = True) -> None:
@@ -1702,10 +1767,12 @@ class LazyInstallConfig:
                 set_lazy_install_mode(package_key, mode_enum)
                 
                 if install_hook:
-                    install_import_hook(package_key)
+                    if not is_import_hook_installed(package_key):
+                        install_import_hook(package_key)
                     logger.info(f"✅ Lazy installation initialized for {package_key} (mode: {mode}, hook: installed)")
                 else:
-                    logger.info(f"✅ Lazy installation initialized for {package_key} (mode: {mode}, hook: deferred)")
+                    uninstall_import_hook(package_key)
+                    logger.info(f"✅ Lazy installation initialized for {package_key} (mode: {mode}, hook: disabled)")
                 
                 cls._initialized[package_key] = True
             except ImportError as e:
@@ -1713,10 +1780,11 @@ class LazyInstallConfig:
         else:
             try:
                 disable_lazy_install(package_key)
-                cls._initialized[package_key] = True
-                logger.info(f"❌ Lazy installation disabled for {package_key}")
             except ImportError:
                 pass
+            uninstall_import_hook(package_key)
+            cls._initialized[package_key] = False
+            logger.info(f"❌ Lazy installation disabled for {package_key}")
     
     @classmethod
     def is_enabled(cls, package_name: str) -> bool:
@@ -1754,10 +1822,17 @@ def config_package_lazy_install_enabled(
         # Force disable
         config_package_lazy_install_enabled("xwdata", False)
     """
+    manual_override = enabled is not None
     if enabled is None:
         enabled = _detect_lazy_installation(package_name)
     
-    LazyInstallConfig.set(package_name, enabled, mode, install_hook=install_hook)
+    LazyInstallConfig.set(
+        package_name,
+        enabled,
+        mode,
+        install_hook=install_hook,
+        manual=manual_override,
+    )
 
 
 # =============================================================================
@@ -1783,9 +1858,43 @@ class LazyModeFacade:
         """Enable lazy mode with specified strategy."""
         self._enabled = True
         self._strategy = strategy
+        
+        package_name = kwargs.pop('package_name', 'xwsystem').lower()
+        enable_lazy_import_flag = kwargs.pop('enable_lazy_imports', True)
+        enable_lazy_install_flag = kwargs.pop('enable_lazy_install', True)
+        lazy_install_mode = kwargs.pop('lazy_install_mode', "auto")
+        install_hook = kwargs.pop('install_hook', True)
+        
+        self._config.update({
+            'package_name': package_name,
+            'enable_lazy_imports': enable_lazy_import_flag,
+            'enable_lazy_install': enable_lazy_install_flag,
+            'lazy_install_mode': lazy_install_mode,
+            'install_hook': install_hook,
+        })
         self._config.update(kwargs)
         
         logger.info(f"Lazy mode enabled with strategy: {strategy}")
+        
+        if enable_lazy_import_flag:
+            _lazy_importer.enable()
+        else:
+            _lazy_importer.disable()
+        
+        if enable_lazy_install_flag:
+            config_package_lazy_install_enabled(
+                package_name,
+                True,
+                lazy_install_mode,
+                install_hook=install_hook,
+            )
+        else:
+            config_package_lazy_install_enabled(
+                package_name,
+                False,
+                install_hook=install_hook,
+            )
+            uninstall_import_hook(package_name)
         
         if self._config.get('enable_monitoring', True):
             self._performance_monitor = LazyPerformanceMonitor()
@@ -1795,8 +1904,23 @@ class LazyModeFacade:
         self._enabled = False
         self._strategy = None
         
+        package_name = self._config.get('package_name', 'xwsystem')
+        
+        if self._config.get('enable_lazy_imports', True):
+            _lazy_importer.disable()
+        
+        if self._config.get('enable_lazy_install', True):
+            LazyInstallConfig.set(
+                package_name,
+                False,
+                self._config.get('lazy_install_mode', 'auto'),
+                install_hook=self._config.get('install_hook', True),
+            )
+        
         if self._config.get('clear_cache_on_disable', True):
             _global_registry.clear_cache()
+        
+        self._performance_monitor = None
         
         logger.info("Lazy mode disabled")
     

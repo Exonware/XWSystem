@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: 02-Nov-2025
 
 JSON Lines (JSONL/NDJSON) Serialization - Newline-Delimited JSON
@@ -30,13 +30,13 @@ from ...base import ASerialization
 from ...contracts import ISerialization
 
 
-class XWJsonLinesSerializer(ASerialization):
+class JsonLinesSerializer(ASerialization):
     """
     JSON Lines (JSONL/NDJSON) serializer for streaming data.
     
     I: ISerialization (interface)
     A: ASerialization (abstract base)
-    XW: XWJsonLinesSerializer (concrete implementation)
+    Concrete: JsonLinesSerializer
     """
     
     def __init__(self):
@@ -113,10 +113,4 @@ class XWJsonLinesSerializer(ASerialization):
                 results.append(json.loads(line))
         
         return results
-
-
-# Backward compatibility aliases
-JsonLinesSerializer = XWJsonLinesSerializer
-JsonlSerializer = XWJsonLinesSerializer
-NDJsonSerializer = XWJsonLinesSerializer
 

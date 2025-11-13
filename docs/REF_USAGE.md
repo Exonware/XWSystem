@@ -168,6 +168,7 @@ representation = codec.dumps(data)
 - **Advanced HTTP Client** – HTTP/2, retry, streaming, and mock transport for tests.
 - **Validation (xModel)** – Pydantic-style models with coercion, schema export, and config-driven constraints.
 - **Caching Stack** – LRU/LFU/TTL decorators for sync/async workloads, with optional disk-backed layers.
+- **Async Process Fabric** – Unified async facade over process pools, message queues, and shared memory helpers.
 - **CLI Helpers** – Rich text, progress, and table utilities for operational tooling.
 - **Metrics & Logging Hooks** – Structured logging adapters and observability meters keyed off `xwconfig`.
 
@@ -186,6 +187,31 @@ async def fetch_user(user_id: int):
         resp = await client.get(f"https://api.example.com/users/{user_id}")
         return User(**resp.json())
 ```
+
+### Async Process Fabric Example
+
+```python
+from exonware.xwsystem.ipc import AsyncProcessFabric
+
+async def main(dataset_ids):
+    fabric = AsyncProcessFabric()
+
+    async with fabric.session() as session:
+        job = await session.submit("tasks.dataset.ingest", dataset_ids)
+
+        async for result in session.iter_results(job):
+            print("dataset complete:", result["dataset"])
+
+        await session.publish("events.sync", {"status": "ingest-complete"})
+        message = await session.consume("events.sync")
+        print("sync event:", message)
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main(["customers", "orders"]))
+```
+
+**Why:** `AsyncProcessFabric` gives you batteries-included orchestration for IO-bound workloads—tying together pools, queues, and shared buffers with consistent async lifecycle management and future-ready monitoring hooks.
 
 ---
 

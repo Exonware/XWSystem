@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.389
+Version: 0.0.1.392
 Generation Date: November 1, 2025
 
 Archive format implementations - COMPREHENSIVE 2025 SUPPORT.
@@ -37,32 +37,29 @@ Priority 5 (Extensibility): Easy to add more formats
 from .zip import ZipArchiver
 from .tar import TarArchiver
 
-# Advanced formats (lazy install on first use)
-from .sevenzip import SevenZipArchiver  # RANK #1 - Best overall
-from .zstandard import ZstandardArchiver  # RANK #2 - Modern standard
-from .rar import RarArchiver  # RANK #3 - Extraction only
-from .brotli_format import BrotliArchiver  # RANK #6 - Web compression
-from .lz4_format import Lz4Archiver  # RANK #7 - Fastest
-from .zpaq_format import ZpaqArchiver  # RANK #8 - Extreme compression
-from .wim_format import WimArchiver  # RANK #9 - Windows imaging
-from .squashfs_format import SquashfsArchiver  # RANK #10 - Embedded systems
+# Advanced formats (lazy loaded - will be imported on first access)
+# This allows lazy mode to install missing dependencies (like wimlib) before import
+_advanced_formats = {
+    'SevenZipArchiver': ('.sevenzip', 'SevenZipArchiver'),  # RANK #1
+    'ZstandardArchiver': ('.zstandard', 'ZstandardArchiver'),  # RANK #2
+    'RarArchiver': ('.rar', 'RarArchiver'),  # RANK #3
+    'BrotliArchiver': ('.brotli_format', 'BrotliArchiver'),  # RANK #6
+    'Lz4Archiver': ('.lz4_format', 'Lz4Archiver'),  # RANK #7
+    'ZpaqArchiver': ('.zpaq_format', 'ZpaqArchiver'),  # RANK #8
+    'WimArchiver': ('.wim_format', 'WimArchiver'),  # RANK #9
+    'SquashfsArchiver': ('.squashfs_format', 'SquashfsArchiver'),  # RANK #10
+}
 
 # Auto-register built-in formats
 from ..base import get_global_archive_registry
 
 _registry = get_global_archive_registry()
 
-# Register all formats
+# Register standard formats immediately
 _registry.register(ZipArchiver)  # ZIP/ZIPX
 _registry.register(TarArchiver)  # TAR variants
-_registry.register(SevenZipArchiver)  # 7z - BEST OVERALL
-_registry.register(ZstandardArchiver)  # Zstd - MODERN STANDARD
-_registry.register(RarArchiver)  # RAR5
-_registry.register(BrotliArchiver)  # Brotli
-_registry.register(Lz4Archiver)  # LZ4
-_registry.register(ZpaqArchiver)  # ZPAQ
-_registry.register(WimArchiver)  # WIM
-_registry.register(SquashfsArchiver)  # SquashFS
+
+# Advanced formats will be registered lazily via __getattr__
 
 
 # Convenience functions (like codec!)
@@ -92,6 +89,27 @@ def register_archive_format(format_class):
     """Decorator to register custom archive format."""
     get_global_archive_registry().register(format_class)
     return format_class
+
+
+def __getattr__(name: str):
+    """
+    Lazy load advanced archive formats on first access.
+    
+    This allows lazy mode to install missing dependencies (like wimlib, py7zr)
+    before the format module is imported.
+    """
+    if name in _advanced_formats:
+        module_path, class_name = _advanced_formats[name]
+        # Import module lazily - lazy hook will catch missing dependencies
+        module = __import__(f'{__name__}{module_path}', fromlist=[class_name])
+        format_class = getattr(module, class_name)
+        # Register format on first access
+        _registry.register(format_class)
+        # Cache for future access
+        globals()[name] = format_class
+        return format_class
+    
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
 
 __all__ = [

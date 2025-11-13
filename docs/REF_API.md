@@ -148,6 +148,50 @@ def expensive_function(param):
     return compute(param)
 ```
 
+### IPC Module
+
+**Import:** `from exonware.xwsystem.ipc import AsyncProcessFabric`
+
+**Class:** `AsyncProcessFabric`
+
+**Constructor Parameters:**
+- `pool_factory` *(optional)* – Callable returning a process pool instance (defaults to `ProcessPool`).
+- `queue_factory` *(optional)* – Callable returning a message queue instance.
+- `shared_memory_factory` *(optional)* – Callable returning a shared memory manager.
+- `logger` *(optional)* – Logger instance for lifecycle events.
+
+**Primary API:**
+```python
+from exonware.xwsystem.ipc import AsyncProcessFabric
+
+fabric = AsyncProcessFabric()
+
+async with fabric.session() as session:
+    # Submit async-friendly callables to the process pool
+    task = await session.submit("tasks.transform", payload)
+
+    # Iterate over results as they complete
+    async for result in session.iter_results(task):
+        handle(result)
+
+    # Publish / consume messages through the shared queue facade
+    await session.publish("events.ingest", {"dataset": "customers"})
+    event = await session.consume("events.ingest")
+```
+
+**Helper Methods:**
+- `session()` – Async context manager that provisions shared pool, queue, and shared memory handles.
+- `submit(func_ref, *args, **kwargs)` – Enqueue work on the underlying process pool.
+- `iter_results(token)` – Async iterator yielding process results (supports backpressure).
+- `publish(channel, message)` / `consume(channel)` – Message queue façade wrapping `MessageQueue`.
+- `share(name, allocator)` – Lazily create shared memory buffers with a user-provided allocator.
+- `shutdown()` – Explicitly tear down managed resources.
+
+**Usage Notes:**
+- Designed to be additive; existing direct imports (`ProcessPool`, `MessageQueue`, etc.) continue to work.
+- Integrates with future monitoring hooks to emit lifecycle telemetry.
+- Exceptions bubble through `ipc.errors`, preserving existing error taxonomy.
+
 ---
 
 ## ?? Serialization Formats

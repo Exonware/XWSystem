@@ -22,16 +22,18 @@ from .shared_memory import SharedMemoryManager, SharedData
 from .message_queue import MessageQueue, AsyncMessageQueue
 from .process_pool import ProcessPool, AsyncProcessPool
 from .pipes import Pipe, AsyncPipe
+from .async_fabric import AsyncProcessFabric
 
 __all__ = [
-    'ProcessManager',
-    'ProcessInfo', 
-    'SharedMemoryManager',
-    'SharedData',
-    'MessageQueue',
-    'AsyncMessageQueue',
-    'ProcessPool',
-    'AsyncProcessPool',
-    'Pipe',
-    'AsyncPipe',
+    "ProcessManager",
+    "ProcessInfo",
+    "SharedMemoryManager",
+    "SharedData",
+    "MessageQueue",
+    "AsyncMessageQueue",
+    "ProcessPool",
+    "AsyncProcessPool",
+    "Pipe",
+    "AsyncPipe",
+    "AsyncProcessFabric",
 ]
