@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.403
+Version: 0.0.1.404
 Generation Date: 11-Nov-2025
 
 Early bootstrap for lazy mode - installs import hook before any imports occur.

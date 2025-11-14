@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.403
+Version: 0.0.1.404
 Generation Date: September 04, 2025
 
 Pydantic-style declarative validation with type hints and automatic coercion.
