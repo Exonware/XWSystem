@@ -23,10 +23,8 @@ text = "MIT"
 
 [project.optional-dependencies]
 lazy = [
-    # Dependencies needed for lazy install functionality
-    "importlib-metadata>=4.0.0",
-    "toml>=0.10.2",
-    "setuptools>=65.0.0",
+    # Marker package that enables lazy functionality
+    "exonware-xwlazy>=0.1.0",
 ]
 full = [
     # Core serialization formats (actually used in codebase)
@@ -95,7 +93,7 @@ profile = "black"
 line_length = 88
 
 [tool.mypy]
-python_version = "0.0.1.400"
+python_version = "0.0.1.401"
 strict = true
 warn_return_any = true
 warn_unused_configs = true

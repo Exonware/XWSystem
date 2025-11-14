@@ -2,7 +2,7 @@
 Example: Lazy Mode Usage with YAML Serialization
 
 This example demonstrates lazy mode auto-installation:
-1. Enable lazy mode via conf.lazy_install = True
+1. Install xwsystem with [lazy] extra: pip install xwsystem[lazy]
 2. Import YamlSerializer (requires PyYAML)
 3. If PyYAML is missing, lazy mode automatically installs it
 4. Serializer works seamlessly after auto-installation
@@ -14,6 +14,9 @@ Expected behavior:
     - If PyYAML not installed: Lazy mode installs it automatically
     - If PyYAML installed: Works normally
     - Output: YAML serialized data
+
+Note: Lazy mode is automatically enabled when xwsystem is installed with [lazy] extra.
+No manual configuration needed!
 """
 
 import sys
@@ -32,18 +35,10 @@ if sys.platform == "win32":
         except Exception:
             pass  # Continue with default encoding if reconfiguration fails
 
-# Import conf BEFORE xwsystem to avoid triggering package initialization
-# This allows us to enable lazy mode before any imports occur
-import exonware.conf as conf
+# Print xwsystem version to ensure we're using the latest
+from exonware.xwsystem.version import get_version
 
-# Enable lazy mode - this installs the import hook if not already installed
-# The hook will automatically install missing dependencies (like PyYAML) on ImportError
-#conf.lazy_install = True
-
-# Check lazy mode status (DX enhancement)
-print(f"✅ Lazy mode active: {conf.is_lazy_active()}")
-status = conf.lazy_install_status()
-print(f"📊 Lazy status: {status}")
+print(f"📦 xwsystem version: {get_version()}")
 
 # Import YamlSerializer - if PyYAML is missing, lazy mode will install it automatically
 # No try/except needed - lazy mode handles missing packages

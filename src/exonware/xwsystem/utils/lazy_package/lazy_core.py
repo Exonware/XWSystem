@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.400
+Version: 0.0.1.401
 Generation Date: 10-Oct-2025
 
 Lazy Loading System - Core Implementation
@@ -62,6 +62,7 @@ from .lazy_base import (
     ALazyLoader,
 )
 from ...config.logging_setup import get_logger
+from .lazy_state import LazyStateManager
 
 logger = get_logger("xwsystem.utils.lazy_package")
 
@@ -1656,72 +1657,74 @@ _MODE_ENUM_MAP = {
 }
 
 
-def _detect_lazy_installation(package_name: str) -> bool:
-    """
-    Detect if the package was installed with [lazy] extra.
-    Optimized with per-package caching to avoid repeated detection.
-    """
-    with _lazy_detection_lock:
-        if package_name in _lazy_detection_cache:
-            return _lazy_detection_cache[package_name]
-    
-    # Method 1: Check via importlib.metadata (Python 3.8+)
-    try:
-        if sys.version_info >= (3, 8):
-            from importlib import metadata
-            
-            package_names_to_try = [
-                f"exonware-{package_name}",
-                package_name,
-                f"exonware.{package_name}"
-            ]
-            
-            for pkg_name in package_names_to_try:
-                try:
-                    dist = metadata.distribution(pkg_name)
-                    if dist.requires:
-                        for req in dist.requires:
-                            if 'extra == "lazy"' in req or 'extra == \'lazy\'' in req:
-                                dep_name = req.split(';')[0].strip().split('[')[0].strip()
-                                try:
-                                    metadata.distribution(dep_name)
-                                    logger.info(f"✅ Detected [lazy] dependencies for {package_name}")
-                                    with _lazy_detection_lock:
-                                        _lazy_detection_cache[package_name] = True
-                                    return True
-                                except metadata.PackageNotFoundError:
-                                    pass
-                    entry_points = metadata.entry_points()
-                    for group_name in ('console_scripts', 'exonware.lazy'):
-                        eps = entry_points.select(group=group_name)
-                        for ep in eps:
-                            if ep.dist.name == pkg_name and ep.extras and 'lazy' in ep.extras:
-                                logger.info(f"✅ Detected [lazy] entry point for {package_name}")
-                                with _lazy_detection_lock:
-                                    _lazy_detection_cache[package_name] = True
-                                return True
-                except metadata.PackageNotFoundError:
-                    continue
-    except Exception as e:
-        logger.debug(f"importlib.metadata check failed: {e}")
-    
-    # Method 3: Check environment variable
+def _lazy_env_override(package_name: str) -> Optional[bool]:
     env_var = f"{package_name.upper()}_LAZY_INSTALL"
-    env_value = os.environ.get(env_var, '').lower()
-    if env_value in ('true', '1', 'yes', 'on'):
-        logger.info(f"✅ Detected lazy via environment variable {env_var}")
-        with _lazy_detection_lock:
-            _lazy_detection_cache[package_name] = True
+    raw_value = os.environ.get(env_var)
+    if raw_value is None:
+        return None
+
+    normalized = raw_value.strip().lower()
+    if normalized in ("true", "1", "yes", "on"):
         return True
-    
-    # Default: lazy installation is NOT enabled
-    result = False
-    logger.info(f"❌ No [lazy] extra detected for {package_name}")
-    
+    if normalized in ("false", "0", "no", "off"):
+        return False
+    return None
+
+
+def _lazy_marker_installed() -> bool:
+    if sys.version_info < (3, 8):
+        return False
+
+    try:
+        from importlib import metadata
+    except Exception as exc:
+        logger.debug(f"importlib.metadata unavailable for lazy detection: {exc}")
+        return False
+
+    try:
+        metadata.distribution("exonware-xwlazy")
+        logger.info("✅ Detected exonware-xwlazy marker package")
+        return True
+    except metadata.PackageNotFoundError:
+        logger.info("❌ exonware-xwlazy marker package not installed")
+        return False
+    except Exception as exc:
+        logger.debug(f"Failed to inspect marker package: {exc}")
+        return False
+
+
+def _detect_lazy_installation(package_name: str) -> bool:
     with _lazy_detection_lock:
-        _lazy_detection_cache[package_name] = result
-    
-    return result
+        cached = _lazy_detection_cache.get(package_name)
+        if cached is not None:
+            return cached
+
+    env_override = _lazy_env_override(package_name)
+    if env_override is not None:
+        with _lazy_detection_lock:
+            _lazy_detection_cache[package_name] = env_override
+        return env_override
+
+    state_manager = LazyStateManager(package_name)
+    manual_state = state_manager.get_manual_state()
+    if manual_state is not None:
+        with _lazy_detection_lock:
+            _lazy_detection_cache[package_name] = manual_state
+        return manual_state
+
+    cached_state = state_manager.get_cached_auto_state()
+    if cached_state is not None:
+        with _lazy_detection_lock:
+            _lazy_detection_cache[package_name] = cached_state
+        return cached_state
+
+    detected = _lazy_marker_installed()
+    state_manager.set_auto_state(detected)
+
+    with _lazy_detection_lock:
+        _lazy_detection_cache[package_name] = detected
+
+    return detected
 
 
 class LazyInstallConfig:
@@ -1742,14 +1745,18 @@ class LazyInstallConfig:
     ) -> None:
         """Enable or disable lazy installation for a specific package."""
         package_key = package_name.lower()
+        state_manager = LazyStateManager(package_name)
         
         if manual:
             cls._manual_overrides[package_key] = True
+            state_manager.set_manual_state(enabled)
         elif cls._manual_overrides.get(package_key):
             logger.debug(
                 f"Lazy install config for {package_key} already overridden manually; skipping auto configuration."
             )
             return
+        else:
+            state_manager.set_manual_state(None)
         
         cls._configs[package_key] = enabled
         cls._modes[package_key] = mode

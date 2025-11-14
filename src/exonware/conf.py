@@ -9,7 +9,7 @@ works across all exonware packages (xwsystem, xwnode, xwdata, etc.).
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.400
+Version: 0.0.1.401
 Generation Date: 11-Nov-2025
 """
 
@@ -18,6 +18,8 @@ from __future__ import annotations
 import sys
 import types
 from typing import Dict, Optional, Any
+
+from exonware.xwsystem.utils.lazy_package.lazy_state import LazyStateManager
 
 
 class _PackageConfig:
@@ -74,6 +76,10 @@ class _PackageConfig:
                     def lazy_import(self, value):
                         import os
                         self._enabled = value
+                        state_manager = LazyStateManager(self._pkg)
+                        state_manager.set_manual_state(value)
+                        if not value:
+                            state_manager.set_auto_state(False)
                         # Set environment variable so bootstrap can read it
                         env_var = f"{self._pkg.upper()}_LAZY_INSTALL"
                         if value:
