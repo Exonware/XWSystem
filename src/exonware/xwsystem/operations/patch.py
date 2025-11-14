@@ -5,7 +5,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.401
+Version: 0.0.1.402
 Generation Date: October 27, 2025
 
 Patch operations implementation (RFC 6902 JSON Patch).

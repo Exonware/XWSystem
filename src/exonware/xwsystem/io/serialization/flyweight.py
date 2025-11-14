@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.401
+Version: 0.0.1.402
 Generation Date: September 05, 2025
 
 Flyweight Pattern Implementation for Serializers

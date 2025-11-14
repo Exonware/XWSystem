@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.401
+Version: 0.0.1.402
 Generation Date: 10-Sep-2025
 
 Shared types and utilities for XWSystem modules.

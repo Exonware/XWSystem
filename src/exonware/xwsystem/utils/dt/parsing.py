@@ -7,7 +7,7 @@ Production-grade datetime parsing for XSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.401
+Version: 0.0.1.402
 Generated: 2025-01-27
 """
 

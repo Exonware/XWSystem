@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.401
+Version: 0.0.1.402
 Generation Date: November 2, 2025
 
 Pickle serialization - Python object serialization.
