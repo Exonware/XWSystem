@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.404
+Version: 0.0.1.405
 Generation Date: September 10, 2025
 
 Shared protocol interfaces (merged from the former core module).
