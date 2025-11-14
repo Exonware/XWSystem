@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.406
+Version: 0.0.1.407
 Generation Date: 10-Oct-2025
 
 Abstract Base Classes for Lazy Loading System

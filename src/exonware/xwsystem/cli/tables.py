@@ -7,7 +7,7 @@ Production-grade table formatting for XWSystem.
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.406
+Version: 0.0.1.407
 Generation Date: September 05, 2025
 """
 
