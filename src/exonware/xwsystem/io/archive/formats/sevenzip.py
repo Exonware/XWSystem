@@ -4,7 +4,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.408
+Version: 0.0.1.409
 Generation Date: November 1, 2025
 
 7z archive format implementation - RANK #1 BEST COMPRESSION.
