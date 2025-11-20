@@ -797,7 +797,7 @@ validator.validate(payload)
 ```
 
 ---
-### Lazy Package (`xwsystem.utils.lazy_package`)
+### Lazy Package (`xwlazy.lazy`)
 
 #### ✅ [IDEA-017] Lazy Dependency Orchestration
 
@@ -823,7 +823,7 @@ validator.validate(payload)
 - Expand parity to TypeScript/Rust once package-manager hooks are defined.
 
 ```python
-from exonware.xwsystem.utils.lazy_package import (
+from xwlazy.lazy import (
     config_package_lazy_install_enabled,
     enable_lazy_mode,
     lazy_import_with_install,

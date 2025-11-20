@@ -15,7 +15,7 @@ from unittest.mock import patch, MagicMock
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent / "src"))
 
 try:
-    from exonware.xwsystem.utils.lazy_package import LazyLoader
+    from xwlazy.lazy import LazyLoader
     from exonware.xwsystem.utils.paths import PathUtils
     from exonware.xwsystem.utils.base import BaseUtils
     from exonware.xwsystem.utils.contracts import ILazyLoader, IPathUtils

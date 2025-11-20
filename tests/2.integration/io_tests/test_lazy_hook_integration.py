@@ -65,14 +65,8 @@ def test_json_run_example_with_lazy_mode():
         os.environ['XWSYSTEM_LAZY_INSTALL'] = '1'
         
         # Clear module cache to ensure fresh import
-        modules_to_clear = [
-            'exonware.xwsystem._lazy_bootstrap',
-            'exonware.xwsystem',
-            'exonware.xwsystem.conf',
-        ]
-        for mod in modules_to_clear:
-            if mod in sys.modules:
-                del sys.modules[mod]
+        for mod in ('exonware.xwsystem', 'exonware.xwsystem.conf'):
+            sys.modules.pop(mod, None)
         
         # Verify hook would be installed
         # Note: Actual execution would require PyYAML installation
@@ -83,7 +77,7 @@ def test_json_run_example_with_lazy_mode():
         conf.lazy_install = True
         
         # Verify hook is installed
-        from exonware.xwsystem.utils.lazy_package.lazy_core import is_import_hook_installed
+        from xwlazy.lazy.lazy_core import is_import_hook_installed
         assert is_import_hook_installed('xwsystem'), "Hook should be installed for lazy mode"
 
 
@@ -100,7 +94,7 @@ def test_hook_intercepts_io_serialization_imports():
         conf.lazy_install = True
         
         # Verify hook is installed
-        from exonware.xwsystem.utils.lazy_package.lazy_core import is_import_hook_installed
+        from xwlazy.lazy.lazy_core import is_import_hook_installed
         assert is_import_hook_installed('xwsystem'), "Hook should be installed"
         
         # Try to import io.serialization module
@@ -129,7 +123,7 @@ def test_rehooking_works_after_package_load():
         # Import package without lazy
         import exonware.xwsystem.conf as conf
         
-        from exonware.xwsystem.utils.lazy_package.lazy_core import is_import_hook_installed, uninstall_import_hook
+        from xwlazy.lazy.lazy_core import is_import_hook_installed, uninstall_import_hook
         
         # Ensure hook is not installed
         try:

@@ -16,7 +16,7 @@ def test_auto_install():
     
     print("1. Testing direct xwimport...")
     try:
-        from exonware.xwsystem.utils.lazy_package import xwimport
+        from xwlazy.lazy import xwimport
         
         print("   Attempting to import fastavro using xwimport...")
         fastavro = xwimport("fastavro")

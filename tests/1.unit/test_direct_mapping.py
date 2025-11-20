@@ -15,7 +15,7 @@ def test_direct_mapping():
     
     try:
         # Import only the specific modules we need
-        from exonware.xwsystem.utils.lazy_package import LazyDiscovery
+        from xwlazy.lazy import LazyDiscovery
         print("✓ LazyDiscovery imported")
         
         discovery = LazyDiscovery()
@@ -39,7 +39,7 @@ def test_direct_mapping():
             print(f"  {import_name}: {package}")
         
         # Test DependencyMapper
-        from exonware.xwsystem.utils.lazy_package import DependencyMapper
+        from xwlazy.lazy import DependencyMapper
         mapper = DependencyMapper()
         print("\n✓ DependencyMapper created")
         

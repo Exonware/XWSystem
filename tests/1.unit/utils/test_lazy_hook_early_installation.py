@@ -29,13 +29,13 @@ from __future__ import annotations
 import os
 import sys
 from contextlib import contextmanager
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from typing import Iterator
 
 import pytest
 
 # Import after setting up mocks/environment
-from exonware.xwsystem.utils.lazy_package.lazy_core import (
+from xwlazy.lazy.lazy_core import (
     is_import_hook_installed,
     uninstall_import_hook,
     is_lazy_install_enabled,
@@ -75,37 +75,21 @@ def clean_lazy_state() -> Iterator[None]:
 
 
 @pytest.mark.xsystem_unit
-def test_early_hook_installation_with_lazy_extra():
+def test_lazy_hook_not_installed_by_default():
     """
-    Test that hook is installed when [lazy] extra is detected.
-    
-    Root cause: Hook must be installed before imports to catch ImportError
-    Priority: Usability (#2) - Zero-config lazy mode
+    Hook should not be installed just because xwlazy is present.
     """
     with clean_lazy_state():
-        # Mock importlib.metadata to simulate [lazy] extra
-        mock_dist = MagicMock()
-        mock_dist.requires = ['exonware-xwsystem[lazy]>=0.0.1']
-        
-        with patch('importlib.metadata.distribution', return_value=mock_dist):
-            # Clear module cache to force re-import
-            modules_to_clear = [
-                'exonware.xwsystem._lazy_bootstrap',
-                'exonware.xwsystem',
-            ]
-            for mod in modules_to_clear:
-                if mod in sys.modules:
-                    del sys.modules[mod]
-            
-            # Import package - bootstrap should install hook
-            import exonware.xwsystem
-            
-            # Verify hook is installed
-            assert is_import_hook_installed('xwsystem'), "Hook should be installed when [lazy] extra detected"
+        # Clear module cache to force re-import
+        for mod in ('exonware.xwsystem',):
+            sys.modules.pop(mod, None)
+        import exonware.xwsystem  # noqa: F401
+
+        assert not is_import_hook_installed('xwsystem'), "Hook must remain disabled until explicitly enabled"
 
 
 @pytest.mark.xsystem_unit
-def test_early_hook_installation_with_env_var():
+def test_env_var_triggers_hook_installation():
     """
     Test that hook is installed when XWSYSTEM_LAZY_INSTALL env var is set.
     
@@ -117,13 +101,7 @@ def test_early_hook_installation_with_env_var():
         os.environ['XWSYSTEM_LAZY_INSTALL'] = '1'
         
         # Clear module cache
-        modules_to_clear = [
-            'exonware.xwsystem._lazy_bootstrap',
-            'exonware.xwsystem',
-        ]
-        for mod in modules_to_clear:
-            if mod in sys.modules:
-                del sys.modules[mod]
+        sys.modules.pop('exonware.xwsystem', None)
         
         # Import package
         import exonware.xwsystem
@@ -141,26 +119,13 @@ def test_no_hook_when_lazy_is_off():
     Priority: Performance (#4) - Zero overhead when lazy off
     """
     with clean_lazy_state():
-        # Ensure no env var and no [lazy] extra
-        # Mock importlib.metadata to return no [lazy] extra
-        mock_dist = MagicMock()
-        mock_dist.requires = []  # No lazy extra
-        
-        with patch('importlib.metadata.distribution', return_value=mock_dist):
-            # Clear module cache
-            modules_to_clear = [
-                'exonware.xwsystem._lazy_bootstrap',
-                'exonware.xwsystem',
-            ]
-            for mod in modules_to_clear:
-                if mod in sys.modules:
-                    del sys.modules[mod]
-            
-            # Import package
-            import exonware.xwsystem
-            
-            # Verify hook is NOT installed
-            assert not is_import_hook_installed('xwsystem'), "Hook should NOT be installed when lazy is off"
+        # Ensure env var removed
+        sys.modules.pop('exonware.xwsystem', None)
+
+        import exonware.xwsystem  # noqa: F401
+
+        # Verify hook is NOT installed
+        assert not is_import_hook_installed('xwsystem'), "Hook should NOT be installed when lazy is off"
 
 
 @pytest.mark.xsystem_unit
@@ -204,7 +169,7 @@ def test_hook_path_fix_for_io_serialization():
         # Try to import io.serialization module
         # This should be intercepted by hook (even if module doesn't exist)
         # The hook's find_spec should be called for io.serialization paths
-        from exonware.xwsystem.utils.lazy_package.lazy_core import LazyMetaPathFinder
+        from xwlazy.lazy.lazy_core import LazyMetaPathFinder
         
         # Check that hook exists and can handle io.serialization path
         hook_installed = is_import_hook_installed('xwsystem')
@@ -286,22 +251,16 @@ def test_bootstrap_fails_gracefully():
         os.environ['XWSYSTEM_LAZY_INSTALL'] = '1'
         
         # Mock install_import_hook to raise exception
-        with patch('exonware.xwsystem._lazy_bootstrap.install_import_hook', side_effect=Exception("Hook install failed")):
+        with patch('xwlazy.lazy.host_packages.install_import_hook', side_effect=Exception("Hook install failed")):
             # Clear module cache
-            modules_to_clear = [
-                'exonware.xwsystem._lazy_bootstrap',
-                'exonware.xwsystem',
-            ]
-            for mod in modules_to_clear:
-                if mod in sys.modules:
-                    del sys.modules[mod]
-            
+            sys.modules.pop('exonware.xwsystem', None)
+
             # Import should succeed even if hook installation fails
             try:
-                import exonware.xwsystem
+                import exonware.xwsystem  # noqa: F401
                 import_succeeded = True
             except Exception:
                 import_succeeded = False
-            
+
             assert import_succeeded, "Package should load even if hook installation fails"
 

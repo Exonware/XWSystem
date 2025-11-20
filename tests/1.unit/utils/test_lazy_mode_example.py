@@ -19,7 +19,7 @@ from typing import Iterator, Tuple
 
 import pytest
 
-from exonware.xwsystem.utils.lazy_package import (
+from xwlazy.lazy import (
     LazyInstallConfig,
     config_package_lazy_install_enabled,
     is_import_hook_installed,

@@ -3,7 +3,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.407
+Version: 0.0.1.408
 Generation Date: October 10, 2025
 
 XWSystem - Enterprise-grade Python framework with AI-powered performance optimization.
@@ -50,6 +50,7 @@ This module provides common utilities that can be used across different
 components including threading, security, I/O, data structures, and design patterns.
 """
 
+import importlib
 import logging
 from typing import TYPE_CHECKING
 
@@ -58,103 +59,15 @@ if TYPE_CHECKING:
     from typing import Any
 
 # =============================================================================
-# EARLY LAZY BOOTSTRAP - Install hook before any imports
+# LAZY MODE INTEGRATION
 # =============================================================================
-# Import bootstrap FIRST to install hook if [lazy] extra detected
-# This ensures hook is active before serialization modules are imported
-from . import _lazy_bootstrap  # This installs hook if [lazy] extra detected
-
-# =============================================================================
-# LAZY LOADING SYSTEM - Unified Package
-# =============================================================================
-# All lazy loading functionality consolidated into lazy_package following DEV_GUIDELINES.md
-# Implements per-package lazy loading with automatic installation of missing dependencies.
-
-from .utils.lazy_package import (
-    # Core classes
-    LazyLoader,
-    LazyModuleRegistry,
-    LazyModeFacade,
-    LazyPerformanceMonitor,
-    LazyInstaller,
-    LazyInstallerRegistry,
-    LazyInstallMode,
-    LazyInstallPolicy,
-    DependencyMapper,
-    LazyDiscovery,
-    LazyInstallConfig,
-    DeferredImportError,
-    LazyMetaPathFinder,
-    
-    # Dataclasses
-    DependencyInfo,
-    
-    # Lazy mode functions
-    register_lazy_module,
-    get_lazy_module,
-    get_loading_stats,
-    preload_frequently_used,
-    enable_lazy_mode,
-    disable_lazy_mode,
-    is_lazy_mode_enabled,
-    get_lazy_mode_stats,
-    configure_lazy_mode,
-    preload_modules,
-    optimize_lazy_mode,
-    
-    # Install functions
-    enable_lazy_install,
-    disable_lazy_install,
-    is_lazy_install_enabled,
-    set_lazy_install_mode,
-    get_lazy_install_mode,
-    install_missing_package,
-    install_and_import,
-    get_lazy_install_stats,
-    get_all_lazy_install_stats,
-    lazy_import_with_install,
-    xwimport,
-    
-    # Discovery functions
-    discover_dependencies,
-    get_lazy_discovery,
-    export_dependency_mappings,
-    config_package_lazy_install_enabled,
-    
-    # Hook functions
-    install_import_hook,
-    uninstall_import_hook,
-    is_import_hook_installed,
-    
-    # Security & Policy APIs
-    set_package_allow_list,
-    set_package_deny_list,
-    add_to_package_allow_list,
-    add_to_package_deny_list,
-    set_package_index_url,
-    set_package_extra_index_urls,
-    add_package_trusted_host,
-    set_package_lockfile,
-    generate_package_sbom,
-    check_externally_managed_environment,
-)
-
-# Auto-detect [lazy] installation mode and install import hook only when enabled
-config_package_lazy_install_enabled("xwsystem")
-
-# =============================================================================
-# LAZY INSTALLATION - Simple One-Line Configuration
-# =============================================================================
-# DISABLED BY DEFAULT - Users can enable manually if needed
-# Auto-detects if user installed with [lazy] extra: pip install xwsystem[lazy]
-# config_package_lazy_install_enabled("xwsystem", install_hook=False)  # Configure lazy mode
-
-# =============================================================================
-# TWO-STAGE LAZY LOADING - Install import hook BEFORE importing serialization
-# =============================================================================
-# DISABLED BY DEFAULT - Prevents import hook interference
-# Install the hook NOW, before serialization imports, so it can intercept them
-# install_import_hook("xwsystem")  # Install hook to intercept serialization module imports
+# Minimal-intrusion lazy mode bootstrap (one line)
+# Enables optimized lazy mode for xwsystem if xwlazy is installed
+# Uses fastest mode from benchmarks: cached + full (1.482 ms)
+try:
+    from .lazy_bootstrap import _bootstrap_lazy_mode  # noqa: F401
+except ImportError:
+    pass  # xwlazy not installed - silently continue
 
 # Logging utilities
 from .config.logging_setup import get_logger, setup_logging
@@ -445,6 +358,14 @@ from .shared.contracts import IStringable
 
 # Import version from centralized location
 from .version import __version__
+
+try:
+    import sys as _sys
+    _parent_pkg = _sys.modules.get("exonware")
+    if _parent_pkg is not None:
+        _parent_pkg.__version__ = __version__
+except Exception:  # pragma: no cover
+    pass
 
 # =============================================================================
 # CONVENIENCE FUNCTIONS - Quick access to common operations
@@ -931,68 +852,6 @@ __all__ = [
     "AsyncProcessPool",
     "Pipe",
     "AsyncPipe",
-    
-    # Lazy Mode - Performance optimization
-    "LazyLoader",
-    "LazyModuleRegistry", 
-    "LazyModeFacade",
-    "LazyPerformanceMonitor",
-    "register_lazy_module",
-    "get_lazy_module",
-    "get_loading_stats",
-    "preload_frequently_used",
-    "enable_lazy_mode",
-    "disable_lazy_mode",
-    "is_lazy_mode_enabled",
-    "get_lazy_mode_stats",
-    "configure_lazy_mode",
-    "preload_modules",
-    "optimize_lazy_mode",
-    
-    # Lazy Install - Auto-install missing packages (per-package isolation)
-    "LazyInstaller",
-    "LazyInstallerRegistry",
-    "LazyInstallMode",
-    "LazyInstallPolicy",
-    "DependencyMapper",
-    "enable_lazy_install",
-    "disable_lazy_install",
-    "is_lazy_install_enabled",
-    "set_lazy_install_mode",
-    "get_lazy_install_mode",
-    "install_missing_package",
-    "install_and_import",
-    "get_lazy_install_stats",
-    "get_all_lazy_install_stats",
-    "lazy_import_with_install",
-    "xwimport",
-    # Security & Policy APIs
-    "set_package_allow_list",
-    "set_package_deny_list",
-    "add_to_package_allow_list",
-    "add_to_package_deny_list",
-    "set_package_index_url",
-    "set_package_extra_index_urls",
-    "add_package_trusted_host",
-    "set_package_lockfile",
-    "generate_package_sbom",
-    "check_externally_managed_environment",
-    
-    # Lazy Discovery - Package-agnostic dependency discovery with auto-detection
-    "LazyDiscovery",
-    "LazyInstallConfig",
-    "DependencyInfo",
-    "discover_dependencies",
-    "get_lazy_discovery",
-    "export_dependency_mappings",
-    "config_package_lazy_install_enabled",
-    
-    # Lazy Import Hook - Performance optimized automatic import interception
-    "DeferredImportError",
-    "LazyMetaPathFinder",
-    "install_import_hook",
-    "uninstall_import_hook",
-    "is_import_hook_installed",
     
     # Convenience Functions - Quick access patterns
     "quick_serialize",

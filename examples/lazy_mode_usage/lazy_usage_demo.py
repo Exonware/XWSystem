@@ -17,7 +17,7 @@ import sys
 import traceback
 from typing import Any, Callable, Dict
 
-from exonware.xwsystem.utils.lazy_package import (
+from xwlazy.lazy import (
     LazyInstallConfig,
     config_package_lazy_install_enabled,
     get_lazy_install_stats,

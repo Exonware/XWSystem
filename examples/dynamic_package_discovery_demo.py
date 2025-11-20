@@ -26,7 +26,7 @@ def demo_package_discovery():
     print("🚀 DEMO 1: Dynamic Package Discovery")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package import (
+    from xwlazy.lazy import (
         LazyDiscovery, 
         discover_dependencies,
         export_dependency_mappings
@@ -65,7 +65,7 @@ def demo_lazy_config_integration():
     print("🚀 DEMO 2: Lazy Install Integration")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package import (
+    from xwlazy.lazy import (
         LazyInstaller,
         DependencyMapper,
         get_lazy_install_stats,
@@ -154,7 +154,7 @@ def demo_export_functionality():
     print("🚀 DEMO 5: Export Functionality")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package import export_dependency_mappings
+    from xwlazy.lazy import export_dependency_mappings
     
     # Export to a temporary file
     export_file = "temp_dependency_mappings.json"

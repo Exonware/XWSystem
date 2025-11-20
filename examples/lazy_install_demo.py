@@ -24,7 +24,7 @@ def demo_lazy_install_configuration():
     print("🚀 DEMO 1: Lazy Install Configuration")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package.config import (
+    from xwlazy.lazy.config import (
         LazyConfig,
         DEFAULT_LAZY_CONFIG,
     )
@@ -64,7 +64,7 @@ def demo_lazy_import_with_install():
     print("🚀 DEMO 2: Lazy Import with Install")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package import lazy_import_with_install
+    from xwlazy.lazy import lazy_import_with_install
     
     # Test with a common package that might not be installed
     test_modules = [
@@ -94,7 +94,7 @@ def demo_lazy_install_stats():
     print("🚀 DEMO 3: Lazy Install Statistics")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package import get_lazy_install_stats
+    from xwlazy.lazy import get_lazy_install_stats
     
     stats = get_lazy_install_stats()
     print(f"📊 Lazy Install Statistics:")
@@ -114,7 +114,7 @@ def demo_environment_control():
     print("🚀 DEMO 4: Environment Variable Control")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package.config import load_from_environment
+    from xwlazy.lazy.config import load_from_environment
     
     print("🌍 Environment variable control:")
     print("   Set XWSYSTEM_LAZY_INSTALL=true to enable")
@@ -168,7 +168,7 @@ def demo_universal_coverage():
     print("🚀 DEMO 6: Universal Coverage")
     print("=" * 60)
     
-    from exonware.xwsystem.utils.lazy_package.config import UNIVERSAL_PACKAGES
+    from xwlazy.lazy.config import UNIVERSAL_PACKAGES
     
     # Categorize packages
     categories = {

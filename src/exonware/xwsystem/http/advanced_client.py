@@ -2,13 +2,14 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.407
+Version: 0.0.1.408
 Generation Date: September 04, 2025
 
 Advanced HTTP client with HTTP/2, streaming, pluggable transports, and modern features.
 """
 
 import asyncio
+import os
 import ssl
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
@@ -16,6 +17,9 @@ from typing import Any, AsyncIterator, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
 from .contracts import Transport
+
+# Prevent httpx from importing rich (Python 3.8+ only, no legacy deps)
+os.environ.setdefault("HTTPX_NO_RICH", "1")
 
 # Import httpx - lazy installation system will handle it if missing
 import httpx

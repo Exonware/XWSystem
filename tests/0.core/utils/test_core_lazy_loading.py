@@ -16,7 +16,7 @@ from exonware.xwsystem import (
     list_available_formats,
     JsonSerializer,
 )
-from exonware.xwsystem.utils.lazy_package import DeferredImportError
+from xwlazy.lazy import DeferredImportError
 
 pytestmark = pytest.mark.xsystem_core
 

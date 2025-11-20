@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.407
+Version: 0.0.1.408
 Generation Date: November 2, 2025
 
 Serialization base classes - ASerialization abstract base.
@@ -14,7 +14,7 @@ Following I→A→XW pattern:
 """
 
 import asyncio
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, ABCMeta
 from typing import Any, Union, Optional, BinaryIO, TextIO, AsyncIterator, Iterator, List, Dict, TYPE_CHECKING
 from pathlib import Path
 

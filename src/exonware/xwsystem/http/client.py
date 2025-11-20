@@ -2,17 +2,21 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.407
+Version: 0.0.1.408
 Generation Date: September 04, 2025
 
 HTTP client with retry mechanisms, connection pooling, and error handling.
 """
 
 import asyncio
+import os
 import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin
+
+# Prevent httpx from importing rich (Python 3.8+ only, no legacy deps)
+os.environ.setdefault("HTTPX_NO_RICH", "1")
 
 import httpx
 

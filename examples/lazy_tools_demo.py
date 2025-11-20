@@ -20,7 +20,7 @@ def demo_lazy_import():
     print("=" * 40)
     
     try:
-        from exonware.xwsystem.utils.lazy_package import (
+        from xwlazy.lazy import (
             enable_lazy_imports,
             disable_lazy_imports,
             is_lazy_import_enabled,
@@ -76,7 +76,7 @@ def demo_lazy_install():
     print("=" * 40)
     
     try:
-        from exonware.xwsystem.utils.lazy_package import (
+        from xwlazy.lazy import (
             enable_lazy_install,
             disable_lazy_install,
             is_lazy_install_enabled,
@@ -136,7 +136,7 @@ def demo_package_mapping():
     print("=" * 40)
     
     try:
-        from exonware.xwsystem.utils.lazy_package import DependencyMapper as PackageMapper
+        from xwlazy.lazy import DependencyMapper as PackageMapper
         
         print("✅ Package mapper imported successfully")
         

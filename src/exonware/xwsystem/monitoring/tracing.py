@@ -2,7 +2,7 @@
 Company: eXonware.com
 Author: Eng. Muhammad AlShehri
 Email: connect@exonware.com
-Version: 0.0.1.407
+Version: 0.0.1.408
 Generation Date: September 05, 2025
 
 Distributed Tracing Integration for Enterprise Observability
@@ -26,7 +26,6 @@ from .defs import SpanKind
 from ..version import __version__
 
 from opentelemetry import trace
-from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
@@ -64,7 +63,7 @@ class OpenTelemetryTracer(ATracingProvider):
     def __init__(
         self,
         service_name: str = "xwsystem",
-        jaeger_endpoint: Optional[str] = None,
+        otlp_endpoint: Optional[str] = None,
         zipkin_endpoint: Optional[str] = None
     ):
         """
@@ -72,7 +71,7 @@ class OpenTelemetryTracer(ATracingProvider):
         
         Args:
             service_name: Name of the service
-            jaeger_endpoint: Optional Jaeger collector endpoint
+            otlp_endpoint: Optional OTLP collector endpoint (modern standard, works with Jaeger/Zipkin)
             zipkin_endpoint: Optional Zipkin endpoint
         """
         # OpenTelemetry is now required
@@ -85,26 +84,29 @@ class OpenTelemetryTracer(ATracingProvider):
         self.tracer = trace.get_tracer(service_name)
         
         # Set up exporters
-        if jaeger_endpoint:
-            self._setup_jaeger_exporter(jaeger_endpoint)
+        if otlp_endpoint:
+            self._setup_otlp_exporter(otlp_endpoint)
         
         if zipkin_endpoint:
             self._setup_zipkin_exporter(zipkin_endpoint)
     
-    def _setup_jaeger_exporter(self, endpoint: str) -> None:
-        """Set up Jaeger exporter."""
+    def _setup_otlp_exporter(self, endpoint: str) -> None:
+        """Set up OTLP exporter (modern standard, Python 3.8+ only, no legacy deps)."""
         try:
-            jaeger_exporter = JaegerExporter(
-                agent_host_name="localhost",
-                agent_port=6831,
-                collector_endpoint=endpoint,
-            )
+            # Lazy import to avoid pulling in dependencies unless actually used
+            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
             
-            span_processor = BatchSpanProcessor(jaeger_exporter)
+            otlp_exporter = OTLPSpanExporter(endpoint=endpoint)
+            span_processor = BatchSpanProcessor(otlp_exporter)
             trace.get_tracer_provider().add_span_processor(span_processor)
+            logger.info(f"OTLP exporter configured for endpoint: {endpoint}")
             
+        except ImportError:
+            logger.warning(
+                "OTLP exporter not available. Install with: pip install opentelemetry-exporter-otlp-proto-http"
+            )
         except Exception as e:
-            logger.warning(f"Failed to setup Jaeger exporter: {e}")
+            logger.warning(f"Failed to setup OTLP exporter: {e}")
     
     def _setup_zipkin_exporter(self, endpoint: str) -> None:
         """Set up Zipkin exporter."""
